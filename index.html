@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>nofa scores</title>
+<meta name="description" content="Spoiler-free watchability ratings for football matches.">
+<meta name="theme-color" content="#0E1012">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="nofa scores">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: mobile-first single column (wider grid for Season); game rows closed by default, tap to open the action bar. Dark-only by design. */
+:root {
+  --bg: #0E1012; --surface: #15181B; --inset: #101315; --line: #22262A; --divider: #1D2124;
+  --fg: #ECEEF0; --muted: #98A0A7; --accent: #4ADE9B; --accent-ink: #06281A;
+  --btn: #1B1F23; --btn-hover: #23282D; --btn-line: #2B3035;
+  --t2: #1D4B37; --t2-ink: #D3F7E6; --t3: #252B30; --t3-ink: #DCE1E5; --t4: #181B1E;
+  --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --text: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  --gap-block: 26px; --gap-inner: 10px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--text); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: calc(12px + env(safe-area-inset-top, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: var(--gap-block); }
+.wrap.wide { max-width: 1180px; }
+header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 12px; border-bottom: 1px solid var(--divider); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 19px/1 var(--display); letter-spacing: -0.01em; }
+nav { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+nav { flex-wrap: wrap; }
+nav a { padding: 10px 14px; border-radius: 999px; color: var(--fg); text-decoration: none; font-weight: 500; font-size: 14px; }
+nav a:hover { background: var(--btn); }
+nav a[aria-current="page"] { background: var(--fg); color: var(--bg); font-weight: 600; }
+main { display: flex; flex-direction: column; gap: var(--gap-block); }
+.bar { display: flex; align-items: center; gap: 14px; }
+.bar .titles { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bar .next { margin-left: auto; }
+h1 { margin: 0; font: 600 15px/1.3 var(--display); text-wrap: balance; }
+h1.page { font-size: 18px; }
+.sub { color: var(--muted); font-size: 13px; }
+section { display: flex; flex-direction: column; gap: var(--gap-inner); }
+h2.label { margin: 0; display: flex; align-items: center; gap: 8px; font: 600 12px/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+button, .iconlink { font: 500 14px var(--text); color: var(--fg); background: var(--btn); border: 1px solid var(--btn-line); border-radius: 10px; min-height: 44px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 13px; text-decoration: none; }
+button:hover, .iconlink:hover { background: var(--btn-hover); }
+button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:disabled { opacity: 0.35; cursor: default; }
+.sq { width: 38px; min-height: 38px; height: 38px; padding: 0; border-radius: 10px; }
+.iconlink { width: 44px; padding: 0; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pills button { border-radius: 999px; padding: 0 16px; }
+.pills.flags { flex-wrap: nowrap; gap: 6px; }
+.pills.flags button { flex: 1 1 0; min-width: 0; min-height: 38px; height: 38px; padding: 0; font-weight: 600; font-size: 13px; }
+.pills.flags .flag { width: 22px; height: 15px; }
+.flag { width: 20px; height: 14px; border-radius: 3px; flex: none; display: inline-block; vertical-align: -2px; box-shadow: 0 0 0 1px rgba(255,255,255,.12); }
+.row { display: flex; flex-direction: column; border-top: 1px solid var(--divider); }
+.row.open { background: #181B1E; }
+.rowbtn { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 0; padding: 12px 14px; background: transparent; border: 0; border-radius: 0; color: var(--fg); font: inherit; text-align: left; justify-content: flex-start; }
+.rowbtn:hover { background: #181B1E; }
+.rowbtn.static { cursor: default; }
+.rowbtn .chev { flex: none; color: var(--muted); width: 18px; height: 18px; transition: transform .15s ease; }
+.rowbtn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.actbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 14px 12px 72px; }
+.row.haspos .actbar { padding-left: 104px; }
+.actbar button, .actbar .iconlink { min-height: 40px; height: 40px; width: auto; border-radius: 10px; }
+.row .why { margin: 0 14px 14px 72px; flex: none; }
+.row.haspos .why { margin-left: 104px; }
+.card > .row:first-child, .rows > .row:first-child { border-top: 0; }
+.pos { width: 20px; color: var(--muted); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.chip { flex: none; min-width: 46px; height: 32px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; font: 700 15px var(--display); font-variant-numeric: tabular-nums; }
+.chip.small { min-width: 44px; height: 26px; border-radius: 8px; font-size: 13px; }
+.t1 { background: var(--accent); color: var(--accent-ink); }
+.t2 { background: var(--t2); color: var(--t2-ink); }
+.t3 { background: var(--t3); color: var(--t3-ink); }
+.t4 { background: var(--t4); color: var(--muted); box-shadow: inset 0 0 0 1px var(--btn-line); }
+.tr { background: #F0606A; color: #2B0709; }
+/* Outlook predictions: same colours as ratings, drawn as outlines */
+.chip.pred.t1 { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.chip.pred.t2 { background: rgba(29, 75, 55, 0.35); color: #8FD9B6; box-shadow: inset 0 0 0 1.5px #2F7A57; }
+.chip.pred.t3 { background: transparent; color: var(--t3-ink); box-shadow: inset 0 0 0 1.5px #4A5158; }
+.chip.pred.tr { background: transparent; color: #F0606A; box-shadow: inset 0 0 0 1.5px #F0606A; }
+/* Season lists: "Show worst" toggle, gap marker, wider rank column for 3-digit positions */
+button.more { align-self: center; margin: 4px auto 2px; min-height: 36px; height: 36px; font-size: 13px; }
+.rows > button.more { display: flex; margin: 6px auto 4px; }
+button.more[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.gapdots { text-align: center; color: var(--muted); font-size: 18px; line-height: 1; padding: 4px 0; }
+.rows > .gapdots { border-top: 1px solid var(--divider); padding: 8px 0; }
+.rk3 .pos { width: 30px; }
+.rk3 .row.haspos .actbar { padding-left: 114px; }
+.rk3 .row.haspos .why { margin-left: 114px; }
+.t0 { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 1px #3A4046; }
+.fx { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.fx .teams { font-weight: 600; line-height: 1.3; }
+.fx .vs { color: var(--muted); font-weight: 400; }
+.fx .meta { color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.fx .meta .flag { width: 16px; height: 11px; border-radius: 2px; }
+.acts { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.score { font: 700 15px var(--display); color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.spacer { width: 44px; height: 44px; }
+.why { flex: 1 1 100%; background: var(--inset); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 7px; }
+.why .cap { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
+.why .ln { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; }
+.why .ln span:last-child { font: 600 14px var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; }
+.stat .k { color: var(--muted); font-size: 13px; }
+.stat .v { font: 700 18px var(--display); font-variant-numeric: tabular-nums; }
+.controls { display: flex; flex-direction: column; gap: var(--gap-block); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: 24px; }
+.league h3 { margin: 0; padding: 18px 18px 12px; display: flex; align-items: center; gap: 10px; font: 600 18px var(--display); }
+.league h3 .lavg { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font: 500 13px var(--text); color: var(--muted); }
+.teamsbox { margin: 0 10px 6px; padding: 12px 12px; background: var(--inset); border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 10px; }
+.cap3 { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+.league .cap3.games { padding: 16px 18px 6px; }
+.tm { display: flex; align-items: center; gap: 10px; }
+.tm .n { flex: 1 1 auto; min-width: 0; font-weight: 600; font-size: 14px; }
+.tm .g { color: var(--muted); font-size: 12px; }
+.league .fx { flex-basis: 140px; }
+.empty { padding: 32px 18px; color: var(--muted); text-align: center; }
+.fav { gap: 12px; }
+.favhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.favsub { color: var(--muted); font: 500 13px var(--text); letter-spacing: 0; text-transform: none; }
+button.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+button.ghost:hover { background: var(--btn); color: var(--fg); }
+button.ghost[aria-expanded="true"] .chev { transform: rotate(180deg); }
+#favbody { display: flex; flex-direction: column; gap: 14px; }
+#favbody[hidden] { display: none !important; }
+.favteam { display: flex; flex-direction: column; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 14px 14px; }
+.favteam .card { background: var(--inset); }
+.empty.small { padding: 18px; }
+.chip.pred { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.pavg { flex-direction: column; align-items: flex-end; gap: 2px; color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; }
+.pavg b { color: var(--fg); font: 600 13px var(--display); font-variant-numeric: tabular-nums; }
+.league.overall { grid-column: 1 / -1; }
+.tm .n .flag { margin-right: 4px; }
+@media (max-width: 600px) { header { flex-direction: column; align-items: stretch; gap: 12px; } nav a { flex: 1 1 auto; text-align: center; padding: 9px 4px; } nav { flex-wrap: nowrap; } }
+/* Header: logo row with the compact/detailed toggle on the right, tabs below */
+header { flex-direction: column; align-items: stretch; gap: 12px; }
+nav { flex-wrap: nowrap; } nav a { flex: 1 1 auto; text-align: center; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.modes { display: inline-flex; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+.modes button { min-height: 30px; height: 30px; width: 36px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--muted); }
+.modes button:hover { background: var(--btn); color: var(--fg); }
+.modes button[aria-pressed="true"] { background: var(--btn-hover); color: var(--fg); }
+/* Compact view: one line per game, only green and red get a filled box, no row arrows, flat Season cards */
+body.compact { --gap-block: 20px; }
+.compact .rowbtn { padding: 9px 12px; gap: 9px; }
+.compact .rowbtn .chev { display: none; }
+.compact .chip { min-width: 40px; height: 26px; border-radius: 8px; font-size: 13px; }
+.compact .chip.t3:not(.pred) { background: var(--t3); }
+.compact .fx { flex: 1 1 auto; flex-direction: row; align-items: center; gap: 8px; }
+.compact .fx .teams { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
+.compact .fx .teams .flag { width: 16px; height: 11px; border-radius: 2px; margin-right: 7px; vertical-align: -1px; }
+.compact .fx .meta { display: none; }
+.compact .rt { margin-left: auto; flex: none; color: var(--muted); font-size: 11.5px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.compact .pos { font-size: 12px; }
+.compact .actbar { padding-left: 61px; padding-right: 12px; }
+.compact .row.haspos .actbar { padding-left: 90px; }
+.compact .row .why { margin-left: 64px; }
+.compact .row.haspos .why { margin-left: 94px; }
+.compact .rk3 .row.haspos .actbar { padding-left: 100px; }
+.compact .rk3 .row.haspos .why { margin-left: 104px; }
+.compact .bar .titles { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 8px; row-gap: 0; }
+.bar h1, .bar .sub { white-space: nowrap; }
+.compact .bar h1 { font-size: 15px; }
+.compact .titles.pagehead { flex-direction: row; align-items: baseline; gap: 8px; display: flex; }
+.compact .titles.pagehead h1.page { font-size: 16px; }
+.compact .sub.explain { display: none; }
+.compact .league h3 { padding: 14px 14px 4px; font-size: 16px; }
+.compact .league .cap3.games { padding: 10px 14px 2px; text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 500; }
+.compact .league .rows > .row:first-child { border-top: 0; }
+.compact .league > button.more { display: flex; margin: 4px auto 8px; }
+.compact .grid { gap: 20px; }
+/* Text that must stay on one line */
+.row .why, .row.haspos .why, .rk3 .row.haspos .why, .compact .row .why, .compact .row.haspos .why, .compact .rk3 .row.haspos .why { margin: 0 14px 12px; }
+.why .ln span:first-child { min-width: 0; }
+.tm .n { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tm .g, .favsub, .rt, button.more, .lavg { white-space: nowrap; }
+.fx .meta > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.fx .meta { flex-wrap: nowrap; }
+@media (prefers-reduced-motion: no-preference) { button, .iconlink, nav a { transition: background-color .12s ease; } }
+
+/* Period bar on top of every tab: centred title; ‹ ›, and the "latest" button left of › */
+.pbar { display: grid; grid-template-columns: 34px 34px minmax(0, 1fr) 34px 34px; align-items: center; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 6px; }
+.pbar.single { display: flex; justify-content: center; padding: 9px 12px; }
+.pbar .pt { text-align: center; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.pbar h1 { margin: 0; font: 600 15px/1.25 var(--display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pbar .sub { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pbar .sq { width: 34px; height: 34px; min-height: 34px; }
+.pbar .sq.ph { visibility: hidden; }
+/* Line under Favourites: green when open, grey when collapsed */
+.sepline { height: 2px; border-radius: 2px; background: var(--btn-line); }
+.sepline.off { background: var(--btn-line); opacity: 1; }
+.favhead.sect { margin-bottom: -8px; }
+button.ghost.info { width: 36px; height: 32px; min-height: 32px; padding: 0; }
+button.ghost.info[aria-expanded="true"] { color: var(--fg); }
+.infobox { background: var(--inset); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 13px; line-height: 1.65; color: #C9CED3; }
+.infobox .k { display: inline-block; border-radius: 5px; padding: 0 5px; font-weight: 700; font-size: 12px; line-height: 1.5; }
+/* Compact match rows: flag | home · rating · away | ▶, the rating exactly in the middle */
+.crow { --side: 22px; }
+.crow.haspos { --side: 50px; }
+.rk3 .crow.haspos { --side: 60px; }
+.crow.wide-r { --side: 46px; }
+.crow .line { position: relative; display: grid; grid-template-columns: var(--side) minmax(0, 1fr) auto minmax(0, 1fr) var(--side); align-items: center; column-gap: 7px; padding: 14px 12px; }
+.crow .hit { position: absolute; inset: 0; z-index: 0; min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.crow .hit:hover { background: #181B1E; }
+.crow .hit:focus-visible { outline-offset: -2px; }
+.crow .side, .crow .hn, .crow .an, .crow .chip { position: relative; z-index: 1; pointer-events: none; }
+.crow .side { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.crow .side.r { justify-content: flex-end; }
+.crow .side .flag { width: 16px; height: 11px; border-radius: 2px; }
+.crow .hn, .crow .an { font-weight: 600; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.crow .hn { text-align: right; }
+.crow .hl { pointer-events: auto; }
+.crow .hl svg { width: 20px; height: 20px; }
+.crow.open { background: #181B1E; }
+.crow .chip { min-width: 40px; height: 26px; }
+.crow .rt { margin-left: 0; }
+.hl { display: inline-flex; align-items: center; justify-content: center; color: var(--muted); text-decoration: none; }
+a.hl:hover { color: var(--fg); }
+.hl.off { color: #4F575E; }
+.chip.vs { background: transparent; color: var(--muted); font: 400 13px var(--text); }
+.chip.score { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1.5px var(--fg); white-space: nowrap; letter-spacing: -0.02em; }
+.compact .chip.score { font-size: 13px; }
+.acts2 { display: flex; justify-content: center; gap: 8px; padding: 0 12px 11px; }
+.ib { width: 40px; height: 26px; min-height: 0; padding: 0; border-radius: 8px; }
+.ib svg { width: 16px; height: 16px; }
+/* Detailed view: icon buttons the size of the rating box */
+.actbar { display: flex; gap: 8px; }
+.actbar .ib, .actbar .iconlink { width: 46px; height: 32px; min-height: 0; border-radius: 9px; padding: 0; }
+.actbar .hl.off { border: 1px solid var(--btn-line); }
+.compact .rowbtn { padding: 14px 12px; }
+
+.crow.ranked .line { grid-template-columns: 20px auto minmax(0, 1fr) 22px; }
+.rk3 .crow.ranked .line { grid-template-columns: 30px auto minmax(0, 1fr) 22px; }
+.crow.ranked .hn { text-align: left; }
+.crow.ranked .hn .flag { width: 16px; height: 11px; border-radius: 2px; margin-right: 7px; vertical-align: -1px; }
+.crow.ranked .hn .vs { color: var(--muted); font-weight: 400; }
+.crow.ranked .acts2 { justify-content: flex-start; padding-left: 39px; }
+.rk3 .crow.ranked .acts2 { padding-left: 49px; }
+.crow.wide-r { --side: 40px; }
+.crow.wide-r .line { column-gap: 6px; }
+.crow.wide-r .hn, .crow.wide-r .an { font-size: 13px; }
+.crow.wide-r .rt { font-size: 11px; }
+
+/* ⓘ speech bubble: floats over the page below the icon */
+.favhead.sect { position: relative; }
+.infobox.bubble { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; width: min(330px, calc(100vw - 32px)); background: #1B1F23; border: 1px solid var(--btn-line); box-shadow: 0 12px 32px rgba(0, 0, 0, .55); font-weight: 400; letter-spacing: 0; text-transform: none; }
+.infobox.bubble::before { content: ""; position: absolute; top: -7px; right: 13px; width: 12px; height: 12px; background: #1B1F23; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); transform: rotate(45deg); }
+.crow .side.dim .flag { box-shadow: none; }
+
+/* Ranked lists (Season): position + flag on the left, ▶ on the right, rating still exactly centred */
+.crow.haspos { --side: 36px; }
+.rk3 .crow.haspos { --side: 42px; }
+.crow.haspos .side.l { justify-content: space-between; }
+.crow.haspos .line { column-gap: 6px; }
+.crow .side .pos { width: auto; min-width: 14px; flex: none; text-align: left; font-size: 11px; color: var(--muted); }
+.rk3 .crow .side .pos { min-width: 21px; }
+.crow .side.l { gap: 5px; }
+
+/* Swiss flag: square inside the usual flag slot */
+.flag.flag-ch { box-shadow: none; border-radius: 0; }
+/* Ranked match rows: flag at the very left, position next to it */
+.crow.haspos .side.l { justify-content: flex-start; }
+/* Teams table: flag | # | Team | M | Rng | Avg, numbers centred in their columns */
+.ttab .trow { display: grid; grid-template-columns: 16px 26px minmax(0, 1fr) 30px 36px 38px; column-gap: 6px; align-items: center; padding: 14px 12px; border-top: 1px solid var(--divider); width: 100%; min-height: 0; border-radius: 0; background: transparent; color: var(--fg); font: inherit; text-align: left; }
+.ttab .trow.thead { padding: 4px 12px 6px; border-top: 0; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #7B838A; }
+.ttab .thead + .trow { border-top: 0; }
+.ttab .trow.thead + .trow, .ttab .thead ~ .gapdots { }
+.ttab .tbtn { border: 0; border-top: 1px solid var(--divider); }
+.ttab .tbtn:hover { background: #181B1E; }
+.ttab .tf { display: flex; align-items: center; }
+.ttab .tf .flag { width: 16px; height: 11px; border-radius: 2px; }
+.ttab .c { text-align: center; font-variant-numeric: tabular-nums; }
+.ttab .pos { width: auto; font-size: 11px; color: var(--muted); }
+.ttab .nm { font-weight: 600; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ttab .n { color: var(--muted); font-size: 12.5px; }
+.ttab .avg { font-weight: 700; font-size: 13.5px; }
+.avg.a1 { color: var(--accent); } .avg.a2 { color: #7FCBA5; } .avg.a3 { color: #DCE1E5; } .avg.ar { color: #F0606A; }
+.ttab > .row { border-top: 1px solid var(--divider); }
+.card.ttab > .thead { padding-top: 10px; }
+
+/* Outlook predictions: dotted outline in the tier colour (real ratings are filled boxes) */
+.chip.pred, .chip.pred.t1, .chip.pred.t2, .chip.pred.t3, .chip.pred.tr { box-shadow: none; border: 2px dotted; }
+.chip.pred.t1 { border-color: var(--accent); }
+.chip.pred.t2 { border-color: #3FA478; }
+.chip.pred.t3 { border-color: #6A7279; }
+.chip.pred.tr { border-color: #F0606A; }
+/* Sortable team table headings */
+.ttab .thead .tsort { min-height: 0; height: auto; padding: 2px 0; border: 0; border-radius: 4px; background: transparent; color: #7B838A; font: inherit; letter-spacing: inherit; text-transform: inherit; display: inline-flex; align-items: center; gap: 2px; justify-content: flex-start; position: relative; }
+.ttab .thead .tsort.c { justify-content: center; }
+.ttab .thead .tsort:hover { color: var(--fg); background: transparent; }
+.ttab .thead .tsort.on { color: var(--fg); }
+.ttab .thead .tsort .arr { font-size: 7px; line-height: 1; }
+.ttab .thead .tsort.c .arr { position: absolute; right: -1px; top: 50%; transform: translateY(-50%); }
+
+.star { color: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <header>
+    <div class="top">
+      <div class="brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--accent)" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.2l4.2 3-1.6 4.9H9.4L7.8 10.2z" fill="currentColor" stroke="none"/></svg>
+        nofa scores
+      </div>
+      <div class="modes" role="group" aria-label="Layout">
+        <button type="button" data-act="mode" data-id="compact" aria-label="Compact view" title="Compact view"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg></button>
+        <button type="button" data-act="mode" data-id="detailed" aria-label="Detailed view" title="Detailed view"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4.5" width="16" height="6" rx="2"/><rect x="4" y="13.5" width="16" height="6" rx="2"/></svg></button>
+      </div>
+    </div>
+    <nav aria-label="Views">
+      <a href="#day" data-view="day">Day</a>
+      <a href="#week" data-view="matchweek">Week</a>
+      <a href="#season" data-view="best">Season</a>
+      <a href="#outlook" data-view="outlook">Outlook</a>
+    </nav>
+  </header>
+  <main id="main" aria-live="polite">
+    <div class="card"><div class="empty">Loading ratings…</div></div>
+  </main>
+</div>
+
+<script>
+(() => {
+  const C = { sl: 'Super League', pl: 'Premier League', ll: 'La Liga', sa: 'Serie A', bl: 'Bundesliga', l1: 'Ligue 1' };
+  const RN = { sl: 'Round', pl: 'Round', ll: 'Round', sa: 'Round', bl: 'Round', l1: 'Round' };
+  const ORDER = ['sl', 'pl', 'll', 'sa', 'bl', 'l1'];
+  const FAV = new Set(['Liverpool', 'FC Basel']);
+  const svgf = (inner, label) => '<svg class="flag' + (label === 'Switzerland' ? ' flag-ch' : '') + '" viewBox="0 0 30 20" preserveAspectRatio="none" role="img" aria-label="' + label + '">' + inner + '</svg>';
+  const FLAG = {
+    sl: svgf('<rect x="5" width="20" height="20" rx="1.5" fill="#DA291C"/><rect x="13" y="4" width="4" height="12" fill="#fff"/><rect x="9" y="8" width="12" height="4" fill="#fff"/>', 'Switzerland'),
+    pl: svgf('<rect width="30" height="20" fill="#fff"/><rect x="12.5" width="5" height="20" fill="#CE1124"/><rect y="7.5" width="30" height="5" fill="#CE1124"/>', 'England'),
+    ll: svgf('<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>', 'Spain'),
+    sa: svgf('<rect width="10" height="20" fill="#009246"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE2B37"/>', 'Italy'),
+    bl: svgf('<rect width="30" height="6.67" fill="#000"/><rect y="6.67" width="30" height="6.67" fill="#DD0000"/><rect y="13.33" width="30" height="6.67" fill="#FFCE00"/>', 'Germany'),
+    l1: svgf('<rect width="10" height="20" fill="#0055A4"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#EF4135"/>', 'France'),
+  };
+  // Greyed-out flags (rows when one league is selected): same shapes, greys instead of colours, so they don't draw the eye
+  const G = { red: '#4A5157', white: '#7B838A', blue: '#2C3136', green: '#5F676E', black: '#272B2F', gold: '#6A7279' };
+  const FLAGG = {
+    sl: svgf('<rect x="5" width="20" height="20" rx="1.5" fill="' + G.red + '"/><rect x="13" y="4" width="4" height="12" fill="' + G.white + '"/><rect x="9" y="8" width="12" height="4" fill="' + G.white + '"/>', 'Switzerland'),
+    pl: svgf('<rect width="30" height="20" fill="' + G.white + '"/><rect x="12.5" width="5" height="20" fill="' + G.red + '"/><rect y="7.5" width="30" height="5" fill="' + G.red + '"/>', 'England'),
+    ll: svgf('<rect width="30" height="20" fill="' + G.red + '"/><rect y="5" width="30" height="10" fill="' + G.gold + '"/>', 'Spain'),
+    sa: svgf('<rect width="10" height="20" fill="' + G.green + '"/><rect x="10" width="10" height="20" fill="' + G.white + '"/><rect x="20" width="10" height="20" fill="' + G.red + '"/>', 'Italy'),
+    bl: svgf('<rect width="30" height="6.67" fill="' + G.black + '"/><rect y="6.67" width="30" height="6.67" fill="' + G.red + '"/><rect y="13.33" width="30" height="6.67" fill="' + G.gold + '"/>', 'Germany'),
+    l1: svgf('<rect width="10" height="20" fill="' + G.blue + '"/><rect x="10" width="10" height="20" fill="' + G.white + '"/><rect x="20" width="10" height="20" fill="' + G.red + '"/>', 'France'),
+  };
+  const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], DAYL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], MONL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const DAYMS = 86400000;
+  const dt = (s) => new Date(s + 'T12:00:00Z');
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const short = (s) => { const d = dt(s); return DAYS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MON[d.getUTCMonth()]; };
+  const long = (s) => { const d = dt(s); return DAYL[d.getUTCDay()] + ', ' + d.getUTCDate() + ' ' + MONL[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); };
+  const tuesday = (s) => { const d = dt(s); return iso(new Date(d.getTime() - ((d.getUTCDay() + 5) % 7) * DAYMS)); };
+  const plusDays = (s, n) => iso(new Date(dt(s).getTime() + n * DAYMS));
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // Shorter club names, so a game fits on one line on a phone
+  const SHORT = { 'Racing Santander': 'Racing', 'Atletico Madrid': 'Atlético', 'Werder Bremen': 'Bremen', 'Hamburger SV': 'Hamburg', 'RB Leipzig': 'Leipzig', 'Deportivo La Coruna': 'Deportivo', 'Rayo Vallecano': 'Rayo', 'Athletic Club': 'Athletic', "Nott'm Forest": 'Forest', 'Crystal Palace': 'Palace', 'Union Berlin': 'Union', 'Real Sociedad': 'Sociedad', 'Aston Villa': 'Villa', 'Grasshoppers': 'GC' };
+  const FIX = { 'Koln': 'Köln', 'FC Zurich': 'FC Zürich', 'Atletico Madrid': 'Atlético Madrid', 'Malaga': 'Málaga', 'Alaves': 'Alavés', 'Deportivo La Coruna': 'Deportivo La Coruña', 'Cadiz': 'Cádiz', 'Leganes': 'Leganés' };
+  // Favourites get a ★ on the outer side: before the name for the home team, after it for the away team and in tables
+  const name = (n, after) => { const t = SHORT[n] || FIX[n] || n; return FAV.has(n) ? (after ? t + ' ★' : '★ ' + t) : t; };
+  const nm = (n, after) => esc(name(n, after)).replace('★', '<span class="star" aria-label="favourite">★</span>');
+  // "Why" lines: one wording per item, whatever wording older daily runs stored (display only)
+  const WHY_NAME = { 'Base': 'Starting score', 'Tight game': 'Close match', 'Lopsided': 'One-sided', 'Dead-game cap': 'Low-score cap', 'Top-end compression': 'High-score cap' };
+  const whyPart = (p) => {
+    if (/^(top-two\/bottom-two team|top-two team|bottom-two team|both in (top|bottom) two|top\/bottom 2)$/.test(p)) return 'top/bottom 2';
+    if (/^(both top four\/bottom four|both top\/bottom 4)$/.test(p)) return 'both top/bottom 4';
+    if (/^(derby\/rivalry|rivalry|derby)$/.test(p)) return 'derby';
+    if (/^VAR(-awarded)? (goal\/penalty|goal|penalty|award)$/.test(p)) return 'VAR award';
+    if (/^(missed|saved|scored) penalty$/.test(p)) return 'penalty';
+    const sot = p.match(/^(\d+) shots on target$/); if (sot) return sot[1] + ' on target';
+    return p;
+  };
+  const whyLabel = (t) => {
+    const m = String(t).match(/^([^(]+?)\s*\((.*)\)$/);
+    if (!m) return WHY_NAME[t] || t;
+    const counts = new Map();
+    m[2].split(', ').forEach((p) => { const k = p.match(/^(.*?)(?: ×(\d+))?$/), key = whyPart(k[1]); counts.set(key, (counts.get(key) || 0) + (+k[2] || 1)); });
+    const parts = Array.from(counts, ([k, n]) => (n > 1 ? k + ' ×' + n : k)).join(', ').replace('top/bottom 2, both top/bottom 4', 'top/bottom 2 & 4');
+    return (WHY_NAME[m[1]] || m[1]) + ' (' + parts + ')';
+  };
+  const RS = { sl: 'R', pl: 'MW', ll: 'MD', sa: 'MD', bl: 'MD', l1: 'MD' };
+  const dm = (s) => { const d = dt(s); return d.getUTCDate() + ' ' + MON[d.getUTCMonth()]; };
+  const span = (a, b) => { const x = dt(a), y = dt(b); return x.getUTCMonth() === y.getUTCMonth() ? x.getUTCDate() + '–' + dm(b) : dm(a) + ' – ' + dm(b); };
+  const wd = (s) => DAYS[dt(s).getUTCDay()];
+  // Match ratings: must-watch 8.5+, good 7.0–8.4, average 4.0–6.9 (grey), skip below 4.0 (red)
+  const tier = (r) => r == null ? 't0' : r >= 8.5 ? 't1' : r >= 7 ? 't2' : r >= 4 ? 't3' : 'tr';
+  // Averages (team ratings, Outlook predictions) sit in a narrower band: 7.0+, 6.3–6.9, 5.3–6.2, below 5.3 (graded on the shown, rounded value)
+  const atier = (a) => { const r = Math.round(a * 10) / 10; return r >= 7 ? 't1' : r >= 6.3 ? 't2' : r >= 5.3 ? 't3' : 'tr'; };
+  const byRating = (a, b) => (b.rt ?? -1) - (a.rt ?? -1);
+  const label = (c) => FLAG[c] + '<span>' + C[c] + '</span>';
+
+  const ICON = {
+    prev: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
+    next: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>',
+    eye: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    bars: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+    chev: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="chev"><path d="M6 9l6 6 6-6"/></svg>',
+    eyeoff: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7c2 0 3.7.6 5.1 1.5M22 12s-3.5 7-10 7c-2 0-3.7-.6-5.1-1.5"/><circle cx="12" cy="12" r="3"/><path d="M3 21L21 3"/></svg>',
+    breakdown: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="4.5" rx="1.3"/><rect x="3" y="9.75" width="18" height="4.5" rx="1.3"/><rect x="3" y="16.5" width="12" height="4.5" rx="1.3"/></svg>',
+    noplay: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor"/><path d="M3 21L21 3"/></svg>',
+    info: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg>',
+    latest: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6"/><path d="M19 12H5"/><path d="M5 6v12"/></svg>',
+    play: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor"/></svg>'
+  };
+
+  let D = [], loaded = false, failed = false, FX = {};
+  const rev = new Set(), why = new Set(), openRows = new Set(), worst = new Set(), favOpen = new Set();
+  let infoOpen = false;
+  const st = { day: null, comp: 'all', round: null, week: null, favCollapsed: false, compact: true, tsort: { k: 'avg', d: -1 } };
+  try { const s = JSON.parse(localStorage.getItem('sfr-prefs') || '{}'); if (s.comp === 'all' || C[s.comp]) st.comp = s.comp; st.favCollapsed = !!s.favCollapsed; if (typeof s.compact === 'boolean') st.compact = s.compact; if (s.tsort && ['rk', 'n', 'k', 'rng', 'avg'].includes(s.tsort.k) && (s.tsort.d === 1 || s.tsort.d === -1)) st.tsort = s.tsort; } catch (e) {}
+  const savePrefs = () => { try { localStorage.setItem('sfr-prefs', JSON.stringify({ comp: st.comp, favCollapsed: st.favCollapsed, compact: st.compact, tsort: st.tsort })); } catch (e) {} };
+  // Tabs: Day, Week (default), Season, Outlook. Old links (#matchweek, #best) still work.
+  const view = () => { const h = location.hash.slice(1); return h === 'season' || h === 'best' ? 'best' : h === 'day' || h === 'outlook' ? h : 'matchweek'; };
+
+  // Match row. Compact: centred pairing (flag | home · rating · away | ▶), tap the row for the score (eye) and the breakdown (bars).
+  // Detailed: two lines with a meta line; the same eye, bars and ▶ appear when the row is opened. A revealed score replaces the rating in both views.
+  function row(m, metaParts, pos, withFlag) {
+    const id = m.id, key = (withFlag ? 'x:' : '') + id, played = m.rt != null, on = played && rev.has(id), w = why.has(id), open = played && openRows.has(key);
+    const link = m.q ? 'https://www.youtube.com/results?search_query=' + encodeURIComponent(m.q).replace(/%2B/g, '+') : '';
+    const hl = !played ? '' : link
+      ? '<a class="hl" href="' + esc(link) + '" target="_blank" rel="noopener" aria-label="Highlights on YouTube" title="Highlights on YouTube">' + ICON.play + '</a>'
+      : '<span class="hl off" role="img" aria-label="No highlights link" title="No highlights link for the ' + esc(C[m.c]) + '">' + ICON.noplay + '</span>';
+    const chip = on ? '<span class="chip score" title="Score">' + esc(String(m.s).replace(/\s*[–-]\s*/, ' – ')) + '</span>'
+      : played ? '<span class="chip ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span>'
+      : st.compact ? '<span class="chip vs">vs</span>' : '<span class="chip t0">–</span>';
+    const acts = '<button type="button" class="ib" data-act="score" data-id="' + esc(id) + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Hide score' : 'Show score') + '" title="' + (on ? 'Hide score' : 'Show score') + '">' + (on ? ICON.eyeoff : ICON.eye) + '</button>' +
+      '<button type="button" class="ib" data-act="why" data-id="' + esc(id) + '" aria-pressed="' + w + '" aria-label="Rating breakdown" title="Rating breakdown">' + ICON.breakdown + '</button>';
+    const whyBox = () => '<div class="why">' + (m.w || []).map((x) => '<div class="ln"><span>' + esc(whyLabel(x[0])) + '</span><span>' + esc(x[1]) + '</span></div>').join('') + '</div>';
+    if (st.compact) {
+      const label = esc(m.h + ' vs ' + m.a + (played ? ', rating ' + m.rt.toFixed(1) : ''));
+      const hit = played ? '<button type="button" class="hit" data-act="open" data-id="' + esc(key) + '" aria-expanded="' + open + '" aria-label="' + label + '"></button>' : '';
+      // Same centred row everywhere; in ranked lists (Season) the position sits in front of the flag
+      let h = '<div class="row crow' + (pos != null ? ' haspos' : '') + (open ? ' open' : '') + '"><div class="line">' + hit +
+          '<span class="side l' + (withFlag ? '' : ' dim') + '">' + (withFlag ? FLAG : FLAGG)[m.c] + (pos != null ? '<span class="pos">' + pos + '</span>' : '') + '</span>' +
+          '<span class="hn">' + nm(m.h) + '</span>' + chip + '<span class="an">' + nm(m.a, 1) + '</span><span class="side r">' + hl + '</span></div>';
+      if (open) { h += '<div class="acts2">' + acts + '</div>'; if (w) h += whyBox(); }
+      return h + '</div>';
+    }
+    const meta = (withFlag ? FLAG[m.c] : '') + '<span>' + esc(metaParts.filter(Boolean).join(' · ') + (played ? '' : ' · to come')) + '</span>';
+    const inner = (pos != null ? '<span class="pos">' + pos + '</span>' : '') + chip +
+      '<span class="fx"><span class="teams">' + nm(m.h) + ' <span class="vs">vs</span> ' + nm(m.a, 1) + '</span><span class="meta">' + meta + '</span></span>';
+    let h = '<div class="row' + (open ? ' open' : '') + (pos != null ? ' haspos' : '') + '">';
+    h += played ? '<button type="button" class="rowbtn" data-act="open" data-id="' + esc(key) + '" aria-expanded="' + open + '">' + inner + ICON.chev + '</button>'
+                : '<div class="rowbtn static">' + inner + '</div>';
+    if (open) { h += '<div class="actbar">' + acts + hl.replace('class="hl', 'class="iconlink hl') + '</div>'; if (w) h += whyBox(); }
+    return h + '</div>';
+  }
+  const card = (rows) => '<div class="card">' + rows.join('') + '</div>';
+  const emptyCard = (t) => '<div class="card"><div class="empty">' + t + '</div></div>';
+  const sectionHtml = (labelHtml, rows) => '<section><h2 class="label">' + labelHtml + '</h2>' + card(rows) + '</section>';
+  // Compact one-line list row for a team: rank, average (team scale), flag + name, games played on the right
+  const teamLine = (x, rank, withFlag, act) => {
+    const inner = '<span class="pos">' + rank + '</span><span class="chip small ' + atier(x.avg) + '">' + x.avg.toFixed(1) + '</span>' +
+      '<span class="fx"><span class="teams">' + (withFlag ? FLAG[x.c] : '') + nm(x.n, 1) + '</span></span><span class="rt">' + x.k + (x.k === 1 ? ' match' : ' matches') + '</span>';
+    return '<div class="row haspos">' + (act ? '<button type="button" class="rowbtn" ' + act + '>' + inner + '</button>' : '<div class="rowbtn static">' + inner + '</div>') + '</div>';
+  };
+  // Period bar at the top of every tab: title centred; Day and Week get ‹ ›, plus a "latest" button when you've moved away from the latest day/week/round
+  const pbar = (title, sub, nav) => {
+    const ph = '<span class="sq ph" aria-hidden="true"></span>';
+    if (!nav) return '<div class="pbar">' + ph + ph + '<div class="pt"><h1>' + esc(title) + '</h1><div class="sub">' + esc(sub) + '</div></div>' + ph + ph + '</div>';
+    return '<div class="pbar"><button type="button" class="sq" data-act="prev" aria-label="Previous ' + nav.what + '"' + (nav.canPrev ? '' : ' disabled') + '>' + ICON.prev + '</button><span class="sq ph" aria-hidden="true"></span>' +
+      '<div class="pt"><h1>' + esc(title) + '</h1><div class="sub">' + esc(sub) + '</div></div>' +
+      (nav.latest ? '<button type="button" class="sq" data-act="latest" aria-label="Back to the latest ' + nav.what + '" title="Latest ' + nav.what + '">' + ICON.latest + '</button>' : '<span class="sq ph" aria-hidden="true"></span>') +
+      '<button type="button" class="sq" data-act="next" aria-label="Next ' + nav.what + '"' + (nav.canNext ? '' : ' disabled') + '>' + ICON.next + '</button></div>';
+  };
+  const cnt = (ms) => { const p = ms.filter((m) => m.rt != null).length, u = ms.length - p; return p + (p === 1 ? ' match' : ' matches') + (u ? ' (+' + u + ' to come)' : ''); };
+  const roundOf = (m) => RN[m.c] + ' ' + m.r;
+
+  const allDays = () => Array.from(new Set(D.map((m) => m.d))).sort();
+  const isFav = (m) => FAV.has(m.h) || FAV.has(m.a);
+  const inComp = (m) => st.comp === 'all' || m.c === st.comp;
+  const comps = () => ORDER.filter((c) => D.some((m) => m.c === c));
+  function weeks() {
+    const ds = allDays(); if (!ds.length) return [];
+    const out = []; for (let w = tuesday(ds[0]); w <= tuesday(ds[ds.length - 1]); w = plusDays(w, 7)) out.push(w);
+    return out;
+  }
+  function teamTable(ms) {
+    const t = {};
+    ms.forEach((m) => [m.h, m.a].forEach((n) => { const k = m.c + '|' + n; t[k] = t[k] || { n, c: m.c, s: 0, k: 0, b: 0, lo: 99 }; t[k].s += m.rt; t[k].k++; t[k].b = Math.max(t[k].b, m.rt); t[k].lo = Math.min(t[k].lo, m.rt); }));
+    return Object.values(t).map((x) => ({ ...x, avg: x.s / x.k })).sort((p, q) => q.avg - p.avg || q.k - p.k || q.b - p.b);
+  }
+  // Team table: tap a column heading to sort by it, tap again to reverse. # always shows the position by average rating.
+  const TCOL = [['rk', '#', 'Position by average rating', 1], ['n', 'Team', 'Team name', 1], ['k', 'M', 'Matches played', -1], ['rng', 'Rng', 'Best minus worst match rating', -1], ['avg', 'Avg', 'Average rating', -1]];
+  const tHead = () => '<div class="trow thead"><span></span>' + TCOL.map(([k, lab, tip]) => {
+    const on = st.tsort.k === k, dir = on ? (st.tsort.d === 1 ? 'ascending' : 'descending') : 'none';
+    return '<button type="button" class="tsort' + (k === 'n' ? '' : ' c') + (on ? ' on' : '') + '" data-act="tsort" data-id="' + k + '" aria-sort="' + dir + '" title="Sort by ' + tip.toLowerCase() + '">' + lab + '<span class="arr" aria-hidden="true">' + (on ? (st.tsort.d === 1 ? '▲' : '▼') : '') + '</span></button>';
+  }).join('') + '</div>';
+  const tVal = { rk: (x) => x.rk, n: (x) => name(x.n).replace('★ ', '').toLowerCase(), k: (x) => x.k, rng: (x) => x.b - x.lo, avg: (x) => x.avg };
+  const tSort = (rows) => { const f = tVal[st.tsort.k], d = st.tsort.d; return rows.slice().sort((p, q) => { const a = f(p), b = f(q); return (a < b ? -1 : a > b ? 1 : 0) * d || q.avg - p.avg; }); };
+  const ranked2 = (table) => table.map((x, i) => ({ ...x, rk: i + 1 }));
+  const tRow = (x, rank, withFlag, act) => {
+    const inner = '<span class="tf">' + (withFlag ? FLAG : FLAGG)[x.c] + '</span><span class="c pos">' + (x.rk || rank) + '</span><span class="nm">' + nm(x.n, 1) + '</span>' +
+      '<span class="c n" title="Matches played">' + x.k + '</span><span class="c n" title="Best minus worst match rating">' + (x.b - x.lo).toFixed(1) + '</span><span class="c avg ' + atier(x.avg).replace('t', 'a') + '" title="Average rating">' + x.avg.toFixed(1) + '</span>';
+    return act ? '<button type="button" class="trow tbtn" ' + act + '>' + inner + '</button>' : '<div class="trow">' + inner + '</div>';
+  };
+  const teamRow = (x, i, withFlag) => '<div class="tm"><span class="pos">' + (i + 1) + '</span><span class="n">' + (withFlag ? FLAG[x.c] + ' ' : '') + nm(x.n, 1) + '</span><span class="g">' + x.k + (x.k === 1 ? ' match' : ' matches') + '</span><span class="chip small ' + atier(x.avg) + '">' + x.avg.toFixed(1) + '</span></div>';
+
+  // ---- resolve the period each view shows (also used by Favorites) ----
+  function resolve(v) {
+    if (v === 'day') {
+      const days = allDays();
+      const p = days.filter((d) => D.some((m) => m.d === d && m.rt != null)), def = (p.length ? p : days).slice(-1)[0];
+      if (st.day == null || !days.includes(st.day)) st.day = def;
+      return { days, i: days.indexOf(st.day), from: st.day, to: st.day, label: short(st.day), atDefault: st.day === def };
+    }
+    if (v === 'matchweek' && st.comp === 'all') {
+      const ws = weeks();
+      const r = ws.filter((w) => D.some((m) => m.rt != null && m.d >= w && m.d <= plusDays(w, 6))), def = (r.length ? r : ws).slice(-1)[0];
+      if (st.week == null || !ws.includes(st.week)) st.week = def;
+      return { ws, i: ws.indexOf(st.week), from: st.week, to: plusDays(st.week, 6), label: 'week of ' + short(st.week), atDefault: st.week === def };
+    }
+    if (v === 'matchweek') {
+      const rounds = Array.from(new Set(D.filter((m) => m.c === st.comp).map((m) => m.r))).sort((x, y) => x - y);
+      const played = rounds.filter((x) => D.some((m) => m.c === st.comp && m.r === x && m.rt != null)), def = (played.length ? played : rounds).slice(-1)[0];
+      if (st.round == null || !rounds.includes(st.round)) st.round = def;
+      const ds = D.filter((m) => m.c === st.comp && m.r === st.round).map((m) => m.d).sort();
+      return { rounds, i: rounds.indexOf(st.round), from: ds[0], to: ds[ds.length - 1], label: RN[st.comp] + ' ' + st.round + ' dates', atDefault: st.round === def };
+    }
+    return {};
+  }
+
+  function favorites(v, P) {
+    let body = '', count = '';
+    if (v === 'outlook') {
+      const xs = ORDER.flatMap((c) => predict(c)).filter((x) => FAV.has(x.f.h) || FAV.has(x.f.a));
+      body = xs.length ? card(xs.map((x) => predRow(x, true))) : '<div class="card"><div class="empty small">No upcoming Liverpool or FC Basel matches stored yet.</div></div>';
+      count = xs.length + (xs.length === 1 ? ' match' : ' matches');
+    } else if (v === 'best') {
+      const rated = D.filter((m) => m.rt != null);
+      const parts = [];
+      if (st.compact) {
+        // Favourite teams in the same sortable table as below: position in their league, matches, range, average; tap for their best match
+        const favRows = [];
+        FAV.forEach((team) => {
+          const mine = rated.filter((m) => m.h === team || m.a === team);
+          if (!mine.length) return;
+          const c = mine[0].c, table = ranked2(teamTable(rated.filter((m) => m.c === c))), me = table.find((x) => x.n === team);
+          favRows.push({ me, team, c, size: table.length, best: mine.slice().sort(byRating)[0] });
+        });
+        tSort(favRows.map((f) => f.me)).forEach((me) => {
+          const f = favRows.find((x) => x.me === me), open = favOpen.has(f.team);
+          parts.push(tRow(me, me.rk, true, 'data-act="favteam" data-id="' + esc(f.team) + '" aria-expanded="' + open + '" title="' + esc(f.team) + ': rank ' + me.rk + ' of ' + f.size + ' in ' + C[f.c] + ' · tap for their best match"'));
+          if (open) parts.push(row(f.best, [], '', true));
+        });
+        body = parts.length ? '<div class="card ttab">' + tHead() + parts.join('') + '</div>' : '<div class="card"><div class="empty">No rated matches for your teams yet.</div></div>';
+      } else FAV.forEach((team) => {
+        const mine = rated.filter((m) => m.h === team || m.a === team);
+        if (!mine.length) return;
+        const c = mine[0].c, table = teamTable(rated.filter((m) => m.c === c)), me = table.find((x) => x.n === team);
+        const best = mine.slice().sort(byRating)[0];
+        parts.push('<div class="favteam"><div class="tm"><span class="n">' + FLAG[c] + ' ' + nm(team, 1) + '</span><span class="g">' + (table.indexOf(me) + 1) + '/' + table.length + ' · ' + me.k + (me.k === 1 ? ' match' : ' matches') + '</span><span class="chip small ' + atier(me.avg) + '">' + me.avg.toFixed(1) + '</span></div>' +
+          '<div class="cap3">Their best match</div>' + card([row(best, [short(best.d), roundOf(best)], null, true)]) + '</div>');
+      });
+      if (!st.compact) body = parts.join('') || '<div class="card"><div class="empty">No rated matches for your teams yet.</div></div>';
+      const nt = Array.from(FAV).filter((t2) => rated.some((m) => m.h === t2 || m.a === t2)).length;
+      count = nt + (nt === 1 ? ' team' : ' teams');
+    } else {
+      const ms = D.filter((m) => isFav(m) && m.d >= P.from && m.d <= P.to).sort((a, b) => a.d < b.d ? -1 : 1);
+      body = ms.length ? card(ms.map((m) => row(m, [roundOf(m), v === 'day' ? '' : short(m.d)], null, true))) : '<div class="card"><div class="empty small">No Liverpool or FC Basel match ' + (v === 'day' ? 'on this day' : st.comp === 'all' ? 'this week' : 'in this round') + '.</div></div>';
+      count = cnt(ms);
+    }
+    return '<section class="fav"><div class="favhead"><h2 class="label">Favourites <span class="favsub">' + esc(count) + '</span></h2>' +
+      '<button type="button" class="ghost" data-act="favtoggle" aria-expanded="' + !st.favCollapsed + '" aria-controls="favbody">' + (st.favCollapsed ? 'Show' : 'Hide') + ICON.chev + '</button></div>' +
+      '<div id="favbody"' + (st.favCollapsed ? ' hidden' : '') + '>' + body + '</div></section>';
+  }
+
+  function pills() {
+    return '<div class="pills flags" role="group" aria-label="League">' +
+      '<button type="button" data-act="comp" data-id="all" aria-pressed="' + (st.comp === 'all') + '" title="All leagues">All</button>' +
+      comps().map((k) => '<button type="button" data-act="comp" data-id="' + k + '" aria-pressed="' + (k === st.comp) + '" aria-label="' + C[k] + '" title="' + C[k] + '">' + FLAG[k] + '</button>').join('') + '</div>';
+  }
+
+  function renderDay(P) {
+    const d = st.day;
+    const ms = D.filter((m) => m.d === d && inComp(m)).sort(byRating), rated = ms.filter((m) => m.rt != null);
+    let h = '';
+    if (!ms.length) return h + emptyCard('No ' + C[st.comp] + ' matches on this day.');
+    // Compact: every game once, in one list sorted by rating (flag only when all leagues are shown)
+    if (st.compact) return h + card(ms.map((m) => row(m, [], null, st.comp === 'all')));
+    if (st.comp === 'all' && rated.length > 5) h += sectionHtml('Best five', rated.slice(0, 5).map((m) => row(m, [roundOf(m)], null, true)));
+    ORDER.forEach((c) => { const x = ms.filter((m) => m.c === c); if (x.length) h += sectionHtml(label(c), x.map((m) => row(m, [roundOf(m)]))); });
+    return h;
+  }
+
+  function renderMatchweek(P) {
+    if (st.comp === 'all') {
+      const a = P.from, b = P.to;
+      const ms = D.filter((m) => m.d >= a && m.d <= b).sort(byRating), rated = ms.filter((m) => m.rt != null);
+      let h = '';
+      if (!ms.length) return h + emptyCard('No matches this week.');
+      if (st.compact) return h + card(ms.map((m) => row(m, [], null, true)));
+      if (rated.length > 5) h += sectionHtml('Best five of the week', rated.slice(0, 5).map((m) => row(m, [short(m.d)], null, true)));
+      ORDER.forEach((c) => { const x = ms.filter((m) => m.c === c); if (x.length) h += sectionHtml(label(c), x.map((m) => row(m, [roundOf(m), short(m.d)]))); });
+      return h;
+    }
+    const c = st.comp, r = st.round;
+    const ms = D.filter((m) => m.c === c && m.r === r).sort(byRating), rated = ms.filter((m) => m.rt != null);
+    const avg = rated.length ? (rated.reduce((s, m) => s + m.rt, 0) / rated.length).toFixed(1) : '–';
+    let h = '';
+    if (st.compact) return h + card(ms.map((m) => row(m, [], null, false)));
+    h += '<div class="stats"><div class="stat"><span class="k">Rated</span><span class="v">' + rated.length + ' of ' + ms.length + '</span></div><div class="stat"><span class="k">Average</span><span class="v">' + avg + '</span></div></div>';
+    return h + card(ms.map((m) => row(m, [short(m.d)])));
+  }
+
+  function renderBest() {
+    const rated = D.filter((m) => m.rt != null);
+    const leagues = ORDER.filter((c) => rated.some((m) => m.c === c) && (st.comp === 'all' || c === st.comp));
+    const n = rated.filter(inComp).length;
+    let h = '<div class="grid">';
+    // A list shows its best five; "Show worst" adds the bottom five (with their real positions), and ⋮ marks the ranks in between when there are more than 10
+    const toggle = (key, open, word) => '<button type="button" class="ghost more" data-act="worst" data-id="' + key + '" aria-expanded="' + open + '">' + (open ? 'Hide ' : 'Show ') + word + ICON.chev + '</button>';
+    const expand = (items, key, draw, withBtn, isTeams) => {
+      const word = isTeams && !['avg', 'rk'].includes(st.tsort.k) ? 'bottom five' : 'worst';
+      const open = worst.has(key), n = items.length;
+      let idx = items.map((_, i) => i);
+      if (!open) idx = idx.slice(0, 5); else if (n > 10) idx = idx.slice(0, 5).concat([-1], idx.slice(n - 5));
+      const body = idx.map((i) => i < 0 ? '<div class="gapdots" aria-label="positions 6 to ' + (n - 5) + ' hidden">⋮</div>' : draw(items[i], i)).join('');
+      return { html: body + (withBtn && n > 5 ? toggle(key, open, word) : ''), cls: n >= 100 ? ' rk3' : '' };
+    };
+    const box = (key, teams, games, flagged, meta, right) => {
+      if (st.compact) {
+        // Compact: flat card with "Teams" and "Games" lists, each with its own "Show worst"
+        const t = expand(tSort(ranked2(teams)), 'T|' + key, (x) => tRow(x, x.rk, flagged), true, true);
+        const g = expand(games, 'G|' + key, (m) => row(m, [], null, flagged), true);
+        return '<div class="cap3 games">Teams</div><div class="rows ttab' + t.cls + '">' + tHead() + t.html + '</div>' +
+          '<div class="cap3 games">Matches</div><div class="rows' + g.cls + '">' + g.html + '</div>';
+      }
+      const t = expand(tSort(ranked2(teams)), 'T|' + key, (x) => tRow(x, x.rk, flagged), true, true);
+      const g = expand(games, 'G|' + key, (m) => row(m, meta(m), null, flagged), true);
+      return '<div class="cap3 games">Teams</div><div class="rows ttab' + t.cls + '">' + tHead() + t.html + '</div>' +
+        '<div class="cap3 games">Matches</div><div class="rows' + g.cls + '">' + g.html + '</div>';
+    };
+    // Ties: older game first, so among equally rated games the most recent sits lowest
+    const ranked = (ms) => ms.slice().sort((a, b) => b.rt - a.rt || (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
+    // League average: mean match rating, shown in the card header as a rating box (two decimals, the leagues sit close together)
+    const lavg = (ms) => { if (!ms.length) return ''; const a = ms.reduce((s2, m) => s2 + m.rt, 0) / ms.length; return '<span class="lavg" title="League average rating"><span class="chip small ' + tier(a) + '">' + a.toFixed(2) + '</span></span>'; };
+    if (st.comp === 'all') {
+      h += '<section class="card league overall"><h3>All leagues' + lavg(rated) + '</h3>' + box('all', teamTable(rated), ranked(rated), true, (m) => [short(m.d)], (m) => dm(m.d)) + '</section>';
+    }
+    leagues.forEach((c) => {
+      const ms = rated.filter((m) => m.c === c);
+      h += '<section class="card league"><h3>' + label(c) + lavg(ms) + '</h3>' + box(c, teamTable(ms), ranked(ms), false, (m) => [short(m.d), roundOf(m)], (m) => RS[m.c] + m.r) + '</section>';
+    });
+    return h + '</div>';
+  }
+
+  // Predicted spectacle for every open fixture of a league's next round: mean of both teams' average rating (league average for unrated teams)
+  function predict(c) {
+    const fx = FX[c]; if (!fx) return [];
+    const open = (fx.matches || []).filter((f) => !D.some((m) => m.c === c && m.h === f.h && m.a === f.a && m.rt != null));
+    const table = teamTable(D.filter((m) => m.c === c && m.rt != null));
+    if (!table.length) return [];
+    const lgAvg = table.reduce((s2, x) => s2 + x.avg, 0) / table.length;
+    const av = (n) => { const x = table.find((y) => y.n === n); return x ? x.avg : lgAvg; };
+    return open.map((f) => ({ c, r: fx.r, f, ah: av(f.h), aa: av(f.a), p: (av(f.h) + av(f.a)) / 2 })).sort((x, y) => y.p - x.p);
+  }
+  const predRow = (x, withLeague) => st.compact
+    ? '<div class="row crow wide-r"><div class="line"><span class="side l">' + (withLeague ? FLAG : FLAGG)[x.c] + '</span><span class="hn">' + nm(x.f.h) + '</span><span class="chip pred ' + atier(x.p) + '" title="Prediction">' + x.p.toFixed(1) + '</span><span class="an">' + nm(x.f.a, 1) + '</span><span class="side r"><span class="rt">' + (x.f.d ? wd(x.f.d) + ' ' + dt(x.f.d).getUTCDate() : '') + '</span></span></div></div>'
+    : '<div class="row"><div class="rowbtn static"><span class="chip pred ' + atier(x.p) + '" title="Prediction">' + x.p.toFixed(1) + '</span><div class="fx"><div class="teams">' + nm(x.f.h) + ' <span class="vs">vs</span> ' + nm(x.f.a, 1) + '</div><div class="meta">' + (withLeague ? FLAG[x.c] : '') + '<span>' + esc([x.f.d ? short(x.f.d) : RN[x.c] + ' ' + x.r, 'team avg ' + x.ah.toFixed(1) + ' / ' + x.aa.toFixed(1)].join(' · ')) + '</span></div></div></div></div>';
+  function renderOutlook() {
+    const leagues = ORDER.filter((c) => st.comp === 'all' || st.comp === c);
+    let h = '';
+    if (st.comp === 'all') {
+      const picks = leagues.map((c) => predict(c)[0]).filter(Boolean).sort((x, y) => y.p - x.p);
+      return h + (picks.length ? card(picks.map((x) => predRow(x, true))) : emptyCard('No upcoming matches stored yet.'));
+    }
+    const c = st.comp, list = predict(c);
+    if (!list.length) return h + emptyCard('No upcoming ' + C[c] + ' matches stored yet.');
+    h += sectionHtml('Top pick · ' + RN[c] + ' ' + list[0].r, [predRow(list[0], false)]);
+    if (list.length > 1) h += sectionHtml('Rest of the round', list.slice(1).map((x) => predRow(x, false)));
+    return h;
+  }
+
+  function periodBar(v, P) {
+    if (v === 'best') { const n = D.filter((m) => m.rt != null && inComp(m)).length; return pbar('Season 2026–27', n + (n === 1 ? ' match' : ' matches')); }
+    if (v === 'outlook') { if (st.comp === 'all') return pbar('Next round', 'Top pick per league'); const l = predict(st.comp); return pbar('Next round', l.length ? RN[st.comp] + ' ' + l[0].r + ' · ' + l.length + (l.length === 1 ? ' match' : ' matches') : C[st.comp]); }
+    if (v === 'day') { const ms = D.filter((m) => m.d === st.day && inComp(m)); return pbar(short(st.day), cnt(ms), { what: 'day', canPrev: P.i > 0, canNext: P.i < P.days.length - 1, latest: !P.atDefault }); }
+    if (st.comp === 'all') { const ms = D.filter((m) => m.d >= P.from && m.d <= P.to); return pbar(span(P.from, P.to), cnt(ms), { what: 'week', canPrev: P.i > 0, canNext: P.i < P.ws.length - 1, latest: !P.atDefault }); }
+    const ms = D.filter((m) => m.c === st.comp && m.r === st.round);
+    return pbar(RN[st.comp] + ' ' + st.round, cnt(ms), { what: 'round', canPrev: P.i > 0, canNext: P.i < P.rounds.length - 1, latest: !P.atDefault });
+  }
+  // One ⓘ per tab, at the right end of the "All matches" / "All teams" header
+  const KEY = '<span class="k t1">8.5+</span> must watch · <span class="k t2">7+</span> worth it · <span class="k t3">4+</span> average · <span class="k tr">below 4</span> skip';
+  const INFO = {
+    day: 'Every match of the selected day, sorted by rating. The rating (0–10) says how worth watching a match is, without giving anything away.<br>' + KEY + '<br>Tap a match to reveal the score or see how the rating is built. ▶ opens the highlights.',
+    matchweek: 'All matches from Tuesday to Monday, sorted by rating. Choose a league to see one round instead.<br>' + KEY + '<br>The arrows move week by week (or round by round); the middle button jumps back to the latest one.',
+    best: 'Teams: M = matches played, Rng = best minus worst match rating (high = unpredictable, low = consistent), Avg = the avg rating of all their matches – who is most worth watching this season. Team avgs use a narrower colour scale: green from 6.3, bright green from 7.0, red below 5.3. Tap a column heading to sort the table, tap it again to reverse.<br>Matches: the best rated matches so far; “Show worst” adds the worst. The number next to each league is its avg rating.',
+    outlook: 'A prediction for each league’s next round: the avg of both teams’ ratings so far. With all leagues selected you see the top pick per league; choose a league to see its whole round.<br>Numbers with a dotted outline are predictions, not ratings. They use the team colour scale: green from 6.3, red below 5.3.'
+  };
+  const sectionHead = (v) => '<div class="favhead sect"><h2 class="label">' + (v === 'best' ? 'All teams' : 'All matches') + '</h2>' +
+    '<button type="button" class="ghost info" data-act="info" aria-expanded="' + infoOpen + '" aria-controls="infobox" aria-label="About this tab" title="About this tab">' + ICON.info + '</button>' +
+    (infoOpen ? '<div class="infobox bubble" id="infobox" role="dialog" aria-label="About this tab">' + INFO[v] + '</div>' : '') + '</div>';
+
+  function render() {
+    const v = view();
+    document.body.classList.toggle('compact', st.compact);
+    document.querySelectorAll('[data-act="mode"]').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.id === 'compact') === st.compact)));
+    document.querySelectorAll('nav a').forEach((a) => { if (a.dataset.view === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    document.getElementById('wrap').classList.toggle('wide', v === 'best');
+    const main = document.getElementById('main');
+    if (!loaded) { main.innerHTML = emptyCard(failed ? 'Ratings can’t be loaded right now. Check your connection and open the app again.' : 'Loading ratings…'); return; }
+    if (!D.length) { main.innerHTML = emptyCard('No ratings yet. The daily digest adds the previous day’s matches every morning.'); return; }
+    if (st.comp !== 'all' && !comps().includes(st.comp)) st.comp = 'all';
+    const P = resolve(v);
+    const content = v === 'matchweek' ? renderMatchweek(P) : v === 'best' ? renderBest() : v === 'outlook' ? renderOutlook() : renderDay(P);
+    main.innerHTML = periodBar(v, P) + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v) + pills() + content;
+  }
+
+  document.addEventListener('click', (e) => {
+    // An open ⓘ bubble closes when you tap anywhere outside it
+    if (infoOpen && !e.target.closest('.bubble') && !e.target.closest('[data-act="info"]')) {
+      infoOpen = false;
+      if (!e.target.closest('button[data-act]')) { const y = window.scrollY; render(); window.scrollTo(0, y); return; }
+    }
+    const b = e.target.closest('button[data-act]'); if (!b) return;
+    const act = b.dataset.act, id = b.dataset.id, v = view();
+    // Keep the page where it is: re-rendering must not scroll. When a list is collapsed, keep its toggle under the finger instead.
+    const y0 = window.scrollY, top0 = b.getBoundingClientRect().top, collapsing = act === 'worst' && worst.has(id);
+    if (act === 'open') { openRows.has(id) ? openRows.delete(id) : openRows.add(id); }
+    else if (act === 'score') { rev.has(id) ? rev.delete(id) : rev.add(id); }
+    else if (act === 'why') { why.has(id) ? why.delete(id) : why.add(id); }
+    else if (act === 'worst') { worst.has(id) ? worst.delete(id) : worst.add(id); }
+    else if (act === 'favteam') { favOpen.has(id) ? favOpen.delete(id) : favOpen.add(id); }
+    else if (act === 'mode') { st.compact = id === 'compact'; savePrefs(); }
+    else if (act === 'info') { infoOpen = !infoOpen; }
+    else if (act === 'tsort') { const col = TCOL.find((x) => x[0] === id); st.tsort = st.tsort.k === id ? { k: id, d: -st.tsort.d } : { k: id, d: col ? col[3] : -1 }; savePrefs(); }
+    else if (act === 'latest') { if (v === 'day') st.day = null; else if (st.comp === 'all') st.week = null; else st.round = null; }
+    else if (act === 'favtoggle') { st.favCollapsed = !st.favCollapsed; savePrefs(); }
+    else if (act === 'comp') { st.comp = id; st.round = null; savePrefs(); }
+    else if (act === 'prev' || act === 'next') {
+      const step = act === 'prev' ? -1 : 1;
+      if (v === 'day') { const ds = allDays(); const i = ds.indexOf(st.day) + step; if (ds[i]) st.day = ds[i]; }
+      else if (v === 'matchweek' && st.comp === 'all') { const ws = weeks(); const i = ws.indexOf(st.week) + step; if (ws[i]) st.week = ws[i]; }
+      else if (v === 'matchweek') { const rs = Array.from(new Set(D.filter((m) => m.c === st.comp).map((m) => m.r))).sort((x, y) => x - y); const i = rs.indexOf(st.round) + step; if (rs[i] != null) st.round = rs[i]; }
+    }
+    render();
+    let f = null;
+    if (act === 'latest') f = document.querySelector('[data-act="next"]');
+    if (['open', 'score', 'why', 'worst', 'favteam', 'mode', 'tsort'].includes(act)) f = document.querySelector('[data-act="' + act + '"][data-id="' + CSS.escape(id) + '"]');
+    if (['prev', 'next', 'comp', 'favtoggle', 'info'].includes(act)) f = document.querySelector('[data-act="' + act + '"]' + (act === 'comp' ? '[data-id="' + id + '"]' : ''));
+    if (f && !f.disabled) f.focus({ preventScroll: true });
+    window.scrollTo(0, y0);
+    if (collapsing && f) window.scrollBy(0, f.getBoundingClientRect().top - top0);
+  });
+  window.addEventListener('hashchange', () => { infoOpen = false; render(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && infoOpen) { infoOpen = false; const y = window.scrollY; render(); window.scrollTo(0, y); const f = document.querySelector('[data-act="info"]'); if (f) f.focus({ preventScroll: true }); } });
+  render();
+
+  // Data: data/matches.json ({ updated, matches: [ {id, c, r, d, h, a, rt, s, w, q} ] }) and data/fixtures.json ({ <league>: {c, r, matches: [{h, a, d}]} }).
+  // Loaded on start and again whenever the app comes back to the foreground, so the morning update shows up without a reload.
+  async function load() {
+    try {
+      const get = (u) => fetch(u + '?t=' + Date.now(), { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+      const [d, f] = await Promise.all([get('data/matches.json'), get('data/fixtures.json').catch(() => ({}))]);
+      D = (d.matches || []).filter((m) => m && m.id && m.h && m.a && C[m.c]);
+      const fx = {}; Object.values(f || {}).forEach((b) => { if (b && C[b.c] && Array.isArray(b.matches)) fx[b.c] = b; });
+      FX = fx; loaded = true; failed = false;
+    } catch (e) { if (!loaded) failed = true; }
+    const y = window.scrollY; render(); window.scrollTo(0, y);
+  }
+  load();
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') load(); });
+  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+})();
+</script>
+</body>
+</html>
