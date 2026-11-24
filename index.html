@@ -28,7 +28,7 @@
   --gap-block: 26px; --gap-inner: 10px;
   color-scheme: dark;
 }
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: rgba(74, 222, 155, .16); }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--text); }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 25; background: var(--green-top); }
 .wrap { max-width: 760px; margin: 0 auto; padding-block: 14px calc(92px + env(safe-area-inset-bottom, 0px)); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
