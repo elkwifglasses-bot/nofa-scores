@@ -301,6 +301,10 @@ a.hl:hover { color: var(--fg); }
 .ttab .thead .tsort.c .arr { position: absolute; right: -1px; top: 50%; transform: translateY(-50%); }
 
 .star { color: inherit; }
+.pbar .sq.back svg { transform: scaleX(-1); }
+.infobox .potv { display: inline; }
+.infobox .potv .chip.pot { display: inline-flex; vertical-align: -2px; }
+.infobox .chip.pot svg { width: 9px; height: 12px; }
 
 /* The box between the team names (rating, score, "vs" or flames) always has the same width; a bit more air to the names */
 .crow .line > .chip { width: 52px; min-width: 52px; padding: 0; margin-inline: 4px; }
@@ -582,9 +586,12 @@ a.hl:hover { color: var(--fg); }
   const pbar = (title, sub, nav) => {
     const ph = '<span class="sq ph" aria-hidden="true"></span>';
     if (!nav) return '<div class="pbar">' + ph + ph + '<div class="pt"><h1>' + esc(title) + '</h1><div class="sub">' + esc(sub) + '</div></div>' + ph + ph + '</div>';
-    return '<div class="pbar"><button type="button" class="sq" data-act="prev" aria-label="Previous ' + nav.what + '"' + (nav.canPrev ? '' : ' disabled') + '>' + ICON.prev + '</button><span class="sq ph" aria-hidden="true"></span>' +
+    // The "latest" button sits on the side the latest period is on: right when looking back, left when looking ahead (nav.ahead)
+    const ph1 = '<span class="sq ph" aria-hidden="true"></span>';
+    const lb = nav.latest ? '<button type="button" class="sq' + (nav.ahead ? ' back' : '') + '" data-act="latest" aria-label="Back to the latest ' + nav.what + '" title="Latest ' + nav.what + '">' + ICON.latest + '</button>' : ph1;
+    return '<div class="pbar"><button type="button" class="sq" data-act="prev" aria-label="Previous ' + nav.what + '"' + (nav.canPrev ? '' : ' disabled') + '>' + ICON.prev + '</button>' + (nav.ahead ? lb : ph1) +
       '<div class="pt"><h1>' + esc(title) + '</h1><div class="sub">' + esc(sub) + '</div></div>' +
-      (nav.latest ? '<button type="button" class="sq" data-act="latest" aria-label="Back to the latest ' + nav.what + '" title="Latest ' + nav.what + '">' + ICON.latest + '</button>' : '<span class="sq ph" aria-hidden="true"></span>') +
+      (nav.ahead ? ph1 : lb) +
       '<button type="button" class="sq" data-act="next" aria-label="Next ' + nav.what + '"' + (nav.canNext ? '' : ' disabled') + '>' + ICON.next + '</button></div>';
   };
   const cnt = (ms) => { const p = ms.filter((m) => m.rt != null).length, u = ms.length - p; return p + (p === 1 ? ' match' : ' matches') + (u ? ' (+' + u + ' to come)' : ''); };
@@ -720,17 +727,17 @@ a.hl:hover { color: var(--fg); }
     return card(ms.map((m) => row(m, [], null, st.comp === 'all')));
   }
 
-  // Potential count for a set of upcoming matches: 🔥🔥🔥 n · 🔥🔥 n · 🔥 n
-  const potStats = (ms) => {
+  // Potential count for the upcoming matches shown, for the ⓘ text: n matches · 🔥🔥🔥 n · 🔥🔥 n · 🔥 n
+  const potCount = (ms) => {
     const n = { 3: 0, 2: 0, 1: 0 }; ms.forEach((m) => { const p = predOf(m); if (p) n[p.lvl]++; });
-    return '<div class="stats"><div class="stat"><span class="k">Matches</span><span class="v">' + ms.length + '</span></div><div class="stat"><span class="k">Potential</span><span class="v potv">' +
-      [3, 2, 1].map((l) => '<span class="chip pot p' + l + '" role="img" aria-label="' + POT[l] + '">' + flames(l) + '</span> ' + n[l]).join(' <span class="sep">·</span> ') + '</span></div></div>';
+    return '<span class="potv">' + ms.length + (ms.length === 1 ? ' match' : ' matches') + ': ' +
+      [3, 2, 1].map((l) => '<span class="chip pot p' + l + '" role="img" aria-label="' + POT[l] + '">' + flames(l) + '</span>&nbsp;' + n[l]).join(' <span class="sep">·</span> ') + '</span>';
   };
 
   function renderNext(P) {
     const ms = P.ms;
     if (!ms.length) return emptyCard('No upcoming matches stored yet.');
-    if (st.comp !== 'all') return potStats(ms) + card(ms.map((m) => row(m, [], null, false)));
+    if (st.comp !== 'all') return card(ms.map((m) => row(m, [], null, false)));
     // All leagues: the top pick of each league, then every league's round sorted by potential
     let h = '';
     const tops = ORDER.map((c) => ms.find((m) => m.c === c)).filter(Boolean).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : ORDER.indexOf(a.c) - ORDER.indexOf(b.c)));
@@ -798,8 +805,8 @@ a.hl:hover { color: var(--fg); }
     if (v === 'day') { const ms = D.filter((m) => m.d === st.day && inComp(m)); return pbar(short(st.day), cnt(ms), { what: 'day', canPrev: P.i > 0, canNext: P.i < P.days.length - 1, latest: !P.atDefault }); }
     if (P.next) {
       const n = P.ms.length, dates = P.from ? (P.from === P.to ? dm(P.from) : span(P.from, P.to)) + ' · ' : '';
-      const title = st.comp === 'all' ? 'Next week' : C[st.comp] + ' · ' + RN[st.comp] + ' ' + (P.ms[0] ? P.ms[0].r : '');
-      return pbar(title, dates + n + (n === 1 ? ' match' : ' matches') + ' · predictions', { what: st.comp === 'all' ? 'week' : 'round', canPrev: true, canNext: false, latest: true });
+      const title = st.comp === 'all' ? 'Next week' : RN[st.comp] + ' ' + (P.ms[0] ? P.ms[0].r : '');
+      return pbar(title, dates + n + ' to come', { what: st.comp === 'all' ? 'week' : 'round', canPrev: true, canNext: false, latest: true, ahead: true });
     }
     if (st.comp === 'all') { const ms = D.filter((m) => m.d >= P.from && m.d <= P.to).concat(extraFixtures((m) => m.d >= P.from && m.d <= P.to)); return pbar(span(P.from, P.to), cnt(ms), { what: 'week', canPrev: P.i > 0, canNext: P.i < P.ws.length - 1 || hasNext(), latest: !P.atDefault }); }
     const ms = D.filter((m) => m.c === st.comp && m.r === st.round).concat(extraFixtures((m) => m.c === st.comp && m.r === st.round));
@@ -811,12 +818,12 @@ a.hl:hover { color: var(--fg); }
   const FLAMEKEY = 'Flames are a prediction for matches still to come, based on both teams’ goals and xG so far: 3 = among the round’s most promising, 1 = among its least. Only a rough hint – the round’s best match is in the top 3 about half the time.';
   const INFO = {
     day: 'Every match of the selected day, sorted by rating. The rating (0–10) says how worth watching a match is, without giving anything away.<br>' + KEY + '<br>Tap a match to reveal the score with each team’s figures, or to see how the rating is built. ▶ opens the highlights.<br>' + FLAMEKEY,
-    matchweek: 'All matches from Tuesday to Monday, sorted by rating. Choose a league to see one round instead.<br>' + KEY + '<br>The arrows move week by week (or round by round); the middle button jumps back to the latest one. › after the latest week shows the next week (or round) with a prediction for each match.<br>' + FLAMEKEY,
+    matchweek: 'All matches from Tuesday to Monday, sorted by rating. Choose a league to see one round instead.<br>' + KEY + '<br>The arrows move week by week (or round by round); the button next to them jumps back to the latest one. › after the latest week shows the next week (or round) with a prediction for each match.<br>' + FLAMEKEY,
     best: 'Teams: M = matches played, Rng = best minus worst match rating (high = unpredictable, low = consistent), Avg = the avg rating of all their matches – who is most worth watching this season. Team avgs use a narrower colour scale: green from 6.3, bright green from 7.0, red below 5.3. Tap a column heading to sort the table, tap it again to reverse.<br>Matches: the best rated matches so far; “Show worst” adds the worst. The number next to each league is its avg rating.'
   };
-  const sectionHead = (v) => '<div class="favhead sect"><h2 class="label">' + (v === 'best' ? 'All teams' : 'All matches') + '</h2>' +
+  const sectionHead = (v, P) => '<div class="favhead sect"><h2 class="label">' + (v === 'best' ? 'All teams' : 'All matches') + '</h2>' +
     '<button type="button" class="ghost info" data-act="info" aria-expanded="' + infoOpen + '" aria-controls="infobox" aria-label="About this tab" title="About this tab">' + ICON.info + '</button>' +
-    (infoOpen ? '<div class="infobox bubble" id="infobox" role="dialog" aria-label="About this tab">' + INFO[v] + '</div>' : '') + '</div>';
+    (infoOpen ? '<div class="infobox bubble" id="infobox" role="dialog" aria-label="About this tab">' + INFO[v] + (P && P.next ? '<br><b>' + (st.comp === 'all' ? 'Next week' : 'This round') + ':</b> ' + potCount(P.ms) : '') + '</div>' : '') + '</div>';
 
   function render() {
     const v = view();
@@ -829,7 +836,7 @@ a.hl:hover { color: var(--fg); }
     if (st.comp !== 'all' && !comps().includes(st.comp)) st.comp = 'all';
     const P = resolve(v);
     const content = v === 'matchweek' ? renderMatchweek(P) : v === 'best' ? renderBest() : renderDay(P);
-    main.innerHTML = periodBar(v, P) + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v) + pills() + content;
+    main.innerHTML = periodBar(v, P) + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v, P) + pills() + content;
   }
 
   document.addEventListener('click', (e) => {
