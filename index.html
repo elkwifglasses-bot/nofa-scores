@@ -743,7 +743,7 @@ a.hl:hover { color: var(--fg); }
     let h = '';
     const tops = ORDER.map((c) => ms.find((m) => m.c === c)).filter(Boolean).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : ORDER.indexOf(a.c) - ORDER.indexOf(b.c)));
     if (tops.length > 1) h += sectionHtml('Top pick per league', tops.map((m) => row(m, [], null, true)));
-    ORDER.forEach((c) => { const x = ms.filter((m) => m.c === c); if (x.length) h += sectionHtml(label(c) + ' <span class="favsub">· ' + RN[c] + ' ' + x[0].r + '</span>', x.map((m) => row(m, [], null, false))); });
+    ORDER.forEach((c) => { const x = ms.filter((m) => m.c === c); if (x.length) h += sectionHtml('<span>' + C[c] + '</span> <span class="favsub">· ' + RN[c] + ' ' + x[0].r + '</span>', x.map((m) => row(m, [], null, false))); });
     return h;
   }
 
