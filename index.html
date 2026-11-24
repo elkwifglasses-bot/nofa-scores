@@ -1476,11 +1476,11 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     } catch (e) { if (!loaded) failed = true; }
     const y = window.scrollY; render(); window.scrollTo(0, y);
   }
-  // Start screen stays about 1.5 s (longer only while the data is still on its way, at most 5 s), then fades into the app
+  // Start screen stays about 2 s (longer only while the data is still on its way, at most 5 s), then fades into the app
   let splashGone = false;
   function hideSplash() {
     const sp = document.getElementById('splash'); if (!sp || sp.hidden || splashGone) return; splashGone = true;
-    const wait = Math.max(0, 1500 - (performance.now() - (window.__splashAt || 0)));
+    const wait = Math.max(0, 2000 - (performance.now() - (window.__splashAt || 0)));
     setTimeout(() => after(anim(sp, [{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: 'forwards' }), () => sp.remove()), wait);
   }
   setTimeout(hideSplash, 5000);
