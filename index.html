@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>nofa scores</title>
 <meta name="description" content="Spoiler-free watchability ratings for football matches.">
-<meta name="theme-color" content="#0E1012">
+<meta name="theme-color" content="#0B1F17">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -22,6 +22,7 @@
   --fg: #ECEEF0; --muted: #98A0A7; --accent: #4ADE9B; --accent-ink: #06281A;
   --btn: #1B1F23; --btn-hover: #23282D; --btn-line: #2B3035;
   --t2: #1D4B37; --t2-ink: #D3F7E6; --t3: #252B30; --t3-ink: #DCE1E5; --t4: #181B1E;
+  --green-top: #0B1F17;
   --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
   --text: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
   --gap-block: 26px; --gap-inner: 10px;
@@ -29,16 +30,24 @@
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--text); }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
-.wrap { max-width: 760px; margin: 0 auto; padding-block: calc(12px + env(safe-area-inset-top, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: var(--gap-block); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 25; background: var(--green-top); }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 14px calc(92px + env(safe-area-inset-bottom, 0px)); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
 .wrap.wide { max-width: 1180px; }
-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 12px; border-bottom: 1px solid var(--divider); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+/* Top section: full width, very dark green – logo, update status, calendar, a divider line, then the date bar */
+header { position: sticky; top: 0; z-index: 20; background: var(--green-top); padding-top: env(safe-area-inset-top, 0px); border-bottom: 1px solid #12301F; }
+.hin { max-width: 760px; margin: 0 auto; padding: 10px max(8px, env(safe-area-inset-right, 0px)) 0 max(8px, env(safe-area-inset-left, 0px)); }
+.wide-h .hin { max-width: 1180px; }
+.tr1 { display: flex; align-items: center; justify-content: space-between; padding: 2px 6px 10px; }
+.ticons { display: flex; gap: 4px; }
+.ti { position: relative; width: 40px; height: 40px; min-height: 40px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--fg); }
+.ti:hover { background: rgba(255, 255, 255, .06); }
+.ti[aria-expanded="true"] { background: rgba(255, 255, 255, .09); }
+.ti:disabled { opacity: .3; }
+.ti .dot { position: absolute; top: 8px; right: 9px; width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--green-top); background: #5F676E; }
+.ti .dot.ok { background: var(--accent); } .ti .dot.bad { background: #F0606A; } .ti .dot.none { display: none; }
+.tsep { height: 2px; border-radius: 2px; background: #1D4231; margin: 0 6px 6px; }
+#dbar { padding: 0 2px 6px; }
 .brand { display: flex; align-items: center; gap: 10px; font: 700 19px/1 var(--display); letter-spacing: -0.01em; }
-nav { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
-nav { flex-wrap: wrap; }
-nav a { padding: 10px 14px; border-radius: 999px; color: var(--fg); text-decoration: none; font-weight: 500; font-size: 14px; }
-nav a:hover { background: var(--btn); }
-nav a[aria-current="page"] { background: var(--fg); color: var(--bg); font-weight: 600; }
 main { display: flex; flex-direction: column; gap: var(--gap-block); }
 .bar { display: flex; align-items: center; gap: 14px; }
 .bar .titles { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -142,12 +151,6 @@ button.ghost[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .pavg b { color: var(--fg); font: 600 13px var(--display); font-variant-numeric: tabular-nums; }
 .league.overall { grid-column: 1 / -1; }
 .tm .n .flag { margin-right: 4px; }
-/* Header: logo on the left, a small Day · Week · Season selector on the right (one line, also on phones) */
-header { flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 10px; }
-.brand { white-space: nowrap; min-width: 0; }
-nav { flex-wrap: nowrap; padding: 3px; gap: 2px; flex: none; }
-nav a { padding: 6px 11px; font-size: 13px; text-align: center; }
-@media (max-width: 360px) { nav a { padding: 6px 8px; font-size: 12.5px; } .brand { font-size: 17px; } }
 /* One line per game, only green and red get a filled box, no row arrows, flat Season cards */
 body.compact { --gap-block: 20px; }
 .compact .rowbtn { padding: 9px 12px; gap: 9px; }
@@ -184,7 +187,7 @@ body.compact { --gap-block: 20px; }
 .tm .g, .favsub, .rt, button.more, .lavg { white-space: nowrap; }
 .fx .meta > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .fx .meta { flex-wrap: nowrap; }
-@media (prefers-reduced-motion: no-preference) { button, .iconlink, nav a { transition: background-color .12s ease; } }
+@media (prefers-reduced-motion: no-preference) { button, .iconlink, .tabbar a { transition: background-color .12s ease, color .12s ease; } }
 
 /* Period bar on top of every tab: centred title; ‹ ›, and the "latest" button left of › */
 .pbar { display: grid; grid-template-columns: 34px 34px minmax(0, 1fr) 34px 34px; align-items: center; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 6px; }
@@ -318,7 +321,7 @@ a.hl:hover { color: var(--fg); }
 .tpop .menu { transform-origin: 100% 0; }
 /* Team popup (Season table): the page scrolls the tapped row under the header, the popup fills the rest of the screen */
 .tdim { position: fixed; inset: 0; z-index: 30; background: rgba(0, 0, 0, .45); }
-.tpop { position: fixed; z-index: 31; left: max(16px, calc((100vw - 760px) / 2 + 16px)); right: max(16px, calc((100vw - 760px) / 2 + 16px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0, 0, 0, .6); }
+.tpop { position: fixed; z-index: 31; left: max(8px, calc((100vw - 760px) / 2 + 8px)); right: max(8px, calc((100vw - 760px) / 2 + 8px)); bottom: calc(74px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0, 0, 0, .6); }
 .tpop::before { content: ""; position: absolute; top: -7px; left: 44px; width: 12px; height: 12px; background: #1B1F23; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); transform: rotate(45deg); }
 .tpop .tph { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 14px 14px 0; }
 .tpop .tpn { display: flex; align-items: center; gap: 10px; font: 700 20px/1.2 var(--display); min-width: 0; }
@@ -390,6 +393,86 @@ html.popopen { overflow: hidden; }
 .bkl.tot { border-top: 1px solid var(--btn-line); margin-top: 2px; padding-top: 8px; }
 .bkl.tot .bn { font-weight: 600; }
 .bkl.tot .chip { min-width: 40px; height: 26px; border-radius: 8px; font-size: 13px; }
+
+/* ===== Redesign: date bar in the top section, tab bar, calendar, update status, favourites ===== */
+#dbar .pbar { background: transparent; border: 0; border-radius: 0; padding: 0; grid-template-columns: 36px 36px minmax(0, 1fr) 36px 36px; gap: 2px; min-height: 36px; }
+#dbar .pbar.single { display: flex; align-items: center; justify-content: center; height: 36px; }
+#dbar .sq { width: 36px; height: 36px; min-height: 36px; border: 0; background: transparent; color: var(--fg); border-radius: 9px; }
+#dbar .sq:hover { background: rgba(255, 255, 255, .06); }
+#dbar .sq:disabled { opacity: .3; }
+#dbar .pt { flex-direction: row; align-items: baseline; justify-content: center; gap: 8px; white-space: nowrap; line-height: 1.2; }
+#dbar .pt h1 { font: 600 13.5px var(--text); flex: none; }
+#dbar .pt .sub { font-size: 12px; color: #8FB5A2; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 22; display: grid; grid-template-columns: repeat(4, 1fr); background: #0C0E10; border-top: 1px solid var(--divider); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.tabbar > a, .tabbar > button { height: 62px; min-height: 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #7B838A; text-decoration: none; font: 500 11.5px var(--text); background: transparent; border: 0; border-radius: 0; padding: 0; }
+.tabbar svg { width: 22px; height: 22px; }
+.tabbar [aria-current="page"] { color: var(--accent); font-weight: 600; }
+.tabbar > *:hover { color: var(--fg); }
+/* Pop-overs of the top section and the tab bar (same look as the ⓘ bubble) */
+.hpop { position: fixed; z-index: 40; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 14px 36px rgba(0, 0, 0, .6); }
+.hpop .arr { position: absolute; top: -7px; width: 12px; height: 12px; background: #1B1F23; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); transform: rotate(45deg); }
+.hpop .arr.down { top: auto; bottom: -7px; border: 0; border-right: 1px solid var(--btn-line); border-bottom: 1px solid var(--btn-line); }
+.calp { width: 304px; padding: 12px; }
+.calp .ch { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.calp .ch b { font: 600 15px var(--display); }
+.calp .cb { width: 34px; height: 34px; min-height: 34px; padding: 0; border: 0; background: transparent; color: var(--muted); border-radius: 8px; }
+.calp .cb:disabled { opacity: .25; }
+.calp .wh, .calp .wk { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; }
+.calp .wh span { font-size: 11px; color: var(--muted); padding: 4px 0; }
+.calp .wk { border-radius: 10px; margin: 2px 0; }
+.calp .wk.wsel { background: rgba(74, 222, 155, .14); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.calp .c { position: relative; height: 36px; min-height: 36px; padding: 0; border: 0; background: transparent; color: var(--fg); font: 500 13.5px var(--text); font-variant-numeric: tabular-nums; border-radius: 9px; }
+.calp .c:disabled { color: #4A5158; opacity: 1; cursor: default; }
+.calp .c.out { color: #5F676E; }
+.calp .c.has::after, .calp .c.fx::after { content: ""; position: absolute; bottom: 4px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
+.calp .c.fx::after { background: transparent; box-shadow: inset 0 0 0 1px var(--accent); width: 5px; height: 5px; margin-left: -2.5px; }
+.calp .c.today { box-shadow: inset 0 0 0 1.5px #6A7279; }
+.calp .c.sel { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.calp .c.sel::after { background: var(--accent-ink); }
+.calp .cleg { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+.calp .cleg i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; background: var(--accent); }
+.calp .cleg i.fx { background: transparent; box-shadow: inset 0 0 0 1px var(--accent); }
+.calp .cleg i.td { width: 9px; height: 9px; border-radius: 3px; background: transparent; box-shadow: inset 0 0 0 1.5px #6A7279; }
+.calp .cnote { margin-top: 8px; text-align: center; font-size: 12px; color: #C9CED3; background: #23282D; border-radius: 8px; padding: 6px; }
+.bellp { padding: 14px; }
+.bellp .nh { display: flex; gap: 12px; align-items: center; }
+.bellp .nh b { font: 600 15px var(--display); }
+.bellp .ns { font-size: 12.5px; color: var(--muted); }
+.bellp .st { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none; font-weight: 700; }
+.bellp .st.ok { background: rgba(74, 222, 155, .15); color: var(--accent); }
+.bellp .st.bad { background: rgba(240, 96, 106, .15); color: #F0606A; }
+.bellp .st.sm { width: 20px; height: 20px; font-size: 12px; }
+.bellp .st svg { width: 15px; height: 15px; } .bellp .st.sm svg { width: 11px; height: 11px; }
+.bellp .nl { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0 42px; }
+.bellp .lr .nl { margin-left: 30px; }
+.bellp .lc { display: inline-flex; align-items: center; gap: 6px; background: #23282D; border-radius: 7px; padding: 3px 8px; font: 600 12.5px var(--display); }
+.bellp .lc i { font: 600 11px var(--text); font-style: normal; letter-spacing: .04em; color: var(--muted); }
+.bellp .nomatch { font-size: 12px; color: var(--muted); }
+.bellp .nx { display: flex; margin: 10px auto 0; min-height: 32px; height: 32px; font-size: 13px; color: var(--muted); background: transparent; border: 0; }
+.bellp .log { margin-top: 6px; border-top: 1px solid var(--divider); max-height: 52vh; overflow-y: auto; overscroll-behavior: contain; }
+.bellp .lr { padding: 10px 0; border-bottom: 1px solid var(--divider); }
+.bellp .lr:last-child { border-bottom: 0; }
+.bellp .lt { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.bellp .lt b { font-weight: 600; }
+.bellp .tm { color: var(--muted); font-variant-numeric: tabular-nums; }
+.bellp .tt { margin-left: auto; color: var(--muted); }
+.optp { width: min(300px, calc(100vw - 24px)); padding: 12px 14px; font-size: 13px; line-height: 1.6; color: #C9CED3; }
+.optp b { color: var(--fg); }
+.search { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid #3A4046; border-radius: 12px; height: 46px; padding: 0 6px 0 12px; color: var(--muted); }
+.search:focus-within { border-color: var(--accent); }
+.search input { flex: 1; min-width: 0; height: 100%; background: transparent; border: 0; outline: 0; color: var(--fg); font: 400 15px var(--text); }
+.search input::placeholder { color: #6B737A; }
+.search .clr { width: 34px; height: 34px; min-height: 34px; padding: 0; border: 0; background: transparent; color: var(--muted); }
+.frow { display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 12px; border-top: 1px solid var(--divider); }
+.frow:first-child { border-top: 0; }
+.frow .fn { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.frow .fl2 { margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.frow .flag { width: 16px; height: 11px; border-radius: 2px; }
+.fstar { width: 44px; height: 44px; min-height: 44px; padding: 0; border: 0; background: transparent; font-size: 20px; color: #5F676E; }
+.fstar[aria-pressed="true"] { color: #F5C451; background: transparent; }
+.fstar:hover { background: rgba(255, 255, 255, .05); }
+.favwrap { display: flex; flex-direction: column; gap: var(--gap-block); }
+.fsec { display: flex; flex-direction: column; gap: var(--gap-inner); }
 </style>
 </head>
 <body>
@@ -401,30 +484,40 @@ html.popopen { overflow: hidden; }
   // Start screen: only when the installed app starts fresh (it carries on from Android's own start screen); ?splash=1 shows it in a browser
   if ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || /[?&]splash=1/.test(location.search)) { document.getElementById('splash').hidden = false; window.__splashAt = performance.now(); }
 </script>
-<div class="wrap" id="wrap">
-  <header>
-    <div class="brand">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--accent)" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.2l4.2 3-1.6 4.9H9.4L7.8 10.2z" fill="currentColor" stroke="none"/></svg>
-      nofa scores
+<header id="top"><div class="hin">
+  <div class="tr1">
+    <div class="brand"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--accent)" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.2l4.2 3-1.6 4.9H9.4L7.8 10.2z" fill="currentColor" stroke="none"/></svg>nofa scores</div>
+    <div class="ticons">
+      <button type="button" class="ti" data-act="bell" aria-expanded="false" aria-label="Last update" title="Last update"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><i class="dot none"></i></button>
+      <button type="button" class="ti" data-act="cal" aria-expanded="false" aria-label="Pick a day or a week" title="Pick a day or a week"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="17" rx="2.5"/><path d="M16 2.5v4M8 2.5v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></button>
     </div>
-    <nav aria-label="Views">
-      <a href="#day" data-view="day">Day</a>
-      <a href="#week" data-view="matchweek">Week</a>
-      <a href="#season" data-view="best">Season</a>
-    </nav>
-  </header>
+  </div>
+  <div class="tsep" role="presentation"></div>
+  <div id="dbar"></div>
+</div></header>
+<div id="hpop"></div>
+<div class="wrap" id="wrap">
   <div id="tpop"></div>
   <main id="main" aria-live="polite">
     <div class="card"><div class="empty">Loading ratings…</div></div>
   </main>
 </div>
+<nav class="tabbar" aria-label="Sections">
+  <a href="#week" data-tab="matches"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.2l4.2 3-1.6 4.9H9.4L7.8 10.2z"/></svg><span>Matches</span></a>
+  <a href="#season" data-tab="best"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3"/></svg><span>Season</span></a>
+  <a href="#favourites" data-tab="fav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg><span>Favourites</span></a>
+  <button type="button" data-act="options" data-tab="opt" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Options</span></button>
+</nav>
 
 <script>
 (() => {
   const C = { sl: 'Super League', pl: 'Premier League', ll: 'La Liga', sa: 'Serie A', bl: 'Bundesliga', l1: 'Ligue 1' };
   const RN = { sl: 'Round', pl: 'Round', ll: 'Round', sa: 'Round', bl: 'Round', l1: 'Round' };
   const ORDER = ['sl', 'pl', 'll', 'sa', 'bl', 'l1'];
+  // Favourite teams: chosen in the Favourites tab, stored on this phone (Liverpool and FC Basel until changed)
   const FAV = new Set(['Liverpool', 'FC Basel']);
+  try { const f = JSON.parse(localStorage.getItem('nofa-fav') || 'null'); if (Array.isArray(f)) { FAV.clear(); f.forEach((n) => typeof n === 'string' && FAV.add(n)); } } catch (e) {}
+  const saveFav = () => { try { localStorage.setItem('nofa-fav', JSON.stringify(Array.from(FAV))); } catch (e) {} };
   const svgf = (inner, label) => '<svg class="flag' + (label === 'Switzerland' ? ' flag-ch' : '') + '" viewBox="0 0 30 20" preserveAspectRatio="none" role="img" aria-label="' + label + '">' + inner + '</svg>';
   const FLAG = {
     sl: svgf('<rect x="5" width="20" height="20" rx="1.5" fill="#DA291C"/><rect x="13" y="4" width="4" height="12" fill="#fff"/><rect x="9" y="8" width="12" height="4" fill="#fff"/>', 'Switzerland'),
@@ -501,6 +594,8 @@ html.popopen { overflow: hidden; }
     noplay: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor"/><path d="M3 21L21 3"/></svg>',
     info: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg>',
     latest: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6l6 6-6 6"/><path d="M19 12H5"/><path d="M5 6v12"/></svg>',
+    check: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>',
+    search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
     play: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor"/></svg>'
   };
 
@@ -534,7 +629,7 @@ html.popopen { overflow: hidden; }
   const savePrefs = () => { try { localStorage.setItem('sfr-prefs', JSON.stringify({ comp: st.comp, favCollapsed: st.favCollapsed, tsort: st.tsort })); } catch (e) {} };
   // Tabs: Day, Week (default), Season. Old links (#matchweek, #best) still work; #outlook opens the upcoming week.
   if (location.hash === '#outlook') { st.next = true; history.replaceState(null, '', '#week'); }
-  const view = () => { const h = location.hash.slice(1); return h === 'season' || h === 'best' ? 'best' : h === 'day' ? h : 'matchweek'; };
+  const view = () => { const h = location.hash.slice(1); return h === 'season' || h === 'best' ? 'best' : h === 'favourites' || h === 'favorites' ? 'fav' : h === 'day' ? h : 'matchweek'; };
 
   // ---- Predicted potential for matches still to come ----
   // Each team's average goals per match and average combined xG (league average when a team has no data yet),
@@ -743,7 +838,7 @@ html.popopen { overflow: hidden; }
     let body = '', count = '';
     if (v === 'matchweek' && P.next) {
       const ms = P.ms.filter(isFav).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
-      body = ms.length ? card(ms.map((m) => row(m, [], null, true))) : '<div class="card"><div class="empty small">No upcoming Liverpool or FC Basel match stored yet.</div></div>';
+      body = ms.length ? card(ms.map((m) => row(m, [], null, true))) : '<div class="card"><div class="empty small">' + (FAV.size ? 'No upcoming match of your teams stored yet.' : 'Pick your teams in Favourites.') + '</div></div>';
       count = ms.length + (ms.length === 1 ? ' match' : ' matches');
     } else if (v === 'best') {
       const rated = D.filter((m) => m.rt != null);
@@ -776,7 +871,7 @@ html.popopen { overflow: hidden; }
       count = nt + (nt === 1 ? ' team' : ' teams');
     } else {
       const ms = D.filter((m) => isFav(m) && m.d >= P.from && m.d <= P.to).sort((a, b) => a.d < b.d ? -1 : 1);
-      body = ms.length ? card(ms.map((m) => row(m, [roundOf(m), v === 'day' ? '' : short(m.d)], null, true))) : '<div class="card"><div class="empty small">No Liverpool or FC Basel match ' + (v === 'day' ? 'on this day' : st.comp === 'all' ? 'this week' : 'in this round') + '.</div></div>';
+      body = ms.length ? card(ms.map((m) => row(m, [roundOf(m), v === 'day' ? '' : short(m.d)], null, true))) : '<div class="card"><div class="empty small">' + (FAV.size ? 'No match of your teams ' + (v === 'day' ? 'on this day' : st.comp === 'all' ? 'this week' : 'in this round') + '.' : 'Pick your teams in Favourites.') + '</div></div>';
       count = cnt(ms);
     }
     return '<section class="fav"><div class="favhead"><h2 class="label">Favourites <span class="favsub">' + esc(count) + '</span></h2>' +
@@ -960,14 +1055,155 @@ html.popopen { overflow: hidden; }
   window.addEventListener('resize', () => { if (!pop) return; const r = document.querySelector('[data-act="team"][data-id="' + CSS.escape(pop) + '"]'), stuck = stuckHeader();
     popTop = Math.max(stuck + 8, Math.min((r ? r.getBoundingClientRect().bottom : stuck) + 8, window.innerHeight * 0.45)); placePop(); });
 
+  // ---- Pop-overs of the top section (calendar, last update) and of the tab bar (Options) ----
+  let hp = null, RUNS = [], logOpen = false, calMonth = null, calLast = null;
+  const CODE = { sl: 'SUI', pl: 'ENG', ll: 'ESP', sa: 'ITA', bl: 'GER', l1: 'FRA' };
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const localIso = (d) => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  const hm = (t) => { const d = new Date(t); return isNaN(d) ? '' : pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
+  const runDay = (t) => { const d = new Date(t); if (isNaN(d)) return ''; const k = localIso(d), now = new Date(), y = new Date(now.getTime() - DAYMS);
+    return k === localIso(now) ? 'Today' : k === localIso(y) ? 'Yesterday' : short(k); };
+  const runTotal = (r) => Object.values(r.added || {}).reduce((s2, n) => s2 + (+n || 0), 0);
+  // Status of the daily update: fine (green), failed or overdue (red), unknown (no dot)
+  const runState = () => { const r = RUNS[0]; if (!r) return 'none'; const age = Date.now() - new Date(r.end || r.start).getTime(); return !r.ok || !(age < 30 * 3600000) ? 'bad' : 'ok'; };
+  function bellDot() { const d = document.querySelector('[data-act="bell"] .dot'); if (d) d.className = 'dot ' + runState(); }
+  const codes = (r) => ORDER.filter((c) => (r.added || {})[c] != null).map((c) => '<span class="lc"><i>' + CODE[c] + '</i>' + r.added[c] + '</span>').join('');
+  function bellHtml() {
+    const r = RUNS[0], stt = runState();
+    if (!r) return '<div class="nh"><span class="st bad">?</span><div><b>No update recorded yet</b><div class="ns">The daily update writes its log here from now on.</div></div></div>';
+    const n = runTotal(r);
+    const title = !r.ok ? 'Last update failed' : stt === 'bad' ? 'No update since ' + short(localIso(new Date(r.start))) : 'Last update ran fine';
+    const line = runDay(r.start) + ' ' + hm(r.start) + (r.end ? '–' + hm(r.end) : '') + ' · ' + (r.ok ? (n ? n + (n === 1 ? ' match' : ' matches') + ' added' : 'no matches yesterday') : esc(r.note || 'see the log'));
+    let h = '<div class="nh"><span class="st ' + (stt === 'ok' ? 'ok' : 'bad') + '">' + (stt === 'ok' ? ICON.check : '!') + '</span><div><b>' + title + '</b><div class="ns">' + line + '</div></div></div>';
+    if (n) h += '<div class="nl">' + codes(r) + '</div>';
+    if (RUNS.length) h += '<button type="button" class="nx" data-act="logtoggle" aria-expanded="' + logOpen + '">' + (logOpen ? 'Hide log' : 'Show log') + ICON.chev + '</button>';
+    if (logOpen) {
+      h += '<div class="log">' + RUNS.slice(0, 30).map((x) => { const t = runTotal(x);
+        return '<div class="lr"><div class="lt"><span class="st sm ' + (x.ok ? 'ok' : 'bad') + '">' + (x.ok ? ICON.check : '!') + '</span><b>' + runDay(x.start) + '</b><span class="tm">' + hm(x.start) + (x.end ? '–' + hm(x.end) : '') + '</span><span class="tt">' + (x.ok ? t + ' added' : 'failed') + '</span></div>' +
+          '<div class="nl">' + (t ? codes(x) : '<span class="nomatch">' + esc(x.ok ? (x.note || 'No matches yesterday') : (x.note || 'The update did not finish')) + '</span>') + '</div></div>'; }).join('') + '</div>';
+    }
+    return h;
+  }
+  // Calendar: weeks run Tuesday to Monday like the app. One tap on a day = its week, the same day again = just that day.
+  function calRange() { const ws = weeks(); const fx = ORDER.flatMap((c) => openFixtures(c)).map((m) => m.d).filter(Boolean).sort();
+    const end = ws.length ? plusDays(ws[ws.length - 1], 6) : ''; return { from: ws[0] || '', end, last: fx.length && fx[fx.length - 1] > end ? plusDays(tuesday(fx[fx.length - 1]), 6) : end }; }
+  function calHtml() {
+    const v = view(), R = calRange(), today = localIso(new Date());
+    const P = resolve(v);
+    const selDay = v === 'day' ? st.day : null, selWeek = v === 'matchweek' && P.from ? tuesday(P.from) : null;
+    if (!calMonth) { const base = selDay || P.from || today; calMonth = { y: +base.slice(0, 4), m: +base.slice(5, 7) - 1 }; }
+    const first = new Date(Date.UTC(calMonth.y, calMonth.m, 1, 12)), firstIso = iso(first), lastIso = iso(new Date(Date.UTC(calMonth.y, calMonth.m + 1, 0, 12)));
+    const rated = new Set(D.filter((m) => m.rt != null).map((m) => m.d)), fxd = new Set(ORDER.flatMap((c) => openFixtures(c)).map((m) => m.d));
+    let h = '<div class="ch"><button type="button" class="cb" data-act="calmonth" data-id="-1" aria-label="Previous month"' + (firstIso <= R.from ? ' disabled' : '') + '>' + ICON.prev + '</button><b>' + MONL[calMonth.m] + ' ' + calMonth.y + '</b>' +
+      '<button type="button" class="cb" data-act="calmonth" data-id="1" aria-label="Next month"' + (lastIso >= R.last ? ' disabled' : '') + '>' + ICON.next + '</button></div>';
+    h += '<div class="wh">' + ['Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'Mo'].map((x) => '<span>' + x + '</span>').join('') + '</div>';
+    for (let w = tuesday(firstIso); w <= lastIso; w = plusDays(w, 7)) {
+      h += '<div class="wk' + (w === selWeek ? ' wsel' : '') + '">';
+      for (let i = 0; i < 7; i++) {
+        const d = plusDays(w, i), ok = d >= R.from && d <= R.last;
+        const cls = ['c', d.slice(5, 7) !== firstIso.slice(5, 7) ? 'out' : '', rated.has(d) ? 'has' : fxd.has(d) ? 'fx' : '', d === today ? 'today' : '', d === selDay ? 'sel' : ''].filter(Boolean).join(' ');
+        h += '<button type="button" class="' + cls + '" data-act="calday" data-id="' + d + '"' + (ok ? '' : ' disabled') + ' aria-label="' + long(d) + '">' + (+d.slice(8)) + '</button>';
+      }
+      h += '</div>';
+    }
+    h += '<div class="cleg"><span><i></i>rated</span><span><i class="fx"></i>to come</span><span><i class="td"></i>today</span></div>';
+    h += '<div class="cnote">' + (calLast ? 'Tap ' + short(calLast).replace(/ \w+$/, '') + ' again for just that day' : 'Tap a day for its week · tap it again for just that day') + '</div>';
+    return h;
+  }
+  function calPick(d) {
+    const R = calRange(), future = d > R.end;
+    if (calLast === d && !future && allDays().includes(d)) {
+      st.day = d; st.next = false; calLast = null;
+      history.replaceState(null, '', '#day'); closeHp(); render(); return;
+    }
+    calLast = d;
+    if (future) { st.next = true; if (!hasNext()) { st.comp = 'all'; } }
+    else {
+      st.next = false; st.week = tuesday(d);
+      if (st.comp !== 'all') { const m = D.find((x) => x.c === st.comp && x.d >= st.week && x.d <= plusDays(st.week, 6)); if (m) st.round = m.r; else st.comp = 'all'; }
+    }
+    history.replaceState(null, '', '#week'); const y = window.scrollY; render(); window.scrollTo(0, y);
+    anim(document.querySelector('#main .slide'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+  }
+  function renderHp() {
+    const box = document.getElementById('hpop');
+    document.querySelectorAll('[data-act="bell"],[data-act="cal"],[data-act="options"]').forEach((b) => b.setAttribute('aria-expanded', String(hp === (b.dataset.act === 'options' ? 'opt' : b.dataset.act))));
+    const ot = document.querySelector('.tabbar [data-tab="opt"]'); if (ot) { if (hp === 'opt') ot.setAttribute('aria-current', 'page'); else ot.removeAttribute('aria-current'); }
+    if (!hp) { box.innerHTML = ''; return; }
+    const log0 = box.querySelector('.log'), logTop = log0 ? log0.scrollTop : 0;
+    const inner = hp === 'cal' ? calHtml() : hp === 'bell' ? bellHtml() : '<b>Options</b><br>Coming soon – notifications, theme and more.';
+    box.innerHTML = '<div class="hpop ' + (hp === 'cal' ? 'calp' : hp === 'bell' ? 'bellp' : 'optp') + '" role="dialog" aria-label="' + (hp === 'cal' ? 'Pick a day or a week' : hp === 'bell' ? 'Last update' : 'Options') + '"><span class="arr' + (hp === 'opt' ? ' down' : '') + '"></span>' + inner + '</div>';
+    const p = box.firstChild, arr = p.querySelector('.arr');
+    const btn = document.querySelector(hp === 'opt' ? '.tabbar [data-tab="opt"]' : '[data-act="' + hp + '"]').getBoundingClientRect();
+    const vw = document.documentElement.clientWidth, edge = Math.max(8, (vw - 760) / 2 + 8);
+    if (hp === 'opt') { p.style.bottom = (window.innerHeight - btn.top + 10) + 'px'; p.style.right = edge + 'px'; }
+    else { p.style.top = (document.getElementById('top').getBoundingClientRect().bottom + 8) + 'px'; if (hp === 'bell') { p.style.left = edge + 'px'; p.style.right = edge + 'px'; p.style.maxWidth = '520px'; p.style.marginLeft = 'auto'; } else p.style.right = edge + 'px'; }
+    if (hp === 'bell' && vw > 536) p.style.left = 'auto', p.style.width = '520px';
+    const pr = p.getBoundingClientRect(); arr.style.left = Math.round(btn.left + btn.width / 2 - pr.left - 6) + 'px';
+    const lg = p.querySelector('.log'); if (lg) lg.scrollTop = logTop;
+  }
+  function openHp(k) {
+    hp = k; calLast = null; calMonth = null; renderHp();
+    const p = document.querySelector('#hpop .hpop');
+    if (p) { p.style.transformOrigin = k === 'opt' ? '100% 100%' : '100% 0'; anim(p, [{ opacity: 0, transform: 'translateY(' + (k === 'opt' ? 4 : -4) + 'px) scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 180 }); }
+  }
+  function closeHp(fn) {
+    const p = document.querySelector('#hpop .hpop');
+    const fin = () => { hp = null; calLast = null; renderHp(); if (fn) fn(); };
+    if (!p) return fin();
+    hp = null; // further taps already see it closed
+    after(anim(p, [{ opacity: 1 }, { opacity: 0 }], { duration: 130, fill: 'forwards' }), fin);
+  }
+  window.addEventListener('resize', () => { if (hp) renderHp(); });
+
+  // ---- Favourites tab: search all teams of the six leagues, narrow by league, tap the star to add or remove ----
+  let favQ = '', favComp = 'all';
+  const plain = (n) => SHORT[n] || FIX[n] || n;
+  const fold = (t) => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  function teamsAll() { const t = new Map(); D.forEach((m) => { t.set(m.h, m.c); t.set(m.a, m.c); }); Object.values(FX).forEach((fx) => (fx.matches || []).forEach((f) => { if (!t.has(f.h)) t.set(f.h, fx.c); if (!t.has(f.a)) t.set(f.a, fx.c); })); return t; }
+  const byLeagueName = (T) => (a, b) => ORDER.indexOf(T.get(a)) - ORDER.indexOf(T.get(b)) || fold(plain(a)).localeCompare(fold(plain(b)));
+  const frow = (n, T) => '<div class="frow">' + FLAG[T.get(n)] + '<span class="fn">' + esc(plain(n)) + '</span><span class="fl2">' + C[T.get(n)] + '</span>' +
+    '<button type="button" class="fstar" data-act="favstar" data-id="' + esc(n) + '" aria-pressed="' + FAV.has(n) + '" aria-label="' + (FAV.has(n) ? 'Remove ' : 'Add ') + esc(plain(n)) + (FAV.has(n) ? ' from' : ' to') + ' favourites">' + (FAV.has(n) ? '★' : '☆') + '</button></div>';
+  const fsec = (title, rows, empty) => '<section class="fsec"><h2 class="label">' + title + '</h2>' + (rows.length ? card(rows) : '<div class="card"><div class="empty small">' + empty + '</div></div>') + '</section>';
+  function favLists() {
+    const T = teamsAll(), q = fold(favQ.trim()), inC = (n) => favComp === 'all' || T.get(n) === favComp;
+    const mine = Array.from(FAV).filter((n) => T.has(n)).sort(byLeagueName(T));
+    let h = '';
+    if (q) { const res = Array.from(T.keys()).filter((n) => inC(n) && (fold(n).includes(q) || fold(plain(n)).includes(q))).sort(byLeagueName(T));
+      h += fsec('Results', res.map((n) => frow(n, T)), 'No team found' + (favComp === 'all' ? '.' : ' in the ' + C[favComp] + '.')); }
+    h += fsec('Your teams', mine.map((n) => frow(n, T)), 'No favourites yet – tap ☆ next to a team.');
+    if (!q) h += fsec('All teams · ' + (favComp === 'all' ? 'All leagues' : C[favComp]), Array.from(T.keys()).filter(inC).sort(byLeagueName(T)).map((n) => frow(n, T)), 'No teams stored yet.');
+    return h;
+  }
+  const favPills = () => '<div class="pills flags" role="group" aria-label="League">' + '<button type="button" data-act="favcomp" data-id="all" aria-pressed="' + (favComp === 'all') + '" title="All leagues">All</button>' +
+    comps().map((k) => '<button type="button" data-act="favcomp" data-id="' + k + '" aria-pressed="' + (k === favComp) + '" aria-label="' + C[k] + '" title="' + C[k] + '">' + FLAG[k] + '</button>').join('') + '</div>';
+  function renderFav() {
+    const n = FAV.size;
+    document.getElementById('dbar').innerHTML = pbar('Favourites', n + (n === 1 ? ' team' : ' teams'));
+    document.getElementById('main').innerHTML = '<div class="slide favwrap"><div class="search">' + ICON.search + '<input id="favq" type="search" placeholder="Search a team" autocomplete="off" spellcheck="false" aria-label="Search a team" value="' + esc(favQ) + '">' +
+      (favQ ? '<button type="button" class="clr" data-act="favclear" aria-label="Clear search">✕</button>' : '') + '</div>' + favPills() + '<div id="favlists" class="favwrap">' + favLists() + '</div></div>';
+  }
+  function refreshFav() { const l = document.getElementById('favlists'); if (l) l.innerHTML = favLists(); const n = FAV.size; document.getElementById('dbar').innerHTML = pbar('Favourites', n + (n === 1 ? ' team' : ' teams'));
+    const s2 = document.querySelector('.search'); if (s2) { const c = s2.querySelector('.clr'); if (favQ && !c) s2.insertAdjacentHTML('beforeend', '<button type="button" class="clr" data-act="favclear" aria-label="Clear search">✕</button>'); if (!favQ && c) c.remove(); } }
+  document.addEventListener('input', (e) => { if (e.target.id === 'favq') { favQ = e.target.value; refreshFav(); } });
+
   function render() {
     const v = view();
     document.body.classList.add('compact');
-    document.querySelectorAll('nav a').forEach((a) => { if (a.dataset.view === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    const mt = v === 'day' ? '#day' : '#week';
+    document.querySelectorAll('.tabbar [data-tab]').forEach((a) => {
+      const on = a.dataset.tab === (v === 'day' || v === 'matchweek' ? 'matches' : v) || (a.dataset.tab === 'opt' && hp === 'opt');
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+      if (a.dataset.tab === 'matches') a.setAttribute('href', mt);
+    });
     document.getElementById('wrap').classList.toggle('wide', v === 'best');
-    const main = document.getElementById('main');
-    if (!loaded) { main.innerHTML = emptyCard(failed ? 'Ratings can’t be loaded right now. Check your connection and open the app again.' : 'Loading ratings…'); return; }
-    if (!D.length) { main.innerHTML = emptyCard('No ratings yet. The daily digest adds the previous day’s matches every morning.'); return; }
+    document.getElementById('top').classList.toggle('wide-h', v === 'best');
+    const cal = document.querySelector('[data-act="cal"]'); cal.disabled = !(v === 'day' || v === 'matchweek') || !loaded || !D.length;
+    bellDot();
+    const main = document.getElementById('main'), dbar = document.getElementById('dbar');
+    if (!loaded) { dbar.innerHTML = pbar(' ', ' '); main.innerHTML = emptyCard(failed ? 'Ratings can’t be loaded right now. Check your connection and open the app again.' : 'Loading ratings…'); return; }
+    if (v === 'fav') { renderFav(); renderPop(); renderHp(); return; }
+    if (!D.length) { dbar.innerHTML = pbar(' ', ' '); main.innerHTML = emptyCard('No ratings yet. The daily update adds the previous day’s matches every morning.'); return; }
     if (st.comp !== 'all' && !comps().includes(st.comp)) st.comp = 'all';
     const P = resolve(v);
     const content = v === 'matchweek' ? renderMatchweek(P) : v === 'best' ? renderBest() : renderDay(P);
@@ -975,9 +1211,11 @@ html.popopen { overflow: hidden; }
     // The next week with all leagues already brings its own sections (top picks, one per league).
     const sel = '<span>' + (st.comp === 'all' ? 'All leagues' : C[st.comp]) + '</span>';
     const body = v === 'matchweek' && P.next && st.comp === 'all' ? content : '<section class="selsec"><h2 class="label">' + sel + '</h2>' + content + '</section>';
-    main.innerHTML = periodBar(v, P) + '<div class="slide">' + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v, P) + pills() + body + '</div>';
+    dbar.innerHTML = periodBar(v, P);
+    main.innerHTML = '<div class="slide">' + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v, P) + pills() + body + '</div>';
     if (pop && v !== 'best') { pop = null; document.body.style.paddingBottom = ''; }
     renderPop();
+    renderHp();
   }
 
   // ---- State changes behind every button (kept separate so the animations can run before or after them) ----
@@ -1019,8 +1257,8 @@ html.popopen { overflow: hidden; }
     const fin = () => {
       mutate(act, null, v); render(); window.scrollTo(0, y0); busy = false;
       anim(document.querySelector('#main .slide'), [{ transform: 'translateX(' + dir * 56 + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260 });
-      anim(document.querySelector('#main .pbar .pt'), [{ opacity: 0 }, { opacity: 1 }], { duration: 260 });
-      const f = document.querySelector('#main [data-act="' + (act === 'latest' ? (dir > 0 ? 'prev' : 'next') : act) + '"]'); if (f && !f.disabled && !from) f.focus({ preventScroll: true });
+      anim(document.querySelector('#dbar .pt'), [{ opacity: 0 }, { opacity: 1 }], { duration: 260 });
+      const f = document.querySelector('#dbar [data-act="' + (act === 'latest' ? (dir > 0 ? 'prev' : 'next') : act) + '"]'); if (f && !f.disabled && !from) f.focus({ preventScroll: true });
     };
     if (!moving() || !old) return fin();
     busy = true;
@@ -1041,11 +1279,26 @@ html.popopen { overflow: hidden; }
       if (!e.target.closest('button[data-act]')) { closeInfo(() => keep(() => {})); return; }
       infoOpen = false;
     }
+    // An open pop-over (calendar, last update, Options) closes when you tap anywhere outside it
+    if (hp && !e.target.closest('#hpop') && !e.target.closest('[data-act="bell"],[data-act="cal"],[data-act="options"]')) { closeHp(); if (!e.target.closest('button[data-act], a[href]')) return; }
     if (pop && e.target.closest('[data-close]')) { closePop(); return; }
     const b = e.target.closest('button[data-act]');
     if (pop && popMenu && (!b || !['tsortmenu', 'tsortby'].includes(b.dataset.act))) { popMenu = false; renderPop(); if (!b) return; }
     if (!b) return;
     const act = b.dataset.act, id = b.dataset.id, v = view();
+
+    // Top section and tab bar pop-overs
+    if (act === 'bell' || act === 'cal' || act === 'options') { const k = act === 'options' ? 'opt' : act; if (hp === k) closeHp(); else if (hp) closeHp(() => openHp(k)); else openHp(k); return; }
+    if (act === 'calday') { calPick(id); return; }
+    if (act === 'calmonth') { const d = new Date(Date.UTC(calMonth.y, calMonth.m + (+id), 1)); calMonth = { y: d.getUTCFullYear(), m: d.getUTCMonth() }; renderHp();
+      anim(document.querySelector('#hpop .calp'), [{ opacity: 0.4 }, { opacity: 1 }], { duration: 160 }); return; }
+    if (act === 'logtoggle') { const opening = !logOpen; const lg = document.querySelector('#hpop .log');
+      if (opening) { logOpen = true; renderHp(); grow(document.querySelector('#hpop .log'), 260); } else shrink([lg], () => { logOpen = false; renderHp(); }); return; }
+    // Favourites tab
+    if (act === 'favstar') { FAV.has(id) ? FAV.delete(id) : FAV.add(id); saveFav(); refreshFav();
+      document.querySelectorAll('#favlists [data-act="favstar"]').forEach((x) => { if (x.dataset.id === id) anim(x, [{ transform: 'scale(.6)' }, { transform: 'scale(1.15)' }, { transform: 'none' }], { duration: 260 }); }); return; }
+    if (act === 'favcomp') { favComp = id; renderFav(); fadeUp(Array.from(document.querySelectorAll('#favlists > .fsec')), 40); return; }
+    if (act === 'favclear') { favQ = ''; renderFav(); const q = document.getElementById('favq'); if (q) q.focus(); return; }
 
     // Team popup
     if (act === 'team') { openPop(id); return; }
@@ -1142,7 +1395,7 @@ html.popopen { overflow: hidden; }
     const reset = (el) => { const cur = el.style.transform; el.style.transform = ''; el.style.opacity = ''; anim(el, [{ transform: cur || 'none' }, { transform: 'none' }], { duration: 200 }); };
     main.addEventListener('touchstart', (e) => {
       sw = null;
-      if (pop || busy || e.touches.length !== 1 || view() === 'best') return;
+      if (pop || hp || busy || e.touches.length !== 1 || view() === 'best' || view() === 'fav') return;
       const el = e.target.closest('.slide'); if (!el) return;
       sw = { x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0, on: false, el };
     }, { passive: true });
@@ -1153,7 +1406,7 @@ html.popopen { overflow: hidden; }
         if (Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.6) sw.on = true;
         else { if (Math.abs(dy) > 14) sw = null; return; }
       }
-      const btn = document.querySelector('#main [data-act="' + (dx < 0 ? 'next' : 'prev') + '"]'), ok = btn && !btn.disabled;
+      const btn = document.querySelector('#dbar [data-act="' + (dx < 0 ? 'next' : 'prev') + '"]'), ok = btn && !btn.disabled;
       sw.dx = dx; sw.ok = ok;
       if (moving()) { sw.el.style.transform = 'translateX(' + (ok ? dx * 0.6 : dx / 6) + 'px)'; sw.el.style.opacity = String(Math.max(0.5, 1 - Math.abs(dx) / 600)); }
     }, { passive: true });
@@ -1165,9 +1418,10 @@ html.popopen { overflow: hidden; }
     main.addEventListener('touchend', end);
     main.addEventListener('touchcancel', () => { if (sw && sw.on) reset(sw.el); sw = null; });
   })();
-  window.addEventListener('hashchange', () => { infoOpen = false; if (location.hash === '#outlook') { st.next = true; history.replaceState(null, '', '#week'); } render(); anim(document.querySelector('#main .slide'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 }); });
+  window.addEventListener('hashchange', () => { infoOpen = false; if (hp) { hp = null; } if (location.hash === '#outlook') { st.next = true; history.replaceState(null, '', '#week'); } render(); anim(document.querySelector('#main .slide'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 }); });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
+    if (hp) { closeHp(); return; }
     if (pop) { if (popMenu) { popMenu = false; renderPop(); } else closePop(); return; }
     if (infoOpen) closeInfo(() => { keep(() => {}); const f = document.querySelector('[data-act="info"]'); if (f) f.focus({ preventScroll: true }); });
   });
@@ -1178,7 +1432,8 @@ html.popopen { overflow: hidden; }
   async function load() {
     try {
       const get = (u) => fetch(u + '?t=' + Date.now(), { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
-      const [d, f] = await Promise.all([get('data/matches.json'), get('data/fixtures.json').catch(() => ({}))]);
+      const [d, f, rl] = await Promise.all([get('data/matches.json'), get('data/fixtures.json').catch(() => ({})), get('data/runs.json').catch(() => ({}))]);
+      RUNS = (rl && Array.isArray(rl.runs) ? rl.runs : []).filter((r) => r && r.start).sort((a, b) => (a.start < b.start ? 1 : -1));
       D = (d.matches || []).filter((m) => m && m.id && m.h && m.a && C[m.c]);
       const fx = {}; Object.values(f || {}).forEach((b) => { if (b && C[b.c] && Array.isArray(b.matches)) fx[b.c] = b; });
       FX = fx; loaded = true; failed = false; buildPred();

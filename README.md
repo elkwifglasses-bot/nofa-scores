@@ -8,9 +8,10 @@ The app is a single page (`index.html`) that reads two data files. GitHub Pages 
 
 | File | What it is |
 |---|---|
-| `index.html` | The app: Day, Week and Season tabs; the Week tab also shows the next week with predictions (flames) |
+| `index.html` | The app: Matches (day or week, picked with the calendar; also the next week with predictions), Season, Favourites (stored on the phone) and Options (coming soon); the bell shows the last daily update |
 | `data/matches.json` | Every match with its rating, breakdown and (from 23 Nov 2026) per-team figures `x`: `{ "season", "updated", "matches": [ ... ] }` |
 | `data/fixtures.json` | Next round per league, used for the next-week predictions: `{ "<league>": { "c", "r", "matches": [ { "h", "a", "d" } ] } }` |
+| `data/runs.json` | Log of the daily update runs (start, end, ok, matches added per league), shown under the bell: `{ "runs": [ { "d", "start", "end", "ok", "added", "note" } ] }` |
 | `manifest.webmanifest`, `icons/` | Make the page installable as an app (name, icon, full screen) |
 | `sw.js` | Offline cache: the app still opens without a connection, with the last data it saw |
 
