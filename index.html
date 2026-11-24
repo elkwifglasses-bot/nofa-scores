@@ -853,7 +853,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   function favorites(v, P) {
     let body = '', count = '';
     if (v === 'matchweek' && P.next) {
-      const ms = P.ms.filter(isFav).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
+      // Like for played matches: your teams from every league in the shown period, whatever league is selected below
+      const ms = ORDER.flatMap((c) => openFixtures(c)).filter((m) => isFav(m) && (!P.from || (m.d >= P.from && m.d <= P.to))).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
       body = ms.length ? card(ms.map((m) => row(m, [], null, true))) : '<div class="card"><div class="empty small">' + (FAV.size ? 'No upcoming match of your teams stored yet.' : 'Pick your teams in Favourites.') + '</div></div>';
       count = ms.length + (ms.length === 1 ? ' match' : ' matches');
     } else if (v === 'best') {
