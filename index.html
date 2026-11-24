@@ -307,8 +307,8 @@ a.hl:hover { color: var(--fg); }
 .star { color: inherit; }
 /* Match popup: scoreboard card, centred between the top section and the tab bar */
 .mdim2 { position: fixed; inset: 0; z-index: 44; background: rgba(0, 0, 0, .62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); touch-action: none; }
-.mwrap { position: fixed; z-index: 45; left: 0; right: 0; display: flex; align-items: center; justify-content: center; padding: 0 max(8px, env(safe-area-inset-left, 0px)); pointer-events: none; }
-.mcard { pointer-events: auto; position: relative; width: 100%; max-width: 560px; max-height: 100%; display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 18px; box-shadow: 0 14px 36px rgba(0, 0, 0, .6); padding: 14px 14px 0; overflow: hidden; }
+.mwrap { position: fixed; z-index: 45; left: 0; right: 0; display: flex; align-items: center; justify-content: center; padding: 0 max(18px, env(safe-area-inset-left, 0px)); pointer-events: none; }
+.mcard { pointer-events: auto; position: relative; width: 100%; max-width: 520px; max-height: 100%; display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 18px; box-shadow: 0 14px 36px rgba(0, 0, 0, .6); padding: 14px 14px 0; overflow: hidden; }
 .mcard .mx { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; min-height: 32px; padding: 0; border-radius: 8px; color: var(--muted); }
 .mmeta { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 12px; color: var(--muted); }
 .mmeta .flag { width: 16px; height: 11px; border-radius: 2px; }
@@ -355,7 +355,7 @@ button, a, .calp .c { touch-action: manipulation; }
 .tpop .menu { transform-origin: 100% 0; }
 /* Team popup (Season table): the page scrolls the tapped row under the header, the popup fills the rest of the screen */
 .tdim { position: fixed; inset: 0; z-index: 30; touch-action: none; background: rgba(0, 0, 0, .62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
-.tpop { position: fixed; z-index: 31; left: max(8px, calc((100vw - 760px) / 2 + 8px)); right: max(8px, calc((100vw - 760px) / 2 + 8px)); bottom: calc(74px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0, 0, 0, .6); }
+.tpop { position: fixed; z-index: 31; left: max(18px, calc((100vw - 720px) / 2 + 18px)); right: max(18px, calc((100vw - 720px) / 2 + 18px)); bottom: calc(74px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0, 0, 0, .6); }
 .tpop::before { display: none; content: ""; position: absolute; top: -7px; left: 44px; width: 12px; height: 12px; background: #1B1F23; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); transform: rotate(45deg); }
 .tpop .tph { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 14px 14px 0; }
 .tpop .tpn { display: flex; align-items: center; gap: 10px; font: 700 20px/1.2 var(--display); min-width: 0; }
@@ -1279,18 +1279,21 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   // Show score / Breakdown: the part slides open below the buttons (the card grows, staying centred)
   function toggleMatch(which) {
     const key = which === 'mscore' ? 'facts' : 'why', isOn = which === 'mscore' ? mScore : mWhy;
-    const panel = document.querySelector('#mpop [data-p="' + key + '"]');
+    const panel = document.querySelector('#mpop .mbody .panel'); // whichever part is open now (only one at a time)
     const card = document.querySelector('#mpop .mcard'), h0 = card ? card.offsetHeight : 0;
     const apply = () => {
-      if (which === 'mscore') mScore = !mScore; else mWhy = !mWhy;
+      // Score and breakdown are either-or: opening one closes the other
+      const wasScore = mScore;
+      if (which === 'mscore') { mScore = !mScore; if (mScore) mWhy = false; } else { mWhy = !mWhy; if (mWhy) mScore = false; }
       renderMatch();
+      if (which === 'mwhy' && wasScore && !mScore) anim(document.querySelector('#mpop .mmid .chip'), [{ transform: 'scale(.8)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 220 });
       const c2 = document.querySelector('#mpop .mcard'), h1 = c2 ? c2.offsetHeight : 0;
       if (c2 && h0 && h1 !== h0) anim(c2, [{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: 240 });
       if (!isOn) { const p = document.querySelector('#mpop [data-p="' + key + '"]'); anim(p, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 240, delay: 60, fill: 'backwards' }); }
       if (which === 'mscore') anim(document.querySelector('#mpop .mmid .chip'), [{ transform: 'scale(.8)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 220 });
       const f = document.querySelector('#mpop [data-act="' + which + '"]'); if (f) f.focus({ preventScroll: true });
     };
-    if (isOn && panel && moving()) after(anim(panel, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: 'forwards' }), apply); else apply();
+    if (panel && moving()) after(anim(panel, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: 'forwards' }), apply); else apply();
   }
   window.addEventListener('resize', () => { if (mpop) placeMatch(); });
 
