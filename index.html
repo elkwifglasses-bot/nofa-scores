@@ -301,7 +301,6 @@ a.hl:hover { color: var(--fg); }
 .ttab .thead .tsort.c .arr { position: absolute; right: -1px; top: 50%; transform: translateY(-50%); }
 
 .star { color: inherit; }
-.selsec > h2.label .flag { width: 16px; height: 11px; border-radius: 2px; }
 .selsec > .grid { margin-top: 2px; }
 .pbar .sq.back svg { transform: scaleX(-1); }
 .infobox .potv { display: inline; }
@@ -840,7 +839,7 @@ a.hl:hover { color: var(--fg); }
     const content = v === 'matchweek' ? renderMatchweek(P) : v === 'best' ? renderBest() : renderDay(P);
     // Under the league pills: a header naming the selection (All leagues / the league), like the section headers of the next week.
     // The next week with all leagues already brings its own sections (top picks, one per league).
-    const sel = st.comp === 'all' ? '<span>All leagues</span>' : label(st.comp);
+    const sel = '<span>' + (st.comp === 'all' ? 'All leagues' : C[st.comp]) + '</span>';
     const body = v === 'matchweek' && P.next && st.comp === 'all' ? content : '<section class="selsec"><h2 class="label">' + sel + '</h2>' + content + '</section>';
     main.innerHTML = periodBar(v, P) + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v, P) + pills() + body;
   }
