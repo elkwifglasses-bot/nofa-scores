@@ -322,9 +322,9 @@ button, a, .calp .c { touch-action: manipulation; }
 .infobox.bubble { transform-origin: calc(100% - 19px) 0; }
 .tpop .menu { transform-origin: 100% 0; }
 /* Team popup (Season table): the page scrolls the tapped row under the header, the popup fills the rest of the screen */
-.tdim { position: fixed; inset: 0; z-index: 30; background: rgba(0, 0, 0, .45); }
+.tdim { position: fixed; inset: 0; z-index: 30; touch-action: none; background: rgba(0, 0, 0, .45); }
 .tpop { position: fixed; z-index: 31; left: max(8px, calc((100vw - 760px) / 2 + 8px)); right: max(8px, calc((100vw - 760px) / 2 + 8px)); bottom: calc(74px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0, 0, 0, .6); }
-.tpop::before { content: ""; position: absolute; top: -7px; left: 44px; width: 12px; height: 12px; background: #1B1F23; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); transform: rotate(45deg); }
+.tpop::before { display: none; content: ""; position: absolute; top: -7px; left: 44px; width: 12px; height: 12px; background: #1B1F23; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); transform: rotate(45deg); }
 .tpop .tph { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 14px 14px 0; }
 .tpop .tpn { display: flex; align-items: center; gap: 10px; font: 700 20px/1.2 var(--display); min-width: 0; }
 .tpop .tpn .chip { min-width: 40px; height: 26px; border-radius: 8px; font-size: 13px; }
@@ -414,6 +414,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 .tabbar [aria-current="page"] { color: var(--accent); font-weight: 600; }
 .tabbar > *:hover { color: var(--fg); }
 /* Pop-overs of the top section and the tab bar (same look as the ⓘ bubble) */
+.hdim { position: fixed; inset: 0; z-index: 39; background: rgba(0, 0, 0, .45); touch-action: none; }
 .hpop { position: fixed; z-index: 40; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 14px 36px rgba(0, 0, 0, .6); }
 .hpop .arr { position: absolute; top: -7px; width: 12px; height: 12px; background: #1B1F23; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); transform: rotate(45deg); }
 .hpop .arr.down { top: auto; bottom: -7px; border: 0; border-right: 1px solid var(--btn-line); border-bottom: 1px solid var(--btn-line); }
@@ -860,9 +861,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
           favRows.push({ me, team, c, size: table.length, best: mine.slice().sort(byRating)[0] });
         });
         tSort(favRows.map((f) => f.me)).forEach((me) => {
-          const f = favRows.find((x) => x.me === me), open = favOpen.has(f.team);
-          parts.push(tRow(me, me.rk, true, 'data-act="favteam" data-id="' + esc(f.team) + '" aria-expanded="' + open + '" title="' + esc(f.team) + ': rank ' + me.rk + ' of ' + f.size + ' in ' + C[f.c] + ' · tap for their best match"'));
-          if (open) parts.push(row(f.best, [], '', true));
+          const f = favRows.find((x) => x.me === me);
+          parts.push(tRow(me, me.rk, true, 'data-act="team" data-id="' + esc('fav|' + f.c + '|' + f.team) + '" title="' + esc(name(f.team)) + ': all matches"'));
         });
         body = parts.length ? '<div class="card ttab">' + tHead() + parts.join('') + '</div>' : '<div class="card"><div class="empty">No rated matches for your teams yet.</div></div>';
       } else FAV.forEach((team) => {
@@ -1032,38 +1032,30 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     placePop();
     const list = box.querySelector('.tplist'); if (list) list.scrollTop = popList;
   }
-  // Popup sits right under the tapped row (which the page scrolls to, just below the header)
-  let popTop = 0;
-  const stuckHeader = () => { const hd = document.querySelector('header'); return hd.offsetHeight + (parseFloat(getComputedStyle(hd).top) || 0); };
+  // The popup fills the space between the top section and the tab bar; the page behind stays where it is
   function placePop() {
-    const p = document.querySelector('.tpop'); if (p) p.style.top = popTop + 'px';
+    const p = document.querySelector('.tpop'); if (!p) return;
+    const tb = document.querySelector('.tabbar');
+    p.style.top = (document.getElementById('top').getBoundingClientRect().bottom + 8) + 'px';
+    p.style.bottom = (window.innerHeight - (tb ? tb.getBoundingClientRect().top : window.innerHeight) + 8) + 'px';
   }
   function openPop(id) {
-    popY = window.scrollY; pop = id; popSort = 'new'; popMenu = false; popList = 0;
-    document.body.style.paddingBottom = '100vh'; // room to scroll the row up, even near the end of the page
-    const r = document.querySelector('[data-act="team"][data-id="' + CSS.escape(id) + '"]'), stuck = stuckHeader();
-    popTop = Math.max(stuck + 8, Math.min(stuck + (r ? r.offsetHeight : 0) + 8, window.innerHeight * 0.45));
-    if (r) window.scrollTo({ top: window.scrollY + r.getBoundingClientRect().top - stuck, behavior: moving() ? 'smooth' : 'auto' });
+    pop = id; popSort = 'new'; popMenu = false; popList = 0;
     renderPop();
-    anim(document.querySelector('.tdim'), [{ opacity: 0 }, { opacity: 1 }], { duration: 240 });
-    anim(document.querySelector('.tpop'), [{ opacity: 0, transform: 'translateY(32px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: 80, fill: 'backwards' });
+    anim(document.querySelector('.tdim'), [{ opacity: 0 }, { opacity: 1 }], { duration: 220 });
+    anim(document.querySelector('.tpop'), [{ opacity: 0, transform: 'translateY(24px)' }, { opacity: 1, transform: 'none' }], { duration: 300, delay: 40, fill: 'backwards' });
   }
   let popClosing = false;
   function closePop() {
     if (popClosing || !pop) return;
     popClosing = true; popMenu = false;
     const p = document.querySelector('.tpop'), d = document.querySelector('.tdim');
-    const fin = () => {
-      pop = null; popClosing = false; renderPop();
-      window.scrollTo({ top: popY, behavior: moving() ? 'smooth' : 'auto' });
-      setTimeout(() => { if (!pop) document.body.style.paddingBottom = ''; }, moving() ? 800 : 0);
-    };
+    const fin = () => { pop = null; popClosing = false; renderPop(); };
     if (!p || !moving()) return fin();
     anim(d, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' });
-    after(anim(p, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(32px)' }], { duration: 200, fill: 'forwards' }), fin);
+    after(anim(p, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(24px)' }], { duration: 200, fill: 'forwards' }), fin);
   }
-  window.addEventListener('resize', () => { if (!pop) return; const r = document.querySelector('[data-act="team"][data-id="' + CSS.escape(pop) + '"]'), stuck = stuckHeader();
-    popTop = Math.max(stuck + 8, Math.min((r ? r.getBoundingClientRect().bottom : stuck) + 8, window.innerHeight * 0.45)); placePop(); });
+  window.addEventListener('resize', () => { if (pop) placePop(); });
 
   // ---- Pop-overs of the top section (calendar, last update) and of the tab bar (Options) ----
   let hp = null, RUNS = [], logOpen = false, calMonth = null, calLast = null;
@@ -1124,13 +1116,19 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const R = calRange(), future = d > R.end;
     if (calLast === d && !future) {
       st.day = d; st.next = false; calLast = null;
-      history.replaceState(null, '', '#day'); closeHp(); render(); return;
+      history.replaceState(null, '', '#day'); const y = window.scrollY; render(); window.scrollTo(0, y);
+      anim(document.querySelector('#main .slide'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 }); return;
     }
     calLast = d;
     if (future) { st.next = true; if (!hasNext()) { st.comp = 'all'; } }
     else {
       st.next = false; st.week = tuesday(d);
-      if (st.comp !== 'all') { const m = D.find((x) => x.c === st.comp && x.d >= st.week && x.d <= plusDays(st.week, 6)); if (m) st.round = m.r; else st.comp = 'all'; }
+      if (st.comp !== 'all') {
+        // A round belongs to the week of its first match (postponed matches weeks later don't move it)
+        const start = {}; D.forEach((x) => { if (x.c === st.comp && (!start[x.r] || x.d < start[x.r])) start[x.r] = x.d; });
+        const we = plusDays(st.week, 6), hit = Object.keys(start).filter((r) => start[r] >= st.week && start[r] <= we).map(Number).sort((a, b) => a - b)[0];
+        if (hit != null) st.round = hit; else st.comp = 'all';
+      }
     }
     history.replaceState(null, '', '#week'); const y = window.scrollY; render(); window.scrollTo(0, y);
     anim(document.querySelector('#main .slide'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
@@ -1142,8 +1140,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (!hp) { box.innerHTML = ''; return; }
     const log0 = box.querySelector('.log'), logTop = log0 ? log0.scrollTop : 0;
     const inner = hp === 'cal' ? calHtml() : hp === 'bell' ? bellHtml() : '<b>Options</b><br>Coming soon – notifications, theme and more.';
-    box.innerHTML = '<div class="hpop ' + (hp === 'cal' ? 'calp' : hp === 'bell' ? 'bellp' : 'optp') + '" role="dialog" aria-label="' + (hp === 'cal' ? 'Pick a day or a week' : hp === 'bell' ? 'Last update' : 'Options') + '"><span class="arr' + (hp === 'opt' ? ' down' : '') + '"></span>' + inner + '</div>';
-    const p = box.firstChild, arr = p.querySelector('.arr');
+    box.innerHTML = (hp === 'cal' ? '<div class="hdim" data-hclose="1"></div>' : '') + '<div class="hpop ' + (hp === 'cal' ? 'calp' : hp === 'bell' ? 'bellp' : 'optp') + '" role="dialog" aria-label="' + (hp === 'cal' ? 'Pick a day or a week' : hp === 'bell' ? 'Last update' : 'Options') + '"><span class="arr' + (hp === 'opt' ? ' down' : '') + '"></span>' + inner + '</div>';
+    const p = box.querySelector('.hpop'), arr = p.querySelector('.arr');
     const btn = document.querySelector(hp === 'opt' ? '.tabbar [data-tab="opt"]' : '[data-act="' + hp + '"]').getBoundingClientRect();
     const vw = document.documentElement.clientWidth, edge = Math.max(8, (vw - 760) / 2 + 8);
     if (hp === 'opt') { p.style.bottom = (window.innerHeight - btn.top + 10) + 'px'; p.style.right = edge + 'px'; }
@@ -1155,6 +1153,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   function openHp(k) {
     hp = k; calLast = null; calMonth = null; renderHp();
     const p = document.querySelector('#hpop .hpop');
+    anim(document.querySelector('#hpop .hdim'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
     if (p) { p.style.transformOrigin = k === 'opt' ? '100% 100%' : '100% 0'; anim(p, [{ opacity: 0, transform: 'translateY(' + (k === 'opt' ? 4 : -4) + 'px) scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 180 }); }
   }
   function closeHp(fn) {
@@ -1162,6 +1161,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const fin = () => { hp = null; calLast = null; renderHp(); if (fn) fn(); };
     if (!p) return fin();
     hp = null; // further taps already see it closed
+    anim(document.querySelector('#hpop .hdim'), [{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: 'forwards' });
     after(anim(p, [{ opacity: 1 }, { opacity: 0 }], { duration: 130, fill: 'forwards' }), fin);
   }
   window.addEventListener('resize', () => { if (hp) renderHp(); });
@@ -1223,7 +1223,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const body = v === 'matchweek' && P.next && st.comp === 'all' ? content : '<section class="selsec"><h2 class="label">' + sel + '</h2>' + content + '</section>';
     dbar.innerHTML = periodBar(v, P);
     main.innerHTML = '<div class="slide">' + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v, P) + pills() + body + '</div>';
-    if (pop && v !== 'best') { pop = null; document.body.style.paddingBottom = ''; }
+    if (pop && v !== 'best') pop = null;
     renderPop();
     renderHp();
   }
@@ -1292,8 +1292,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       infoOpen = false;
     }
     // An open pop-over (calendar, last update, Options) closes when you tap anywhere outside it
-    if (hp && !e.target.closest('#hpop') && !e.target.closest('[data-act="bell"],[data-act="cal"],[data-act="options"]')) { closeHp(); if (!e.target.closest('button[data-act], a[href]')) return; }
-    if (pop && e.target.closest('[data-close]')) { closePop(); return; }
+    if (hp && !e.target.closest('#hpop .hpop')) { e.preventDefault(); closeHp(); return; }
+    if (pop && e.target.closest('[data-close]')) { e.preventDefault(); closePop(); return; }
     const b = e.target.closest('button[data-act]');
     if (pop && popMenu && (!b || !['tsortmenu', 'tsortby'].includes(b.dataset.act))) { popMenu = false; renderPop(); if (!b) return; }
     if (!b) return;
