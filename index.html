@@ -305,6 +305,11 @@ a.hl:hover { color: var(--fg); }
 .ttab .thead .tsort.c .arr { position: absolute; right: -1px; top: 50%; transform: translateY(-50%); }
 
 .star { color: inherit; }
+.idim { z-index: 39; }
+.infobox.bubble { z-index: 41; }
+.tpop .mdim { position: fixed; inset: 0; z-index: 2; background: rgba(0, 0, 0, .35); border-radius: 14px; }
+.tpop .dd { z-index: 3; }
+.tpop .tps { position: relative; z-index: 3; }
 h2.label .hstar { width: 14px; height: 14px; color: #7B838A; flex: none; margin-right: -2px; }
 button, a, .calp .c { touch-action: manipulation; }
 /* Start screen */
@@ -1003,7 +1008,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   };
   const sectionHead = (v, P) => '<div class="favhead sect"><h2 class="label">' + (v === 'best' ? 'League' : 'Matches') + '</h2>' +
     '<button type="button" class="ghost info" data-act="info" aria-expanded="' + infoOpen + '" aria-controls="infobox" aria-label="About this tab" title="About this tab">' + ICON.info + '</button>' +
-    (infoOpen ? '<div class="infobox bubble" id="infobox" role="dialog" aria-label="About this tab">' + INFO[v] + (P && P.next ? '<br><b>' + (st.comp === 'all' ? 'Next week' : 'This round') + ':</b> ' + potCount(P.ms) : '') + '</div>' : '') + '</div>';
+    (infoOpen ? '<div class="hdim idim"></div><div class="infobox bubble" id="infobox" role="dialog" aria-label="About this tab">' + INFO[v] + (P && P.next ? '<br><b>' + (st.comp === 'all' ? 'Next week' : 'This round') + ':</b> ' + potCount(P.ms) : '') + '</div>' : '') + '</div>';
 
   // ---- Team popup (tap a team in the Season table) ----
   let pop = null, popY = 0, popSort = 'new', popMenu = false, popList = 0;
@@ -1026,7 +1031,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       '<button type="button" class="tpx" data-act="tclose" aria-label="Close" title="Close">✕</button></div>' +
       '<div class="tps"><span class="tpc">' + ms.length + (ms.length === 1 ? ' match' : ' matches') + '</span><div class="dd">' +
       '<button type="button" class="ddb" data-act="tsortmenu" aria-haspopup="menu" aria-expanded="' + popMenu + '" aria-label="Sort: ' + cur + '">' + ICON_SORT + '<span>' + cur + '</span>' + ICON.chev + '</button>' +
-      (popMenu ? '<div class="menu" role="menu">' + SORTS.map(([k, l]) => '<button type="button" role="menuitemradio" aria-checked="' + (k === popSort) + '" data-act="tsortby" data-id="' + k + '"><span class="ck">' + (k === popSort ? '✓' : '') + '</span>' + l + '</button>').join('') + '</div>' : '') +
+      (popMenu ? '<div class="mdim"></div><div class="menu" role="menu">' + SORTS.map(([k, l]) => '<button type="button" role="menuitemradio" aria-checked="' + (k === popSort) + '" data-act="tsortby" data-id="' + k + '"><span class="ck">' + (k === popSort ? '✓' : '') + '</span>' + l + '</button>').join('') + '</div>' : '') +
       '</div></div><div class="tplist">';
     ms.forEach((m) => { h += '<div class="tmr ' + (m.h === n ? 'me-h' : 'me-a') + '"><div class="mt">' + short(m.d) + ' · ' + RN[m.c] + ' ' + m.r + '</div>' + row(m, [], null, false) + '</div>'; });
     box.innerHTML = h + '</div></div>';
@@ -1141,7 +1146,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (!hp) { box.innerHTML = ''; return; }
     const log0 = box.querySelector('.log'), logTop = log0 ? log0.scrollTop : 0;
     const inner = hp === 'cal' ? calHtml() : hp === 'bell' ? bellHtml() : '<b>Options</b><br>Coming soon – notifications, theme and more.';
-    box.innerHTML = (hp === 'cal' ? '<div class="hdim" data-hclose="1"></div>' : '') + '<div class="hpop ' + (hp === 'cal' ? 'calp' : hp === 'bell' ? 'bellp' : 'optp') + '" role="dialog" aria-label="' + (hp === 'cal' ? 'Pick a day or a week' : hp === 'bell' ? 'Last update' : 'Options') + '"><span class="arr' + (hp === 'opt' ? ' down' : '') + '"></span>' + inner + '</div>';
+    box.innerHTML = '<div class="hdim" data-hclose="1"></div>' + '<div class="hpop ' + (hp === 'cal' ? 'calp' : hp === 'bell' ? 'bellp' : 'optp') + '" role="dialog" aria-label="' + (hp === 'cal' ? 'Pick a day or a week' : hp === 'bell' ? 'Last update' : 'Options') + '"><span class="arr' + (hp === 'opt' ? ' down' : '') + '"></span>' + inner + '</div>';
     const p = box.querySelector('.hpop'), arr = p.querySelector('.arr');
     const btn = document.querySelector(hp === 'opt' ? '.tabbar [data-tab="opt"]' : '[data-act="' + hp + '"]').getBoundingClientRect();
     const vw = document.documentElement.clientWidth, edge = Math.max(8, (vw - 760) / 2 + 8);
@@ -1283,20 +1288,18 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   function closeInfo(fn) {
     const bub = document.querySelector('.infobox.bubble');
     infoOpen = false;
+    anim(document.querySelector('.idim'), [{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: 'forwards' });
     after(anim(bub, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-4px) scale(.97)' }], { duration: 140, fill: 'forwards' }), fn);
   }
 
   document.addEventListener('click', (e) => {
     // An open ⓘ bubble closes when you tap anywhere outside it
-    if (infoOpen && !e.target.closest('.bubble') && !e.target.closest('[data-act="info"]')) {
-      if (!e.target.closest('button[data-act]')) { closeInfo(() => keep(() => {})); return; }
-      infoOpen = false;
-    }
+    if (infoOpen && !e.target.closest('.bubble')) { e.preventDefault(); closeInfo(() => keep(() => {})); return; }
     // An open pop-over (calendar, last update, Options) closes when you tap anywhere outside it
     if (hp && !e.target.closest('#hpop .hpop')) { e.preventDefault(); closeHp(); return; }
     if (pop && e.target.closest('[data-close]')) { e.preventDefault(); closePop(); return; }
     const b = e.target.closest('button[data-act]');
-    if (pop && popMenu && (!b || !['tsortmenu', 'tsortby'].includes(b.dataset.act))) { popMenu = false; renderPop(); if (!b) return; }
+    if (pop && popMenu && !e.target.closest('.tpop .menu')) { e.preventDefault(); after(anim(document.querySelector('.tpop .menu'), [{ opacity: 1 }, { opacity: 0 }], { duration: 110, fill: 'forwards' }), () => { popMenu = false; renderPop(); }); return; }
     if (!b) return;
     const act = b.dataset.act, id = b.dataset.id, v = view();
 
@@ -1329,7 +1332,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (act === 'team') { openPop(id); return; }
     if (act === 'tclose') { closePop(); return; }
     if (act === 'tsortmenu') {
-      if (!popMenu) { popMenu = true; renderPop(); anim(document.querySelector('.tpop .menu'), [{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 170 }); }
+      if (!popMenu) { popMenu = true; renderPop(); anim(document.querySelector('.tpop .mdim'), [{ opacity: 0 }, { opacity: 1 }], { duration: 170 }); anim(document.querySelector('.tpop .menu'), [{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 170 }); }
       else after(anim(document.querySelector('.tpop .menu'), [{ opacity: 1 }, { opacity: 0 }], { duration: 110, fill: 'forwards' }), () => { popMenu = false; renderPop(); });
       return;
     }
@@ -1380,6 +1383,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       if (infoOpen) { closeInfo(() => keep(() => {})); return; }
       keep(() => mutate(act, id, v));
       const bub = document.querySelector('.infobox.bubble');
+      anim(document.querySelector('.idim'), [{ opacity: 0 }, { opacity: 1 }], { duration: 180 });
       anim(bub, [{ opacity: 0, transform: 'translateY(-4px) scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 180 });
       const f = document.querySelector('[data-act="info"]'); if (f) f.focus({ preventScroll: true });
       return;
