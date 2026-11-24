@@ -987,7 +987,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     }
     if (st.comp === 'all') { const ms = D.filter((m) => m.d >= P.from && m.d <= P.to).concat(extraFixtures((m) => m.d >= P.from && m.d <= P.to)); return pbar(span(P.from, P.to), cnt(ms), { what: 'week', canPrev: P.i > 0, canNext: P.i < P.ws.length - 1 || hasNext(), latest: !P.atDefault }); }
     const ms = D.filter((m) => m.c === st.comp && m.r === st.round).concat(extraFixtures((m) => m.c === st.comp && m.r === st.round));
-    return pbar(RN[st.comp] + ' ' + st.round, cnt(ms), { what: 'round', canPrev: P.i > 0, canNext: P.i < P.rounds.length - 1 || hasNext(), latest: !P.atDefault });
+    // Dates of the round, like the next round shows them: "21–23 Nov · 10 matches"
+    const rd = ms.map((m) => m.d).filter(Boolean).sort(), rdates = rd.length ? (rd[0] === rd[rd.length - 1] ? dm(rd[0]) : span(rd[0], rd[rd.length - 1])) + ' · ' : '';
+    return pbar(RN[st.comp] + ' ' + st.round, rdates + cnt(ms), { what: 'round', canPrev: P.i > 0, canNext: P.i < P.rounds.length - 1 || hasNext(), latest: !P.atDefault });
   }
 
   // One ⓘ per tab, at the right end of the "All matches" / "All teams" header
