@@ -301,6 +301,21 @@ a.hl:hover { color: var(--fg); }
 .ttab .thead .tsort.c .arr { position: absolute; right: -1px; top: 50%; transform: translateY(-50%); }
 
 .star { color: inherit; }
+/* Start screen */
+#splash { position: fixed; inset: 0; z-index: 100; background: #0E1012; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding-bottom: 4vh; }
+#splash[hidden] { display: none; }
+#splash svg { width: 104px; height: 104px; color: var(--accent); }
+#splash .sp-t { font: 600 17px var(--display); letter-spacing: .01em; color: var(--fg); }
+@media (prefers-reduced-motion: no-preference) {
+  #splash svg { animation: sp-in .9s cubic-bezier(.2,.7,.2,1) both; }
+  #splash .sp-t { animation: sp-t .6s cubic-bezier(.2,.7,.2,1) .25s both; }
+}
+@keyframes sp-in { from { transform: scale(.9); } to { transform: none; } }
+@keyframes sp-t { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* Everything under the period bar moves as one when the day / week / round changes */
+.slide { display: flex; flex-direction: column; gap: var(--gap-block); touch-action: pan-y; }
+.infobox.bubble { transform-origin: calc(100% - 19px) 0; }
+.tpop .menu { transform-origin: 100% 0; }
 /* Team popup (Season table): the page scrolls the tapped row under the header, the popup fills the rest of the screen */
 .tdim { position: fixed; inset: 0; z-index: 30; background: rgba(0, 0, 0, .45); }
 .tpop { position: fixed; z-index: 31; left: max(16px, calc((100vw - 760px) / 2 + 16px)); right: max(16px, calc((100vw - 760px) / 2 + 16px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0, 0, 0, .6); }
@@ -378,6 +393,14 @@ html.popopen { overflow: hidden; }
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.2l4.2 3-1.6 4.9H9.4L7.8 10.2z" fill="currentColor" stroke="none"/></svg>
+  <div class="sp-t">score free football scores</div>
+</div>
+<script>
+  // Start screen: only when the installed app starts fresh (it carries on from Android's own start screen); ?splash=1 shows it in a browser
+  if ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || /[?&]splash=1/.test(location.search)) { document.getElementById('splash').hidden = false; window.__splashAt = performance.now(); }
+</script>
 <div class="wrap" id="wrap">
   <header>
     <div class="brand">
@@ -481,6 +504,27 @@ html.popopen { overflow: hidden; }
     play: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor"/></svg>'
   };
 
+  // ---- Motion: short, calm animations (Web Animations API); none at all when the phone asks for reduced motion ----
+  const RM = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  const moving = () => !RM.matches && typeof Element !== 'undefined' && !!Element.prototype.animate;
+  const EASE = 'cubic-bezier(.2,.7,.2,1)';
+  const anim = (el, kf, o) => (moving() && el ? el.animate(kf, Object.assign({ duration: 220, easing: EASE }, o)) : null);
+  const after = (a, fn) => { if (!a) { fn(); return; } let d = false; const f = () => { if (!d) { d = true; fn(); } }; a.onfinish = f; a.oncancel = f; };
+  const dims = (el) => { const cs = getComputedStyle(el); return { h: el.offsetHeight + 'px', mt: cs.marginTop, mb: cs.marginBottom, pt: cs.paddingTop, pb: cs.paddingBottom }; };
+  const flat = { height: '0px', marginTop: '0px', marginBottom: '0px', paddingTop: '0px', paddingBottom: '0px', opacity: 0 };
+  // Slide open (height from 0) / slide shut (to 0), then continue
+  function grow(el, dur) {
+    if (!el || !moving() || el.hidden) return;
+    const d = dims(el); el.style.overflow = 'hidden';
+    after(anim(el, [flat, { height: d.h, marginTop: d.mt, marginBottom: d.mb, paddingTop: d.pt, paddingBottom: d.pb, opacity: 1 }], { duration: dur || 260 }), () => { el.style.overflow = ''; });
+  }
+  function shrink(els, fn) {
+    els = els.filter(Boolean); if (!els.length || !moving()) { fn(); return; }
+    let n = els.length;
+    els.forEach((el) => { const d = dims(el); el.style.overflow = 'hidden';
+      after(anim(el, [{ height: d.h, marginTop: d.mt, marginBottom: d.mb, paddingTop: d.pt, paddingBottom: d.pb, opacity: 1 }, flat], { duration: 190, fill: 'forwards' }), () => { if (--n === 0) fn(); }); });
+  }
+
   let D = [], loaded = false, failed = false, FX = {};
   const rev = new Set(), why = new Set(), openRows = new Set(), worst = new Set(), favOpen = new Set();
   let infoOpen = false;
@@ -554,7 +598,7 @@ html.popopen { overflow: hidden; }
     lines.forEach((ln) => { if ((ln[3] === 'sm' || !m.x) && ln[1] == null && ln[2] == null) return; h += '<div class="stl' + (ln[3] === 'sm' ? ' sm' : '') + '">' + cell(ln[1], ln[2], ln, '') + '<span class="k">' + ln[0] + '</span>' + cell(ln[2], ln[1], ln, ' r') + '</div>'; });
     if (typeof x.derby === 'boolean') h += '<div class="stl foot"><span class="k">' + (x.derby ? 'Derby' : 'Not a derby') + '</span></div>';
     else if (!m.x) h += '<div class="stl foot"><span class="k">More figures per team are stored for matches from 23 Nov 2026 on</span></div>';
-    return '<div class="panel">' + h + '</div>';
+    return '<div class="panel" data-p="facts">' + h + '</div>';
   }
   // What counted for each step: stored by the daily run as a third value; for older matches worked out where it is unambiguous
   function whatCounted(name, label, val, m) {
@@ -577,7 +621,7 @@ html.popopen { overflow: hidden; }
       h += '<div class="bkl"><div class="bn">' + esc(name) + (detail ? '<div class="bc">' + esc(detail) + '</div>' : '') + '</div><span class="bp ' + ptClass(name, x[1]) + '">(' + esc(val) + ')</span></div>';
     });
     if (m.rt != null) h += '<div class="bkl tot"><div class="bn">Rating</div><span class="chip ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span></div>';
-    return '<div class="panel">' + h + '</div>';
+    return '<div class="panel" data-p="why">' + h + '</div>';
   }
 
   // Match row: centred pairing (flag | home · box · away | ▶ or weekday). The box is the rating, the score once revealed,
@@ -883,25 +927,38 @@ html.popopen { overflow: hidden; }
     placePop();
     const list = box.querySelector('.tplist'); if (list) list.scrollTop = popList;
   }
-  // Popup sits right under the tapped row (which the page has scrolled to just below the header)
+  // Popup sits right under the tapped row (which the page scrolls to, just below the header)
+  let popTop = 0;
+  const stuckHeader = () => { const hd = document.querySelector('header'); return hd.offsetHeight + (parseFloat(getComputedStyle(hd).top) || 0); };
   function placePop() {
-    const p = document.querySelector('.tpop'); if (!p) return;
-    const r = document.querySelector('[data-act="team"][data-id="' + CSS.escape(pop) + '"]'), hd = document.querySelector('header').getBoundingClientRect().bottom;
-    const top = r ? r.getBoundingClientRect().bottom + 8 : hd + 8;
-    p.style.top = Math.max(hd + 8, Math.min(top, window.innerHeight * 0.45)) + 'px';
+    const p = document.querySelector('.tpop'); if (p) p.style.top = popTop + 'px';
   }
   function openPop(id) {
     popY = window.scrollY; pop = id; popSort = 'new'; popMenu = false; popList = 0;
     document.body.style.paddingBottom = '100vh'; // room to scroll the row up, even near the end of the page
-    const r = document.querySelector('[data-act="team"][data-id="' + CSS.escape(id) + '"]');
-    const hd = document.querySelector('header'), stuck = hd.offsetHeight + (parseFloat(getComputedStyle(hd).top) || 0); // header height once it sticks
-    if (r) window.scrollTo(0, window.scrollY + r.getBoundingClientRect().top - stuck);
+    const r = document.querySelector('[data-act="team"][data-id="' + CSS.escape(id) + '"]'), stuck = stuckHeader();
+    popTop = Math.max(stuck + 8, Math.min(stuck + (r ? r.offsetHeight : 0) + 8, window.innerHeight * 0.45));
+    if (r) window.scrollTo({ top: window.scrollY + r.getBoundingClientRect().top - stuck, behavior: moving() ? 'smooth' : 'auto' });
     renderPop();
+    anim(document.querySelector('.tdim'), [{ opacity: 0 }, { opacity: 1 }], { duration: 240 });
+    anim(document.querySelector('.tpop'), [{ opacity: 0, transform: 'translateY(32px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: 80, fill: 'backwards' });
   }
+  let popClosing = false;
   function closePop() {
-    pop = null; popMenu = false; renderPop(); document.body.style.paddingBottom = ''; window.scrollTo(0, popY);
+    if (popClosing || !pop) return;
+    popClosing = true; popMenu = false;
+    const p = document.querySelector('.tpop'), d = document.querySelector('.tdim');
+    const fin = () => {
+      pop = null; popClosing = false; renderPop();
+      window.scrollTo({ top: popY, behavior: moving() ? 'smooth' : 'auto' });
+      setTimeout(() => { if (!pop) document.body.style.paddingBottom = ''; }, moving() ? 800 : 0);
+    };
+    if (!p || !moving()) return fin();
+    anim(d, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' });
+    after(anim(p, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(32px)' }], { duration: 200, fill: 'forwards' }), fin);
   }
-  window.addEventListener('resize', () => { if (pop) placePop(); });
+  window.addEventListener('resize', () => { if (!pop) return; const r = document.querySelector('[data-act="team"][data-id="' + CSS.escape(pop) + '"]'), stuck = stuckHeader();
+    popTop = Math.max(stuck + 8, Math.min((r ? r.getBoundingClientRect().bottom : stuck) + 8, window.innerHeight * 0.45)); placePop(); });
 
   function render() {
     const v = view();
@@ -918,35 +975,13 @@ html.popopen { overflow: hidden; }
     // The next week with all leagues already brings its own sections (top picks, one per league).
     const sel = '<span>' + (st.comp === 'all' ? 'All leagues' : C[st.comp]) + '</span>';
     const body = v === 'matchweek' && P.next && st.comp === 'all' ? content : '<section class="selsec"><h2 class="label">' + sel + '</h2>' + content + '</section>';
-    main.innerHTML = periodBar(v, P) + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v, P) + pills() + body;
+    main.innerHTML = periodBar(v, P) + '<div class="slide">' + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v, P) + pills() + body + '</div>';
     if (pop && v !== 'best') { pop = null; document.body.style.paddingBottom = ''; }
     renderPop();
   }
 
-  document.addEventListener('click', (e) => {
-    // An open ⓘ bubble closes when you tap anywhere outside it
-    if (infoOpen && !e.target.closest('.bubble') && !e.target.closest('[data-act="info"]')) {
-      infoOpen = false;
-      if (!e.target.closest('button[data-act]')) { const y = window.scrollY; render(); window.scrollTo(0, y); return; }
-    }
-    if (pop && e.target.closest('[data-close]')) { closePop(); return; }
-    const b = e.target.closest('button[data-act]');
-    if (pop && popMenu && (!b || !['tsortmenu', 'tsortby'].includes(b.dataset.act))) { popMenu = false; renderPop(); if (!b) return; }
-    if (!b) return;
-    const act = b.dataset.act, id = b.dataset.id, v = view();
-    if (act === 'team') { openPop(id); return; }
-    if (act === 'tclose') { closePop(); return; }
-    if (act === 'tsortmenu') { popMenu = !popMenu; renderPop(); return; }
-    if (act === 'tsortby') { popSort = id; popMenu = false; popList = 0; const l = document.querySelector('.tplist'); if (l) l.scrollTop = 0; renderPop(); const f = document.querySelector('[data-act="tsortmenu"]'); if (f) f.focus({ preventScroll: true }); return; }
-    // Inside the popup (open a match, score, breakdown): only the popup changes, the page stays where it is
-    if (pop && b.closest('.tpop')) {
-      if (act === 'open') { openRows.has(id) ? openRows.delete(id) : openRows.add(id); }
-      else if (act === 'score') { rev.has(id) ? rev.delete(id) : rev.add(id); }
-      else if (act === 'why') { why.has(id) ? why.delete(id) : why.add(id); }
-      const y = window.scrollY; render(); window.scrollTo(0, y); return;
-    }
-    // Keep the page where it is: re-rendering must not scroll. When a list is collapsed, keep its toggle under the finger instead.
-    const y0 = window.scrollY, top0 = b.getBoundingClientRect().top, collapsing = act === 'worst' && worst.has(id);
+  // ---- State changes behind every button (kept separate so the animations can run before or after them) ----
+  function mutate(act, id, v) {
     if (act === 'open') { openRows.has(id) ? openRows.delete(id) : openRows.add(id); }
     else if (act === 'score') { rev.has(id) ? rev.delete(id) : rev.add(id); }
     else if (act === 'why') { why.has(id) ? why.delete(id) : why.add(id); }
@@ -964,17 +999,178 @@ html.popopen { overflow: hidden; }
       else if (v === 'matchweek' && st.comp === 'all') { const ws = weeks(); const i = ws.indexOf(st.week) + step; if (ws[i]) st.week = ws[i]; else if (step > 0 && hasNext()) st.next = true; }
       else if (v === 'matchweek') { const rs = Array.from(new Set(D.filter((m) => m.c === st.comp).map((m) => m.r))).sort((x, y) => x - y); const i = rs.indexOf(st.round) + step; if (rs[i] != null) st.round = rs[i]; else if (step > 0 && hasNext()) st.next = true; }
     }
-    render();
+  }
+  // Re-render without moving the page
+  const keep = (fn) => { const y = window.scrollY; fn(); render(); window.scrollTo(0, y); };
+  // Find "the same button" again after a re-render (same place: page or popup, same position among equal buttons)
+  const spot = (b) => { const scope = b.closest('.tpop') ? '#tpop' : '#main', sel = '[data-act="' + b.dataset.act + '"]' + (b.dataset.id != null ? '[data-id="' + CSS.escape(b.dataset.id) + '"]' : '');
+    return { scope, sel, i: Array.from(document.querySelectorAll(scope + ' ' + sel)).indexOf(b) }; };
+  const refind = (s) => { const all = document.querySelectorAll(s.scope + ' ' + s.sel); return all[s.i] || all[0] || null; };
+  const extras = (row) => (row ? Array.from(row.children).filter((c) => !c.classList.contains('line')) : []);
+  const panelOf = (row, act) => (row ? row.querySelector(':scope > [data-p="' + (act === 'score' ? 'facts' : 'why') + '"]') : null);
+  const fadeUp = (els, stagger) => els.forEach((el, i) => anim(el, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 220, delay: Math.min(i, 12) * (stagger || 0), fill: 'backwards' }));
+
+  // Day / week / round change: the list slides out to one side and the new one comes in from the other
+  let busy = false;
+  function go(act, from) {
+    if (busy) return;
+    const v = view(), dir = act === 'prev' ? -1 : act === 'next' ? 1 : (st.next ? -1 : 1);
+    const old = document.querySelector('#main .slide'), y0 = window.scrollY;
+    const fin = () => {
+      mutate(act, null, v); render(); window.scrollTo(0, y0); busy = false;
+      anim(document.querySelector('#main .slide'), [{ transform: 'translateX(' + dir * 56 + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260 });
+      anim(document.querySelector('#main .pbar .pt'), [{ opacity: 0 }, { opacity: 1 }], { duration: 260 });
+      const f = document.querySelector('#main [data-act="' + (act === 'latest' ? (dir > 0 ? 'prev' : 'next') : act) + '"]'); if (f && !f.disabled && !from) f.focus({ preventScroll: true });
+    };
+    if (!moving() || !old) return fin();
+    busy = true;
+    const x0 = from || 0;
+    after(anim(old, [{ transform: 'translateX(' + x0 + 'px)', opacity: from ? Math.max(0.5, 1 - Math.abs(x0) / 400) : 1 }, { transform: 'translateX(' + (x0 - dir * 56) + 'px)', opacity: 0 }], { duration: 150, fill: 'forwards' }), fin);
+  }
+
+  // ⓘ bubble out
+  function closeInfo(fn) {
+    const bub = document.querySelector('.infobox.bubble');
+    infoOpen = false;
+    after(anim(bub, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-4px) scale(.97)' }], { duration: 140, fill: 'forwards' }), fn);
+  }
+
+  document.addEventListener('click', (e) => {
+    // An open ⓘ bubble closes when you tap anywhere outside it
+    if (infoOpen && !e.target.closest('.bubble') && !e.target.closest('[data-act="info"]')) {
+      if (!e.target.closest('button[data-act]')) { closeInfo(() => keep(() => {})); return; }
+      infoOpen = false;
+    }
+    if (pop && e.target.closest('[data-close]')) { closePop(); return; }
+    const b = e.target.closest('button[data-act]');
+    if (pop && popMenu && (!b || !['tsortmenu', 'tsortby'].includes(b.dataset.act))) { popMenu = false; renderPop(); if (!b) return; }
+    if (!b) return;
+    const act = b.dataset.act, id = b.dataset.id, v = view();
+
+    // Team popup
+    if (act === 'team') { openPop(id); return; }
+    if (act === 'tclose') { closePop(); return; }
+    if (act === 'tsortmenu') {
+      if (!popMenu) { popMenu = true; renderPop(); anim(document.querySelector('.tpop .menu'), [{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 170 }); }
+      else after(anim(document.querySelector('.tpop .menu'), [{ opacity: 1 }, { opacity: 0 }], { duration: 110, fill: 'forwards' }), () => { popMenu = false; renderPop(); });
+      return;
+    }
+    if (act === 'tsortby') {
+      const rowsOld = Array.from(document.querySelectorAll('.tplist > .tmr'));
+      const fin = () => {
+        popSort = id; popMenu = false; popList = 0; const l = document.querySelector('.tplist'); if (l) l.scrollTop = 0; renderPop();
+        fadeUp(Array.from(document.querySelectorAll('.tplist > .tmr')), 28);
+        const f = document.querySelector('[data-act="tsortmenu"]'); if (f) f.focus({ preventScroll: true });
+      };
+      anim(document.querySelector('.tpop .menu'), [{ opacity: 1 }, { opacity: 0 }], { duration: 110, fill: 'forwards' });
+      if (!moving() || !rowsOld.length) return fin();
+      let n = rowsOld.length; rowsOld.forEach((r) => after(anim(r, [{ opacity: 1 }, { opacity: 0 }], { duration: 130, fill: 'forwards' }), () => { if (--n === 0) fin(); }));
+      return;
+    }
+
+    // Day / week / round navigation
+    if (act === 'prev' || act === 'next' || act === 'latest') { go(act); return; }
+
+    // A match: buttons (open), score with team figures, breakdown – they slide open and shut
+    if (act === 'open' || act === 'score' || act === 'why') {
+      const s0 = spot(b), row = b.closest('.row');
+      const closing = act === 'open' ? openRows.has(id) : act === 'score' ? rev.has(id) : why.has(id);
+      const out = !closing ? [] : act === 'open' ? extras(row) : [panelOf(row, act)];
+      shrink(out, () => {
+        keep(() => mutate(act, id, v));
+        const nb = refind(s0); if (nb) nb.focus({ preventScroll: true });
+        const nrow = nb && nb.closest('.row'); if (!nrow) return;
+        if (act === 'score') anim(nrow.querySelector('.line > .chip'), [{ transform: 'scale(.8)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 220 });
+        if (!closing) (act === 'open' ? extras(nrow) : [panelOf(nrow, act)]).forEach((el) => grow(el));
+      });
+      return;
+    }
+
+    // Favourites: hide / show
+    if (act === 'favtoggle') {
+      const closing = !st.favCollapsed;
+      shrink(closing ? [document.getElementById('favbody')] : [], () => {
+        keep(() => mutate(act, id, v));
+        const f = document.querySelector('[data-act="favtoggle"]'); if (f) f.focus({ preventScroll: true });
+        if (!closing) grow(document.getElementById('favbody'), 280);
+      });
+      return;
+    }
+
+    // ⓘ bubble
+    if (act === 'info') {
+      if (infoOpen) { closeInfo(() => keep(() => {})); return; }
+      keep(() => mutate(act, id, v));
+      const bub = document.querySelector('.infobox.bubble');
+      anim(bub, [{ opacity: 0, transform: 'translateY(-4px) scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 180 });
+      const f = document.querySelector('[data-act="info"]'); if (f) f.focus({ preventScroll: true });
+      return;
+    }
+
+    // Season lists: "Show worst" / "Hide worst" – the list grows or shrinks smoothly; collapsing keeps the toggle under the finger
+    if (act === 'worst') {
+      const s0 = spot(b), list0 = b.parentElement, h0 = list0.offsetHeight, top0 = b.getBoundingClientRect().top, y0 = window.scrollY, collapsing = worst.has(id);
+      const before = list0.children.length;
+      mutate(act, id, v); render(); window.scrollTo(0, y0);
+      const nb = refind(s0); if (!nb) return;
+      nb.focus({ preventScroll: true });
+      if (collapsing) window.scrollBy(0, nb.getBoundingClientRect().top - top0);
+      const list = nb.parentElement, h1 = list.offsetHeight;
+      list.style.overflow = 'hidden';
+      after(anim(list, [{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: 280 }), () => { list.style.overflow = ''; });
+      if (!collapsing) fadeUp(Array.from(list.children).slice(5, Math.max(5, list.children.length - 1)).filter((c) => c !== nb), 0);
+      void before;
+      return;
+    }
+
+    // League buttons, table sorting, Favourites team rows: content fades in
+    keep(() => mutate(act, id, v));
     let f = null;
-    if (act === 'latest') f = document.querySelector('[data-act="next"]');
-    if (['open', 'score', 'why', 'worst', 'favteam', 'tsort'].includes(act)) f = document.querySelector('[data-act="' + act + '"][data-id="' + CSS.escape(id) + '"]');
-    if (['prev', 'next', 'comp', 'favtoggle', 'info'].includes(act)) f = document.querySelector('[data-act="' + act + '"]' + (act === 'comp' ? '[data-id="' + id + '"]' : ''));
-    if (f && !f.disabled) f.focus({ preventScroll: true });
-    window.scrollTo(0, y0);
-    if (collapsing && f) window.scrollBy(0, f.getBoundingClientRect().top - top0);
+    if (['favteam', 'tsort'].includes(act)) f = document.querySelector('[data-act="' + act + '"][data-id="' + CSS.escape(id) + '"]');
+    if (act === 'comp') f = document.querySelector('[data-act="comp"][data-id="' + id + '"]');
+    if (f) f.focus({ preventScroll: true });
+    const slide = document.querySelector('#main .slide');
+    if (act === 'comp' && slide) { const kids = Array.from(slide.children), i = kids.findIndex((k) => k.classList.contains('pills')); fadeUp(kids.slice(i + 1), 40); }
+    if (act === 'tsort') fadeUp(Array.from(document.querySelectorAll('#main .ttab > .trow:not(.thead), #main .ttab > .tbtn')), 15);
+    if (act === 'favteam' && f) { const nx = f.nextElementSibling; if (nx && nx.classList.contains('row')) grow(nx); }
   });
-  window.addEventListener('hashchange', () => { infoOpen = false; if (location.hash === '#outlook') { st.next = true; history.replaceState(null, '', '#week'); } render(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && pop) { if (popMenu) { popMenu = false; renderPop(); } else closePop(); return; } if (e.key === 'Escape' && infoOpen) { infoOpen = false; const y = window.scrollY; render(); window.scrollTo(0, y); const f = document.querySelector('[data-act="info"]'); if (f) f.focus({ preventScroll: true }); } });
+
+  // Swipe left / right on the list: next / previous day, week or round (the list follows the finger)
+  (() => {
+    const main = document.getElementById('main');
+    let sw = null;
+    const reset = (el) => { const cur = el.style.transform; el.style.transform = ''; el.style.opacity = ''; anim(el, [{ transform: cur || 'none' }, { transform: 'none' }], { duration: 200 }); };
+    main.addEventListener('touchstart', (e) => {
+      sw = null;
+      if (pop || busy || e.touches.length !== 1 || view() === 'best') return;
+      const el = e.target.closest('.slide'); if (!el) return;
+      sw = { x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0, on: false, el };
+    }, { passive: true });
+    main.addEventListener('touchmove', (e) => {
+      if (!sw) return;
+      const dx = e.touches[0].clientX - sw.x, dy = e.touches[0].clientY - sw.y;
+      if (!sw.on) {
+        if (Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.6) sw.on = true;
+        else { if (Math.abs(dy) > 14) sw = null; return; }
+      }
+      const btn = document.querySelector('#main [data-act="' + (dx < 0 ? 'next' : 'prev') + '"]'), ok = btn && !btn.disabled;
+      sw.dx = dx; sw.ok = ok;
+      if (moving()) { sw.el.style.transform = 'translateX(' + (ok ? dx * 0.6 : dx / 6) + 'px)'; sw.el.style.opacity = String(Math.max(0.5, 1 - Math.abs(dx) / 600)); }
+    }, { passive: true });
+    const end = () => {
+      if (!sw) return; const s = sw; sw = null; if (!s.on) return;
+      if (s.ok && Math.abs(s.dx) > 60) { const x = s.dx * 0.6; s.el.style.transform = ''; s.el.style.opacity = ''; go(s.dx < 0 ? 'next' : 'prev', moving() ? x : 0); }
+      else reset(s.el);
+    };
+    main.addEventListener('touchend', end);
+    main.addEventListener('touchcancel', () => { if (sw && sw.on) reset(sw.el); sw = null; });
+  })();
+  window.addEventListener('hashchange', () => { infoOpen = false; if (location.hash === '#outlook') { st.next = true; history.replaceState(null, '', '#week'); } render(); anim(document.querySelector('#main .slide'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 }); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (pop) { if (popMenu) { popMenu = false; renderPop(); } else closePop(); return; }
+    if (infoOpen) closeInfo(() => { keep(() => {}); const f = document.querySelector('[data-act="info"]'); if (f) f.focus({ preventScroll: true }); });
+  });
   render();
 
   // Data: data/matches.json ({ updated, matches: [ {id, c, r, d, h, a, rt, s, w, q} ] }) and data/fixtures.json ({ <league>: {c, r, matches: [{h, a, d}]} }).
@@ -989,7 +1185,15 @@ html.popopen { overflow: hidden; }
     } catch (e) { if (!loaded) failed = true; }
     const y = window.scrollY; render(); window.scrollTo(0, y);
   }
-  load();
+  // Start screen stays about 1.5 s (longer only while the data is still on its way, at most 5 s), then fades into the app
+  let splashGone = false;
+  function hideSplash() {
+    const sp = document.getElementById('splash'); if (!sp || sp.hidden || splashGone) return; splashGone = true;
+    const wait = Math.max(0, 1500 - (performance.now() - (window.__splashAt || 0)));
+    setTimeout(() => after(anim(sp, [{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: 'forwards' }), () => sp.remove()), wait);
+  }
+  setTimeout(hideSplash, 5000);
+  load().then(hideSplash, hideSplash);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') load(); });
   if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 })();
