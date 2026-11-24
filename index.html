@@ -142,16 +142,13 @@ button.ghost[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .pavg b { color: var(--fg); font: 600 13px var(--display); font-variant-numeric: tabular-nums; }
 .league.overall { grid-column: 1 / -1; }
 .tm .n .flag { margin-right: 4px; }
-@media (max-width: 600px) { header { flex-direction: column; align-items: stretch; gap: 12px; } nav a { flex: 1 1 auto; text-align: center; padding: 9px 4px; } nav { flex-wrap: nowrap; } }
-/* Header: logo row with the compact/detailed toggle on the right, tabs below */
-header { flex-direction: column; align-items: stretch; gap: 12px; }
-nav { flex-wrap: nowrap; } nav a { flex: 1 1 auto; text-align: center; }
-.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.modes { display: inline-flex; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
-.modes button { min-height: 30px; height: 30px; width: 36px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--muted); }
-.modes button:hover { background: var(--btn); color: var(--fg); }
-.modes button[aria-pressed="true"] { background: var(--btn-hover); color: var(--fg); }
-/* Compact view: one line per game, only green and red get a filled box, no row arrows, flat Season cards */
+/* Header: logo on the left, a small Day · Week · Season selector on the right (one line, also on phones) */
+header { flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 10px; }
+.brand { white-space: nowrap; min-width: 0; }
+nav { flex-wrap: nowrap; padding: 3px; gap: 2px; flex: none; }
+nav a { padding: 6px 11px; font-size: 13px; text-align: center; }
+@media (max-width: 360px) { nav a { padding: 6px 8px; font-size: 12.5px; } .brand { font-size: 17px; } }
+/* One line per game, only green and red get a filled box, no row arrows, flat Season cards */
 body.compact { --gap-block: 20px; }
 .compact .rowbtn { padding: 9px 12px; gap: 9px; }
 .compact .rowbtn .chev { display: none; }
@@ -304,26 +301,60 @@ a.hl:hover { color: var(--fg); }
 .ttab .thead .tsort.c .arr { position: absolute; right: -1px; top: 50%; transform: translateY(-50%); }
 
 .star { color: inherit; }
+
+/* The box between the team names (rating, score, "vs" or flames) always has the same width; a bit more air to the names */
+.crow .line > .chip { width: 52px; min-width: 52px; padding: 0; margin-inline: 4px; }
+.crow.ranked .line > .chip { margin-inline: 0; }
+.crow .chip.score { font-size: 13px; letter-spacing: -0.01em; }
+/* Predicted potential for matches still to come: 3 / 2 / 1 lit flames in a dotted box (real ratings are filled boxes) */
+.chip.pot { background: transparent; border: 2px dotted #4A5158; gap: 0; }
+.chip.pot.p3 { border-color: var(--accent); }
+.chip.pot.p2 { border-color: #3FA478; }
+.chip.pot svg { width: 10px; height: 14px; flex: none; }
+.chip.pot .f { fill: #30363C; }
+.chip.pot.p3 .f.on { fill: var(--accent); }
+.chip.pot.p2 .f.on { fill: #8FD9B6; }
+.chip.pot.p1 .f.on { fill: #7B838A; }
+.crow .day { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.potv { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.potv .sep { color: var(--muted); font-weight: 400; }
+.potv .chip.pot { width: auto; min-width: 0; height: auto; border: 0; padding: 0; }
+/* Opened match: score panel (factors per team) and breakdown panel (what counted, points in brackets) */
+.panel { margin: 0 12px 12px; background: var(--inset); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; }
+.panel + .panel { margin-top: -4px; }
+.sth { display: grid; grid-template-columns: 1fr auto 1fr; font: 600 11px var(--display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 2px 0 6px; }
+.sth span:last-child { text-align: right; }
+.stl { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: baseline; gap: 8px; padding: 5px 0; border-top: 1px solid var(--divider); }
+.stl .k { color: var(--muted); font-size: 12.5px; text-align: center; white-space: nowrap; }
+.stl .v { font: 600 14px var(--display); font-variant-numeric: tabular-nums; }
+.stl .v.r { text-align: right; }
+.stl .v.z { color: #4A5158; font-weight: 500; }
+.stl .v.lead { color: var(--accent); }
+.stl.sm .v { font: 500 11.5px var(--text); color: var(--muted); }
+.stl.foot { grid-template-columns: 1fr; }
+.stl.foot .k { font-size: 11.5px; white-space: normal; }
+.bkl { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--divider); }
+.bkl:first-child { border-top: 0; }
+.bkl .bn { font-size: 13.5px; min-width: 0; }
+.bkl .bc { font-size: 12px; color: var(--muted); }
+.bkl .bp { font: 700 14px var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bp.pbig { color: var(--accent); } .bp.pmid { color: #8FD9B6; } .bp.pgrey { color: var(--muted); } .bp.pneg { color: #F0606A; }
+.bkl.tot { border-top: 1px solid var(--btn-line); margin-top: 2px; padding-top: 8px; }
+.bkl.tot .bn { font-weight: 600; }
+.bkl.tot .chip { min-width: 40px; height: 26px; border-radius: 8px; font-size: 13px; }
 </style>
 </head>
 <body>
 <div class="wrap" id="wrap">
   <header>
-    <div class="top">
-      <div class="brand">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--accent)" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.2l4.2 3-1.6 4.9H9.4L7.8 10.2z" fill="currentColor" stroke="none"/></svg>
-        nofa scores
-      </div>
-      <div class="modes" role="group" aria-label="Layout">
-        <button type="button" data-act="mode" data-id="compact" aria-label="Compact view" title="Compact view"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg></button>
-        <button type="button" data-act="mode" data-id="detailed" aria-label="Detailed view" title="Detailed view"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4.5" width="16" height="6" rx="2"/><rect x="4" y="13.5" width="16" height="6" rx="2"/></svg></button>
-      </div>
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--accent)" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.2l4.2 3-1.6 4.9H9.4L7.8 10.2z" fill="currentColor" stroke="none"/></svg>
+      nofa scores
     </div>
     <nav aria-label="Views">
       <a href="#day" data-view="day">Day</a>
       <a href="#week" data-view="matchweek">Week</a>
       <a href="#season" data-view="best">Season</a>
-      <a href="#outlook" data-view="outlook">Outlook</a>
     </nav>
   </header>
   <main id="main" aria-live="polite">
@@ -419,43 +450,123 @@ a.hl:hover { color: var(--fg); }
   let D = [], loaded = false, failed = false, FX = {};
   const rev = new Set(), why = new Set(), openRows = new Set(), worst = new Set(), favOpen = new Set();
   let infoOpen = false;
-  const st = { day: null, comp: 'all', round: null, week: null, favCollapsed: false, compact: true, tsort: { k: 'avg', d: -1 } };
-  try { const s = JSON.parse(localStorage.getItem('sfr-prefs') || '{}'); if (s.comp === 'all' || C[s.comp]) st.comp = s.comp; st.favCollapsed = !!s.favCollapsed; if (typeof s.compact === 'boolean') st.compact = s.compact; if (s.tsort && ['rk', 'n', 'k', 'rng', 'avg'].includes(s.tsort.k) && (s.tsort.d === 1 || s.tsort.d === -1)) st.tsort = s.tsort; } catch (e) {}
-  const savePrefs = () => { try { localStorage.setItem('sfr-prefs', JSON.stringify({ comp: st.comp, favCollapsed: st.favCollapsed, compact: st.compact, tsort: st.tsort })); } catch (e) {} };
-  // Tabs: Day, Week (default), Season, Outlook. Old links (#matchweek, #best) still work.
-  const view = () => { const h = location.hash.slice(1); return h === 'season' || h === 'best' ? 'best' : h === 'day' || h === 'outlook' ? h : 'matchweek'; };
+  // st.next: the Week tab shows the upcoming week (all leagues) or the next round (one league) with predictions
+  const st = { day: null, comp: 'all', round: null, week: null, next: false, favCollapsed: false, compact: true, tsort: { k: 'avg', d: -1 } };
+  try { const s = JSON.parse(localStorage.getItem('sfr-prefs') || '{}'); if (s.comp === 'all' || C[s.comp]) st.comp = s.comp; st.favCollapsed = !!s.favCollapsed; if (s.tsort && ['rk', 'n', 'k', 'rng', 'avg'].includes(s.tsort.k) && (s.tsort.d === 1 || s.tsort.d === -1)) st.tsort = s.tsort; } catch (e) {}
+  const savePrefs = () => { try { localStorage.setItem('sfr-prefs', JSON.stringify({ comp: st.comp, favCollapsed: st.favCollapsed, tsort: st.tsort })); } catch (e) {} };
+  // Tabs: Day, Week (default), Season. Old links (#matchweek, #best) still work; #outlook opens the upcoming week.
+  if (location.hash === '#outlook') { st.next = true; history.replaceState(null, '', '#week'); }
+  const view = () => { const h = location.hash.slice(1); return h === 'season' || h === 'best' ? 'best' : h === 'day' ? h : 'matchweek'; };
 
-  // Match row. Compact: centred pairing (flag | home · rating · away | ▶), tap the row for the score (eye) and the breakdown (bars).
-  // Detailed: two lines with a meta line; the same eye, bars and ▶ appear when the row is opened. A revealed score replaces the rating in both views.
+  // ---- Predicted potential for matches still to come ----
+  // Each team's average goals per match and average combined xG (league average when a team has no data yet),
+  // both standardised within the round and added up. The round's top 3 are "high", the bottom 3 "low", the rest "medium"
+  // (top/bottom 2 in rounds of 6–8 matches, 1 in rounds of 3–5). Shown as 3 / 2 / 1 lit flames, never as a number.
+  let PRED = new Map();
+  const fxKey = (c, h, a) => c + '|' + h + '|' + a;
+  const goalsOf = (s) => { const g = String(s || '').match(/(\d+)\s*[–-]\s*(\d+)/); return g ? [+g[1], +g[2]] : null; };
+  const xgOf = (m) => { for (const x of m.w || []) { const g = String(x[0]).match(/^Chances \(xG ([\d.]+)\)/); if (g) return +g[1]; } return m.x && m.x.h && m.x.a && m.x.h.xg != null && m.x.a.xg != null ? m.x.h.xg + m.x.a.xg : null; };
+  function buildPred() {
+    PRED = new Map();
+    Object.values(FX).forEach((fx) => {
+      const c = fx.c, ms = D.filter((m) => m.c === c && m.rt != null), T = {};
+      ms.forEach((m) => { const g = goalsOf(m.s), xg = xgOf(m); [m.h, m.a].forEach((n) => { const t = T[n] = T[n] || { g: [], x: [] }; if (g) t.g.push(g[0] + g[1]); if (xg != null) t.x.push(xg); }); });
+      const mean = (a) => a.reduce((s, v) => s + v, 0) / a.length;
+      const lg = (k) => { const v = Object.values(T).filter((t) => t[k].length).map((t) => mean(t[k])); return v.length ? mean(v) : 0; };
+      const lgG = lg('g'), lgX = lg('x');
+      const av = (n, k, d) => (T[n] && T[n][k].length ? mean(T[n][k]) : d);
+      const rows = (fx.matches || []).map((f) => ({ f, g: (av(f.h, 'g', lgG) + av(f.a, 'g', lgG)) / 2, x: (av(f.h, 'x', lgX) + av(f.a, 'x', lgX)) / 2 }));
+      if (!rows.length) return;
+      const z = (k) => { const v = rows.map((r) => r[k]), mu = mean(v), sd = Math.sqrt(mean(v.map((a) => (a - mu) ** 2))) || 1; rows.forEach((r) => { r['z' + k] = (r[k] - mu) / sd; }); };
+      z('g'); z('x');
+      rows.forEach((r) => { r.p = r.zg + r.zx; });
+      const n = rows.length, k = n >= 9 ? 3 : n >= 6 ? 2 : n >= 3 ? 1 : 0;
+      rows.slice().sort((p, q) => q.p - p.p).forEach((r, i) => PRED.set(fxKey(c, r.f.h, r.f.a), { c, r: fx.r, d: r.f.d, h: r.f.h, a: r.f.a, p: r.p, lvl: i < k ? 3 : i >= n - k ? 1 : 2 }));
+    });
+  }
+  const POT = { 3: 'High potential', 2: 'Medium potential', 1: 'Low potential' };
+  const FLAME = '<path d="M8 1c1 3 4 4.5 4 8a4 4 0 0 1-8 0c0-2 1-3 1.6-4 .3 1.4 1 2 1.6 2C7.6 5 7 3 8 1z"/>';
+  const flames = (lvl) => [0, 1, 2].map((i) => '<svg viewBox="2 0 12 16" aria-hidden="true"><g class="f' + (i < lvl ? ' on' : '') + '">' + FLAME + '</g></svg>').join('');
+  const potChip = (lvl) => '<span class="chip pot p' + lvl + '" role="img" aria-label="' + POT[lvl] + '" title="' + POT[lvl] + ' (prediction)">' + flames(lvl) + '</span>';
+  // The fixtures of a league's next round that are not rated yet, as rows (a stored, unrated match keeps its own entry)
+  const openFixtures = (c) => { const fx = FX[c]; if (!fx) return []; return (fx.matches || []).filter((f) => !D.some((m) => m.c === c && m.h === f.h && m.a === f.a && m.rt != null))
+    .map((f) => D.find((m) => m.c === c && m.h === f.h && m.a === f.a) || { id: 'fx:' + fxKey(c, f.h, f.a), c, r: fx.r, d: f.d, h: f.h, a: f.a, rt: null, s: '', w: [] }); };
+  const predOf = (m) => PRED.get(fxKey(m.c, m.h, m.a));
+  const byPred = (a, b) => ((predOf(b) || { p: -99 }).p - (predOf(a) || { p: -99 }).p) || (a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
+
+  // ---- Opened match: factors per team (with the score) and the rating breakdown ----
+  const ord = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
+  const mins = (a) => (a || []).map((t) => { const g = String(t).match(/^(\d+(?:\+\d+)?)\s*(p|pen|og)?$/i); return g ? g[1] + '′' + (g[2] ? (/^og$/i.test(g[2]) ? ' (og)' : ' (pen)') : '') : String(t); }).join(' · ');
+  function factsBox(m) {
+    const x = m.x || {}, H = x.h || {}, A = x.a || {}, g = goalsOf(m.s);
+    const num = (v, dec) => (v == null ? null : dec ? (+v).toFixed(1) : String(v));
+    const reds = (t) => (t.rc ? String(t.rc.length) + (t.rc.length ? ' (' + mins(t.rc) + ')' : '') : null);
+    const pens = (t) => (t.ps == null && t.pm == null ? null : (t.ps || t.pm) ? [t.ps ? t.ps + ' scored' : '', t.pm ? t.pm + ' missed' : ''].filter(Boolean).join(' · ') : '0');
+    const lines = [
+      ['Goals', g ? String(g[0]) : num(H.g), g ? String(g[1]) : num(A.g)],
+      ['Goal minutes', H.gm ? mins(H.gm) || '–' : null, A.gm ? mins(A.gm) || '–' : null, 'sm'],
+      ['xG', num(H.xg, 1), num(A.xg, 1), 'lead'], ['Big chances', num(H.bc), num(A.bc), 'lead'],
+      ['Shots on target', num(H.sot), num(A.sot), 'lead'], ['Shots', num(H.sh), num(A.sh), 'lead'],
+      ['Red cards', reds(H), reds(A)], ['Penalties', pens(H), pens(A)],
+      ['Disallowed goals', num(H.dis), num(A.dis)], ['VAR awards', num(H.var), num(A.var)],
+      ['Position before', H.pos ? ord(H.pos) : null, A.pos ? ord(A.pos) : null],
+    ];
+    const cell = (v, other, ln, side) => {
+      if (v == null) return '<span class="v' + side + ' z">–</span>';
+      const lead = ln[3] === 'lead' && other != null && +v > +other;
+      return '<span class="v' + side + (v === '0' ? ' z' : '') + (lead ? ' lead' : '') + '">' + esc(v) + '</span>';
+    };
+    let h = '<div class="sth"><span>' + nm(m.h) + '</span><span></span><span>' + nm(m.a, 1) + '</span></div>';
+    lines.forEach((ln) => { if ((ln[3] === 'sm' || !m.x) && ln[1] == null && ln[2] == null) return; h += '<div class="stl' + (ln[3] === 'sm' ? ' sm' : '') + '">' + cell(ln[1], ln[2], ln, '') + '<span class="k">' + ln[0] + '</span>' + cell(ln[2], ln[1], ln, ' r') + '</div>'; });
+    if (typeof x.derby === 'boolean') h += '<div class="stl foot"><span class="k">' + (x.derby ? 'Derby' : 'Not a derby') + '</span></div>';
+    else if (!m.x) h += '<div class="stl foot"><span class="k">More figures per team are stored for matches from 23 Nov 2026 on</span></div>';
+    return '<div class="panel">' + h + '</div>';
+  }
+  // What counted for each step: stored by the daily run as a third value; for older matches worked out where it is unambiguous
+  function whatCounted(name, label, val, m) {
+    const pm = label.match(/\((.*)\)$/); if (pm) return pm[1];
+    const v = parseFloat(String(val).replace('−', '-')), g = goalsOf(m.s);
+    if (name === 'Goals' && g) { const n = g[0] + g[1]; return n + (n === 1 ? ' goal' : ' goals'); }
+    if (name === 'Close match') return v === 0.5 ? 'margin 0–1' : v === 0.7 ? 'margin 0–1 · close at 75′' : v === 0.2 ? 'close at 75′' : '';
+    if (name === 'One-sided') return 'margin 3 or more';
+    if (name === 'Equalisers & lead changes') return v === 0.5 ? '1 equaliser or lead change' : v >= 1 ? '2 or more' : '';
+    if (name === 'Comeback') return v === 0.5 ? 'from 2 down to draw' : v === 1.2 ? 'from 3+ down to win' : '';
+    return '';
+  }
+  // Points colours: +1.0 and more bright green, +0.5 to +0.9 light green, +0.1 to +0.4 and the starting score grey, minus and caps red
+  const ptClass = (name, val) => { if (name === 'Starting score') return 'pgrey'; const v = parseFloat(String(val).replace('−', '-')); if (isNaN(v) || v < 0) return 'pneg'; return v >= 1 ? 'pbig' : v >= 0.5 ? 'pmid' : 'pgrey'; };
+  function whyBox(m) {
+    let h = '';
+    (m.w || []).forEach((x) => {
+      const full = whyLabel(x[0]), name = full.replace(/\s*\(.*\)$/, ''), detail = x[2] || whatCounted(name, full, x[1], m);
+      const val = name === 'Starting score' ? String(x[1]).replace(/^\+/, '') : String(x[1]).replace(/^-/, '−');
+      h += '<div class="bkl"><div class="bn">' + esc(name) + (detail ? '<div class="bc">' + esc(detail) + '</div>' : '') + '</div><span class="bp ' + ptClass(name, x[1]) + '">(' + esc(val) + ')</span></div>';
+    });
+    if (m.rt != null) h += '<div class="bkl tot"><div class="bn">Rating</div><span class="chip ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span></div>';
+    return '<div class="panel">' + h + '</div>';
+  }
+
+  // Match row: centred pairing (flag | home · box · away | ▶ or weekday). The box is the rating, the score once revealed,
+  // or the predicted potential (flames) for a match still to come. Tap a played match for the score (eye) and the breakdown (bars).
   function row(m, metaParts, pos, withFlag) {
     const id = m.id, key = (withFlag ? 'x:' : '') + id, played = m.rt != null, on = played && rev.has(id), w = why.has(id), open = played && openRows.has(key);
+    const pr = played ? null : predOf(m);
     const link = m.q ? 'https://www.youtube.com/results?search_query=' + encodeURIComponent(m.q).replace(/%2B/g, '+') : '';
-    const hl = !played ? '' : link
+    const hl = !played ? (m.d ? '<span class="day" title="' + esc(short(m.d)) + '">' + wd(m.d) + '</span>' : '') : link
       ? '<a class="hl" href="' + esc(link) + '" target="_blank" rel="noopener" aria-label="Highlights on YouTube" title="Highlights on YouTube">' + ICON.play + '</a>'
       : '<span class="hl off" role="img" aria-label="No highlights link" title="No highlights link for the ' + esc(C[m.c]) + '">' + ICON.noplay + '</span>';
-    const chip = on ? '<span class="chip score" title="Score">' + esc(String(m.s).replace(/\s*[–-]\s*/, ' – ')) + '</span>'
+    const chip = on ? '<span class="chip score" title="Score">' + esc(String(m.s).replace(/\s*[–-]\s*/, '–')) + '</span>'
       : played ? '<span class="chip ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span>'
-      : st.compact ? '<span class="chip vs">vs</span>' : '<span class="chip t0">–</span>';
+      : pr ? potChip(pr.lvl) : '<span class="chip vs">vs</span>';
     const acts = '<button type="button" class="ib" data-act="score" data-id="' + esc(id) + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Hide score' : 'Show score') + '" title="' + (on ? 'Hide score' : 'Show score') + '">' + (on ? ICON.eyeoff : ICON.eye) + '</button>' +
       '<button type="button" class="ib" data-act="why" data-id="' + esc(id) + '" aria-pressed="' + w + '" aria-label="Rating breakdown" title="Rating breakdown">' + ICON.breakdown + '</button>';
-    const whyBox = () => '<div class="why">' + (m.w || []).map((x) => '<div class="ln"><span>' + esc(whyLabel(x[0])) + '</span><span>' + esc(x[1]) + '</span></div>').join('') + '</div>';
-    if (st.compact) {
-      const label = esc(m.h + ' vs ' + m.a + (played ? ', rating ' + m.rt.toFixed(1) : ''));
-      const hit = played ? '<button type="button" class="hit" data-act="open" data-id="' + esc(key) + '" aria-expanded="' + open + '" aria-label="' + label + '"></button>' : '';
-      // Same centred row everywhere; in ranked lists (Season) the position sits in front of the flag
-      let h = '<div class="row crow' + (pos != null ? ' haspos' : '') + (open ? ' open' : '') + '"><div class="line">' + hit +
-          '<span class="side l' + (withFlag ? '' : ' dim') + '">' + (withFlag ? FLAG : FLAGG)[m.c] + (pos != null ? '<span class="pos">' + pos + '</span>' : '') + '</span>' +
-          '<span class="hn">' + nm(m.h) + '</span>' + chip + '<span class="an">' + nm(m.a, 1) + '</span><span class="side r">' + hl + '</span></div>';
-      if (open) { h += '<div class="acts2">' + acts + '</div>'; if (w) h += whyBox(); }
-      return h + '</div>';
-    }
-    const meta = (withFlag ? FLAG[m.c] : '') + '<span>' + esc(metaParts.filter(Boolean).join(' · ') + (played ? '' : ' · to come')) + '</span>';
-    const inner = (pos != null ? '<span class="pos">' + pos + '</span>' : '') + chip +
-      '<span class="fx"><span class="teams">' + nm(m.h) + ' <span class="vs">vs</span> ' + nm(m.a, 1) + '</span><span class="meta">' + meta + '</span></span>';
-    let h = '<div class="row' + (open ? ' open' : '') + (pos != null ? ' haspos' : '') + '">';
-    h += played ? '<button type="button" class="rowbtn" data-act="open" data-id="' + esc(key) + '" aria-expanded="' + open + '">' + inner + ICON.chev + '</button>'
-                : '<div class="rowbtn static">' + inner + '</div>';
-    if (open) { h += '<div class="actbar">' + acts + hl.replace('class="hl', 'class="iconlink hl') + '</div>'; if (w) h += whyBox(); }
+    const label = esc(m.h + ' vs ' + m.a + (played ? ', rating ' + m.rt.toFixed(1) : ''));
+    const hit = played ? '<button type="button" class="hit" data-act="open" data-id="' + esc(key) + '" aria-expanded="' + open + '" aria-label="' + label + '"></button>' : '';
+    // Same centred row everywhere; in ranked lists (Season) the position sits in front of the flag
+    let h = '<div class="row crow' + (pos != null ? ' haspos' : '') + (open ? ' open' : '') + '"><div class="line">' + hit +
+        '<span class="side l' + (withFlag ? '' : ' dim') + '">' + (withFlag ? FLAG : FLAGG)[m.c] + (pos != null ? '<span class="pos">' + pos + '</span>' : '') + '</span>' +
+        '<span class="hn">' + nm(m.h) + '</span>' + chip + '<span class="an">' + nm(m.a, 1) + '</span><span class="side r">' + hl + '</span></div>';
+    if (open) { h += '<div class="acts2">' + acts + '</div>'; if (on) h += factsBox(m); if (w) h += whyBox(m); }
     return h + '</div>';
   }
   const card = (rows) => '<div class="card">' + rows.join('') + '</div>';
@@ -517,6 +628,12 @@ a.hl:hover { color: var(--fg); }
       if (st.day == null || !days.includes(st.day)) st.day = def;
       return { days, i: days.indexOf(st.day), from: st.day, to: st.day, label: short(st.day), atDefault: st.day === def };
     }
+    // Upcoming week / next round: the open fixtures of the leagues' next rounds, with predictions
+    if (v === 'matchweek' && st.next && !hasNext()) st.next = false;
+    if (v === 'matchweek' && st.next) {
+      const ms = nextMatches(), ds = ms.map((m) => m.d).filter(Boolean).sort();
+      return { next: true, ms, from: ds[0], to: ds[ds.length - 1], atDefault: false };
+    }
     if (v === 'matchweek' && st.comp === 'all') {
       const ws = weeks();
       const r = ws.filter((w) => D.some((m) => m.rt != null && m.d >= w && m.d <= plusDays(w, 6))), def = (r.length ? r : ws).slice(-1)[0];
@@ -533,12 +650,20 @@ a.hl:hover { color: var(--fg); }
     return {};
   }
 
+  // Next week (all leagues) or the selected league's next round: open fixtures, best predicted first
+  // Only fixtures beyond what the normal navigation already reaches: after the last stored week (all leagues) or a round not stored yet (one league)
+  const beyond = (m) => { if (st.comp !== 'all') return !D.some((x) => x.c === m.c && x.r === m.r); const ws = weeks(); return !ws.length || !m.d || m.d > plusDays(ws[ws.length - 1], 6); };
+  const nextMatches = () => (st.comp === 'all' ? ORDER : [st.comp]).flatMap((c) => openFixtures(c)).filter(beyond).sort(byPred);
+  const hasNext = () => nextMatches().length > 0;
+  // Fixtures (not stored yet) that fall into a stored week or round, so its unplayed matches show their potential too
+  const extraFixtures = (test) => ORDER.flatMap((c) => openFixtures(c)).filter((m) => !D.includes(m) && test(m));
+
   function favorites(v, P) {
     let body = '', count = '';
-    if (v === 'outlook') {
-      const xs = ORDER.flatMap((c) => predict(c)).filter((x) => FAV.has(x.f.h) || FAV.has(x.f.a));
-      body = xs.length ? card(xs.map((x) => predRow(x, true))) : '<div class="card"><div class="empty small">No upcoming Liverpool or FC Basel matches stored yet.</div></div>';
-      count = xs.length + (xs.length === 1 ? ' match' : ' matches');
+    if (v === 'matchweek' && P.next) {
+      const ms = P.ms.filter(isFav).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
+      body = ms.length ? card(ms.map((m) => row(m, [], null, true))) : '<div class="card"><div class="empty small">No upcoming Liverpool or FC Basel match stored yet.</div></div>';
+      count = ms.length + (ms.length === 1 ? ' match' : ' matches');
     } else if (v === 'best') {
       const rated = D.filter((m) => m.rt != null);
       const parts = [];
@@ -584,36 +709,46 @@ a.hl:hover { color: var(--fg); }
       comps().map((k) => '<button type="button" data-act="comp" data-id="' + k + '" aria-pressed="' + (k === st.comp) + '" aria-label="' + C[k] + '" title="' + C[k] + '">' + FLAG[k] + '</button>').join('') + '</div>';
   }
 
+  // Lists: rated matches by rating, then matches still to come by predicted potential
+  const byRatingThenPred = (a, b) => (a.rt == null) - (b.rt == null) || (a.rt != null ? b.rt - a.rt : byPred(a, b));
+
   function renderDay(P) {
     const d = st.day;
-    const ms = D.filter((m) => m.d === d && inComp(m)).sort(byRating), rated = ms.filter((m) => m.rt != null);
+    const ms = D.filter((m) => m.d === d && inComp(m)).sort(byRatingThenPred);
+    if (!ms.length) return emptyCard('No ' + C[st.comp] + ' matches on this day.');
+    // Every match once, in one list sorted by rating (flag only when all leagues are shown)
+    return card(ms.map((m) => row(m, [], null, st.comp === 'all')));
+  }
+
+  // Potential count for a set of upcoming matches: 🔥🔥🔥 n · 🔥🔥 n · 🔥 n
+  const potStats = (ms) => {
+    const n = { 3: 0, 2: 0, 1: 0 }; ms.forEach((m) => { const p = predOf(m); if (p) n[p.lvl]++; });
+    return '<div class="stats"><div class="stat"><span class="k">Matches</span><span class="v">' + ms.length + '</span></div><div class="stat"><span class="k">Potential</span><span class="v potv">' +
+      [3, 2, 1].map((l) => '<span class="chip pot p' + l + '" role="img" aria-label="' + POT[l] + '">' + flames(l) + '</span> ' + n[l]).join(' <span class="sep">·</span> ') + '</span></div></div>';
+  };
+
+  function renderNext(P) {
+    const ms = P.ms;
+    if (!ms.length) return emptyCard('No upcoming matches stored yet.');
+    if (st.comp !== 'all') return potStats(ms) + card(ms.map((m) => row(m, [], null, false)));
+    // All leagues: the top pick of each league, then every league's round sorted by potential
     let h = '';
-    if (!ms.length) return h + emptyCard('No ' + C[st.comp] + ' matches on this day.');
-    // Compact: every game once, in one list sorted by rating (flag only when all leagues are shown)
-    if (st.compact) return h + card(ms.map((m) => row(m, [], null, st.comp === 'all')));
-    if (st.comp === 'all' && rated.length > 5) h += sectionHtml('Best five', rated.slice(0, 5).map((m) => row(m, [roundOf(m)], null, true)));
-    ORDER.forEach((c) => { const x = ms.filter((m) => m.c === c); if (x.length) h += sectionHtml(label(c), x.map((m) => row(m, [roundOf(m)]))); });
+    const tops = ORDER.map((c) => ms.find((m) => m.c === c)).filter(Boolean).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : ORDER.indexOf(a.c) - ORDER.indexOf(b.c)));
+    if (tops.length > 1) h += sectionHtml('Top pick per league', tops.map((m) => row(m, [], null, true)));
+    ORDER.forEach((c) => { const x = ms.filter((m) => m.c === c); if (x.length) h += sectionHtml(label(c) + ' <span class="favsub">· ' + RN[c] + ' ' + x[0].r + '</span>', x.map((m) => row(m, [], null, false))); });
     return h;
   }
 
   function renderMatchweek(P) {
+    if (P.next) return renderNext(P);
     if (st.comp === 'all') {
-      const a = P.from, b = P.to;
-      const ms = D.filter((m) => m.d >= a && m.d <= b).sort(byRating), rated = ms.filter((m) => m.rt != null);
-      let h = '';
-      if (!ms.length) return h + emptyCard('No matches this week.');
-      if (st.compact) return h + card(ms.map((m) => row(m, [], null, true)));
-      if (rated.length > 5) h += sectionHtml('Best five of the week', rated.slice(0, 5).map((m) => row(m, [short(m.d)], null, true)));
-      ORDER.forEach((c) => { const x = ms.filter((m) => m.c === c); if (x.length) h += sectionHtml(label(c), x.map((m) => row(m, [roundOf(m), short(m.d)]))); });
-      return h;
+      const ms = D.filter((m) => m.d >= P.from && m.d <= P.to).concat(extraFixtures((m) => m.d >= P.from && m.d <= P.to)).sort(byRatingThenPred);
+      if (!ms.length) return emptyCard('No matches this week.');
+      return card(ms.map((m) => row(m, [], null, true)));
     }
     const c = st.comp, r = st.round;
-    const ms = D.filter((m) => m.c === c && m.r === r).sort(byRating), rated = ms.filter((m) => m.rt != null);
-    const avg = rated.length ? (rated.reduce((s, m) => s + m.rt, 0) / rated.length).toFixed(1) : '–';
-    let h = '';
-    if (st.compact) return h + card(ms.map((m) => row(m, [], null, false)));
-    h += '<div class="stats"><div class="stat"><span class="k">Rated</span><span class="v">' + rated.length + ' of ' + ms.length + '</span></div><div class="stat"><span class="k">Average</span><span class="v">' + avg + '</span></div></div>';
-    return h + card(ms.map((m) => row(m, [short(m.d)])));
+    const ms = D.filter((m) => m.c === c && m.r === r).concat(extraFixtures((m) => m.c === c && m.r === r)).sort(byRatingThenPred);
+    return card(ms.map((m) => row(m, [], null, false)));
   }
 
   function renderBest() {
@@ -658,48 +793,26 @@ a.hl:hover { color: var(--fg); }
     return h + '</div>';
   }
 
-  // Predicted spectacle for every open fixture of a league's next round: mean of both teams' average rating (league average for unrated teams)
-  function predict(c) {
-    const fx = FX[c]; if (!fx) return [];
-    const open = (fx.matches || []).filter((f) => !D.some((m) => m.c === c && m.h === f.h && m.a === f.a && m.rt != null));
-    const table = teamTable(D.filter((m) => m.c === c && m.rt != null));
-    if (!table.length) return [];
-    const lgAvg = table.reduce((s2, x) => s2 + x.avg, 0) / table.length;
-    const av = (n) => { const x = table.find((y) => y.n === n); return x ? x.avg : lgAvg; };
-    return open.map((f) => ({ c, r: fx.r, f, ah: av(f.h), aa: av(f.a), p: (av(f.h) + av(f.a)) / 2 })).sort((x, y) => y.p - x.p);
-  }
-  const predRow = (x, withLeague) => st.compact
-    ? '<div class="row crow wide-r"><div class="line"><span class="side l">' + (withLeague ? FLAG : FLAGG)[x.c] + '</span><span class="hn">' + nm(x.f.h) + '</span><span class="chip pred ' + atier(x.p) + '" title="Prediction">' + x.p.toFixed(1) + '</span><span class="an">' + nm(x.f.a, 1) + '</span><span class="side r"><span class="rt">' + (x.f.d ? wd(x.f.d) + ' ' + dt(x.f.d).getUTCDate() : '') + '</span></span></div></div>'
-    : '<div class="row"><div class="rowbtn static"><span class="chip pred ' + atier(x.p) + '" title="Prediction">' + x.p.toFixed(1) + '</span><div class="fx"><div class="teams">' + nm(x.f.h) + ' <span class="vs">vs</span> ' + nm(x.f.a, 1) + '</div><div class="meta">' + (withLeague ? FLAG[x.c] : '') + '<span>' + esc([x.f.d ? short(x.f.d) : RN[x.c] + ' ' + x.r, 'team avg ' + x.ah.toFixed(1) + ' / ' + x.aa.toFixed(1)].join(' · ')) + '</span></div></div></div></div>';
-  function renderOutlook() {
-    const leagues = ORDER.filter((c) => st.comp === 'all' || st.comp === c);
-    let h = '';
-    if (st.comp === 'all') {
-      const picks = leagues.map((c) => predict(c)[0]).filter(Boolean).sort((x, y) => y.p - x.p);
-      return h + (picks.length ? card(picks.map((x) => predRow(x, true))) : emptyCard('No upcoming matches stored yet.'));
-    }
-    const c = st.comp, list = predict(c);
-    if (!list.length) return h + emptyCard('No upcoming ' + C[c] + ' matches stored yet.');
-    h += sectionHtml('Top pick · ' + RN[c] + ' ' + list[0].r, [predRow(list[0], false)]);
-    if (list.length > 1) h += sectionHtml('Rest of the round', list.slice(1).map((x) => predRow(x, false)));
-    return h;
-  }
-
   function periodBar(v, P) {
     if (v === 'best') { const n = D.filter((m) => m.rt != null && inComp(m)).length; return pbar('Season 2026–27', n + (n === 1 ? ' match' : ' matches')); }
-    if (v === 'outlook') { if (st.comp === 'all') return pbar('Next round', 'Top pick per league'); const l = predict(st.comp); return pbar('Next round', l.length ? RN[st.comp] + ' ' + l[0].r + ' · ' + l.length + (l.length === 1 ? ' match' : ' matches') : C[st.comp]); }
     if (v === 'day') { const ms = D.filter((m) => m.d === st.day && inComp(m)); return pbar(short(st.day), cnt(ms), { what: 'day', canPrev: P.i > 0, canNext: P.i < P.days.length - 1, latest: !P.atDefault }); }
-    if (st.comp === 'all') { const ms = D.filter((m) => m.d >= P.from && m.d <= P.to); return pbar(span(P.from, P.to), cnt(ms), { what: 'week', canPrev: P.i > 0, canNext: P.i < P.ws.length - 1, latest: !P.atDefault }); }
-    const ms = D.filter((m) => m.c === st.comp && m.r === st.round);
-    return pbar(RN[st.comp] + ' ' + st.round, cnt(ms), { what: 'round', canPrev: P.i > 0, canNext: P.i < P.rounds.length - 1, latest: !P.atDefault });
+    if (P.next) {
+      const n = P.ms.length, dates = P.from ? (P.from === P.to ? dm(P.from) : span(P.from, P.to)) + ' · ' : '';
+      const title = st.comp === 'all' ? 'Next week' : C[st.comp] + ' · ' + RN[st.comp] + ' ' + (P.ms[0] ? P.ms[0].r : '');
+      return pbar(title, dates + n + (n === 1 ? ' match' : ' matches') + ' · predictions', { what: st.comp === 'all' ? 'week' : 'round', canPrev: true, canNext: false, latest: true });
+    }
+    if (st.comp === 'all') { const ms = D.filter((m) => m.d >= P.from && m.d <= P.to).concat(extraFixtures((m) => m.d >= P.from && m.d <= P.to)); return pbar(span(P.from, P.to), cnt(ms), { what: 'week', canPrev: P.i > 0, canNext: P.i < P.ws.length - 1 || hasNext(), latest: !P.atDefault }); }
+    const ms = D.filter((m) => m.c === st.comp && m.r === st.round).concat(extraFixtures((m) => m.c === st.comp && m.r === st.round));
+    return pbar(RN[st.comp] + ' ' + st.round, cnt(ms), { what: 'round', canPrev: P.i > 0, canNext: P.i < P.rounds.length - 1 || hasNext(), latest: !P.atDefault });
   }
+
   // One ⓘ per tab, at the right end of the "All matches" / "All teams" header
   const KEY = '<span class="k t1">8.5+</span> must watch · <span class="k t2">7+</span> worth it · <span class="k t3">4+</span> average · <span class="k tr">below 4</span> skip';
+  const FLAMEKEY = 'Flames are a prediction for matches still to come, based on both teams’ goals and xG so far: 3 = among the round’s most promising, 1 = among its least. Only a rough hint – the round’s best match is in the top 3 about half the time.';
   const INFO = {
-    day: 'Every match of the selected day, sorted by rating. The rating (0–10) says how worth watching a match is, without giving anything away.<br>' + KEY + '<br>Tap a match to reveal the score or see how the rating is built. ▶ opens the highlights.',
-    matchweek: 'All matches from Tuesday to Monday, sorted by rating. Choose a league to see one round instead.<br>' + KEY + '<br>The arrows move week by week (or round by round); the middle button jumps back to the latest one.',
-    best: 'Teams: M = matches played, Rng = best minus worst match rating (high = unpredictable, low = consistent), Avg = the avg rating of all their matches – who is most worth watching this season. Team avgs use a narrower colour scale: green from 6.3, bright green from 7.0, red below 5.3. Tap a column heading to sort the table, tap it again to reverse.<br>Matches: the best rated matches so far; “Show worst” adds the worst. The number next to each league is its avg rating.',
-    outlook: 'A prediction for each league’s next round: the avg of both teams’ ratings so far. With all leagues selected you see the top pick per league; choose a league to see its whole round.<br>Numbers with a dotted outline are predictions, not ratings. They use the team colour scale: green from 6.3, red below 5.3.'
+    day: 'Every match of the selected day, sorted by rating. The rating (0–10) says how worth watching a match is, without giving anything away.<br>' + KEY + '<br>Tap a match to reveal the score with each team’s figures, or to see how the rating is built. ▶ opens the highlights.<br>' + FLAMEKEY,
+    matchweek: 'All matches from Tuesday to Monday, sorted by rating. Choose a league to see one round instead.<br>' + KEY + '<br>The arrows move week by week (or round by round); the middle button jumps back to the latest one. › after the latest week shows the next week (or round) with a prediction for each match.<br>' + FLAMEKEY,
+    best: 'Teams: M = matches played, Rng = best minus worst match rating (high = unpredictable, low = consistent), Avg = the avg rating of all their matches – who is most worth watching this season. Team avgs use a narrower colour scale: green from 6.3, bright green from 7.0, red below 5.3. Tap a column heading to sort the table, tap it again to reverse.<br>Matches: the best rated matches so far; “Show worst” adds the worst. The number next to each league is its avg rating.'
   };
   const sectionHead = (v) => '<div class="favhead sect"><h2 class="label">' + (v === 'best' ? 'All teams' : 'All matches') + '</h2>' +
     '<button type="button" class="ghost info" data-act="info" aria-expanded="' + infoOpen + '" aria-controls="infobox" aria-label="About this tab" title="About this tab">' + ICON.info + '</button>' +
@@ -707,8 +820,7 @@ a.hl:hover { color: var(--fg); }
 
   function render() {
     const v = view();
-    document.body.classList.toggle('compact', st.compact);
-    document.querySelectorAll('[data-act="mode"]').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.id === 'compact') === st.compact)));
+    document.body.classList.add('compact');
     document.querySelectorAll('nav a').forEach((a) => { if (a.dataset.view === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     document.getElementById('wrap').classList.toggle('wide', v === 'best');
     const main = document.getElementById('main');
@@ -716,7 +828,7 @@ a.hl:hover { color: var(--fg); }
     if (!D.length) { main.innerHTML = emptyCard('No ratings yet. The daily digest adds the previous day’s matches every morning.'); return; }
     if (st.comp !== 'all' && !comps().includes(st.comp)) st.comp = 'all';
     const P = resolve(v);
-    const content = v === 'matchweek' ? renderMatchweek(P) : v === 'best' ? renderBest() : v === 'outlook' ? renderOutlook() : renderDay(P);
+    const content = v === 'matchweek' ? renderMatchweek(P) : v === 'best' ? renderBest() : renderDay(P);
     main.innerHTML = periodBar(v, P) + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v) + pills() + content;
   }
 
@@ -735,28 +847,28 @@ a.hl:hover { color: var(--fg); }
     else if (act === 'why') { why.has(id) ? why.delete(id) : why.add(id); }
     else if (act === 'worst') { worst.has(id) ? worst.delete(id) : worst.add(id); }
     else if (act === 'favteam') { favOpen.has(id) ? favOpen.delete(id) : favOpen.add(id); }
-    else if (act === 'mode') { st.compact = id === 'compact'; savePrefs(); }
     else if (act === 'info') { infoOpen = !infoOpen; }
     else if (act === 'tsort') { const col = TCOL.find((x) => x[0] === id); st.tsort = st.tsort.k === id ? { k: id, d: -st.tsort.d } : { k: id, d: col ? col[3] : -1 }; savePrefs(); }
-    else if (act === 'latest') { if (v === 'day') st.day = null; else if (st.comp === 'all') st.week = null; else st.round = null; }
+    else if (act === 'latest') { st.next = false; if (v === 'day') st.day = null; else if (st.comp === 'all') st.week = null; else st.round = null; }
     else if (act === 'favtoggle') { st.favCollapsed = !st.favCollapsed; savePrefs(); }
-    else if (act === 'comp') { st.comp = id; st.round = null; savePrefs(); }
+    else if (act === 'comp') { st.comp = id; st.round = null; if (st.next && !hasNext()) st.next = false; savePrefs(); }
     else if (act === 'prev' || act === 'next') {
       const step = act === 'prev' ? -1 : 1;
       if (v === 'day') { const ds = allDays(); const i = ds.indexOf(st.day) + step; if (ds[i]) st.day = ds[i]; }
-      else if (v === 'matchweek' && st.comp === 'all') { const ws = weeks(); const i = ws.indexOf(st.week) + step; if (ws[i]) st.week = ws[i]; }
-      else if (v === 'matchweek') { const rs = Array.from(new Set(D.filter((m) => m.c === st.comp).map((m) => m.r))).sort((x, y) => x - y); const i = rs.indexOf(st.round) + step; if (rs[i] != null) st.round = rs[i]; }
+      else if (v === 'matchweek' && st.next) { if (step < 0) { st.next = false; st.week = null; st.round = null; const ws = weeks(); if (ws.length) st.week = ws[ws.length - 1]; const rs = Array.from(new Set(D.filter((m) => m.c === st.comp).map((m) => m.r))).sort((x, y) => x - y); if (rs.length) st.round = rs[rs.length - 1]; } }
+      else if (v === 'matchweek' && st.comp === 'all') { const ws = weeks(); const i = ws.indexOf(st.week) + step; if (ws[i]) st.week = ws[i]; else if (step > 0 && hasNext()) st.next = true; }
+      else if (v === 'matchweek') { const rs = Array.from(new Set(D.filter((m) => m.c === st.comp).map((m) => m.r))).sort((x, y) => x - y); const i = rs.indexOf(st.round) + step; if (rs[i] != null) st.round = rs[i]; else if (step > 0 && hasNext()) st.next = true; }
     }
     render();
     let f = null;
     if (act === 'latest') f = document.querySelector('[data-act="next"]');
-    if (['open', 'score', 'why', 'worst', 'favteam', 'mode', 'tsort'].includes(act)) f = document.querySelector('[data-act="' + act + '"][data-id="' + CSS.escape(id) + '"]');
+    if (['open', 'score', 'why', 'worst', 'favteam', 'tsort'].includes(act)) f = document.querySelector('[data-act="' + act + '"][data-id="' + CSS.escape(id) + '"]');
     if (['prev', 'next', 'comp', 'favtoggle', 'info'].includes(act)) f = document.querySelector('[data-act="' + act + '"]' + (act === 'comp' ? '[data-id="' + id + '"]' : ''));
     if (f && !f.disabled) f.focus({ preventScroll: true });
     window.scrollTo(0, y0);
     if (collapsing && f) window.scrollBy(0, f.getBoundingClientRect().top - top0);
   });
-  window.addEventListener('hashchange', () => { infoOpen = false; render(); });
+  window.addEventListener('hashchange', () => { infoOpen = false; if (location.hash === '#outlook') { st.next = true; history.replaceState(null, '', '#week'); } render(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && infoOpen) { infoOpen = false; const y = window.scrollY; render(); window.scrollTo(0, y); const f = document.querySelector('[data-act="info"]'); if (f) f.focus({ preventScroll: true }); } });
   render();
 
@@ -768,7 +880,7 @@ a.hl:hover { color: var(--fg); }
       const [d, f] = await Promise.all([get('data/matches.json'), get('data/fixtures.json').catch(() => ({}))]);
       D = (d.matches || []).filter((m) => m && m.id && m.h && m.a && C[m.c]);
       const fx = {}; Object.values(f || {}).forEach((b) => { if (b && C[b.c] && Array.isArray(b.matches)) fx[b.c] = b; });
-      FX = fx; loaded = true; failed = false;
+      FX = fx; loaded = true; failed = false; buildPred();
     } catch (e) { if (!loaded) failed = true; }
     const y = window.scrollY; render(); window.scrollTo(0, y);
   }

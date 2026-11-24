@@ -8,9 +8,9 @@ The app is a single page (`index.html`) that reads two data files. GitHub Pages 
 
 | File | What it is |
 |---|---|
-| `index.html` | The app: Day, Week, Season and Outlook tabs |
-| `data/matches.json` | Every match with its rating: `{ "season", "updated", "matches": [ ... ] }` |
-| `data/fixtures.json` | Next round per league, used by the Outlook tab: `{ "<league>": { "c", "r", "matches": [ { "h", "a", "d" } ] } }` |
+| `index.html` | The app: Day, Week and Season tabs; the Week tab also shows the next week with predictions (flames) |
+| `data/matches.json` | Every match with its rating, breakdown and (from 23 Nov 2026) per-team figures `x`: `{ "season", "updated", "matches": [ ... ] }` |
+| `data/fixtures.json` | Next round per league, used for the next-week predictions: `{ "<league>": { "c", "r", "matches": [ { "h", "a", "d" } ] } }` |
 | `manifest.webmanifest`, `icons/` | Make the page installable as an app (name, icon, full screen) |
 | `sw.js` | Offline cache: the app still opens without a connection, with the last data it saw |
 
