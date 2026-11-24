@@ -776,10 +776,12 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       (nav.ahead ? ph1 : lb) +
       '<button type="button" class="sq" data-act="next" aria-label="Next ' + nav.what + '"' + (nav.canNext ? '' : ' disabled') + '>' + ICON.next + '</button></div>';
   };
-  const cnt = (ms) => { const p = ms.filter((m) => m.rt != null).length, u = ms.length - p; return p + (p === 1 ? ' match' : ' matches') + (u ? ' (+' + u + ' to come)' : ''); };
+  const cnt = (ms) => { const p = ms.filter((m) => m.rt != null).length, u = ms.length - p; if (!p && u) return u + ' to come'; return p + (p === 1 ? ' match' : ' matches') + (u ? ' (+' + u + ' to come)' : ''); };
   const roundOf = (m) => RN[m.c] + ' ' + m.r;
 
   const allDays = () => Array.from(new Set(D.map((m) => m.d))).sort();
+  // Days the Day view steps through: days with stored matches plus days with upcoming fixtures
+  const dayList = () => Array.from(new Set(allDays().concat(ORDER.flatMap((c) => openFixtures(c)).map((m) => m.d).filter(Boolean)))).sort();
   const isFav = (m) => FAV.has(m.h) || FAV.has(m.a);
   const inComp = (m) => st.comp === 'all' || m.c === st.comp;
   const comps = () => ORDER.filter((c) => D.some((m) => m.c === c));
@@ -812,7 +814,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   // ---- resolve the period each view shows (also used by Favorites) ----
   function resolve(v) {
     if (v === 'day') {
-      const md = allDays();
+      const md = dayList();
       const p = md.filter((d) => D.some((m) => m.d === d && m.rt != null)), def = (p.length ? p : md).slice(-1)[0];
       if (st.day == null || !(md.includes(st.day) || (md.length && st.day >= md[0] && st.day <= plusDays(md[md.length - 1], 7)))) st.day = def;
       const days = md.includes(st.day) ? md : md.concat([st.day]).sort();
@@ -903,7 +905,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 
   function renderDay(P) {
     const d = st.day;
-    const ms = D.filter((m) => m.d === d && inComp(m)).sort(byRatingThenPred);
+    const ms = D.filter((m) => m.d === d && inComp(m)).concat(extraFixtures((m) => m.d === d && inComp(m))).sort(byRatingThenPred);
     if (!ms.length) return emptyCard('No ' + (st.comp === 'all' ? '' : C[st.comp] + ' ') + 'matches on this day.', true);
     // Every match once, in one list sorted by rating (flag only when all leagues are shown)
     return card(ms.map((m) => row(m, [], null, st.comp === 'all')));
@@ -985,7 +987,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 
   function periodBar(v, P) {
     if (v === 'best') { const n = D.filter((m) => m.rt != null && inComp(m)).length; return pbar('Season 2026–27', n + (n === 1 ? ' match' : ' matches')); }
-    if (v === 'day') { const ms = D.filter((m) => m.d === st.day && inComp(m)); return pbar(short(st.day), cnt(ms), { what: 'day', canPrev: P.i > 0, canNext: P.i < P.days.length - 1, latest: !P.atDefault }); }
+    if (v === 'day') { const ms = D.filter((m) => m.d === st.day && inComp(m)).concat(extraFixtures((m) => m.d === st.day && inComp(m))); return pbar(short(st.day), cnt(ms), { what: 'day', canPrev: P.i > 0, canNext: P.i < P.days.length - 1, latest: !P.atDefault }); }
     if (P.next) {
       const n = P.ms.length, dates = P.from ? (P.from === P.to ? dm(P.from) : span(P.from, P.to)) + ' · ' : '';
       const title = st.comp === 'all' ? 'Next week' : RN[st.comp] + ' ' + (P.ms[0] ? P.ms[0].r : '');
@@ -1120,7 +1122,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   }
   function calPick(d) {
     const R = calRange(), future = d > R.end;
-    if (calLast === d && !future) {
+    if (calLast === d) {
       st.day = d; st.next = false; calLast = null;
       history.replaceState(null, '', '#day'); const y = window.scrollY; render(); window.scrollTo(0, y);
       anim(document.querySelector('#main .slide'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 }); return;
@@ -1248,7 +1250,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     else if (act === 'comp') { st.comp = id; st.round = null; if (st.next && !hasNext()) st.next = false; savePrefs(); }
     else if (act === 'prev' || act === 'next') {
       const step = act === 'prev' ? -1 : 1;
-      if (v === 'day') { const ds = allDays(); const nx = step > 0 ? ds.find((d) => d > st.day) : ds.slice().reverse().find((d) => d < st.day); if (nx) st.day = nx; }
+      if (v === 'day') { const ds = dayList(); const nx = step > 0 ? ds.find((d) => d > st.day) : ds.slice().reverse().find((d) => d < st.day); if (nx) st.day = nx; }
       else if (v === 'matchweek' && st.next) { if (step < 0) { st.next = false; st.week = null; st.round = null; const ws = weeks(); if (ws.length) st.week = ws[ws.length - 1]; const rs = Array.from(new Set(D.filter((m) => m.c === st.comp).map((m) => m.r))).sort((x, y) => x - y); if (rs.length) st.round = rs[rs.length - 1]; } }
       else if (v === 'matchweek' && st.comp === 'all') { const ws = weeks(); const i = ws.indexOf(st.week) + step; if (ws[i]) st.week = ws[i]; else if (step > 0 && hasNext()) st.next = true; }
       else if (v === 'matchweek') { const rs = Array.from(new Set(D.filter((m) => m.c === st.comp).map((m) => m.r))).sort((x, y) => x - y); const i = rs.indexOf(st.round) + step; if (rs[i] != null) st.round = rs[i]; else if (step > 0 && hasNext()) st.next = true; }
