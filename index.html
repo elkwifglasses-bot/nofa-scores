@@ -306,7 +306,7 @@ a.hl:hover { color: var(--fg); }
 
 .star { color: inherit; }
 /* Match popup: scoreboard card, centred between the top section and the tab bar */
-.mdim2 { position: fixed; inset: 0; z-index: 44; background: rgba(0, 0, 0, .45); touch-action: none; }
+.mdim2 { position: fixed; inset: 0; z-index: 44; background: rgba(0, 0, 0, .62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); touch-action: none; }
 .mwrap { position: fixed; z-index: 45; left: 0; right: 0; display: flex; align-items: center; justify-content: center; padding: 0 max(8px, env(safe-area-inset-left, 0px)); pointer-events: none; }
 .mcard { pointer-events: auto; position: relative; width: 100%; max-width: 560px; max-height: 100%; display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 18px; box-shadow: 0 14px 36px rgba(0, 0, 0, .6); padding: 14px 14px 0; overflow: hidden; }
 .mcard .mx { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; min-height: 32px; padding: 0; border-radius: 8px; color: var(--muted); }
@@ -333,7 +333,7 @@ a.hl:hover { color: var(--fg); }
 .mbody .panel { margin: 0 12px 12px; }
 .idim { z-index: 39; }
 .infobox.bubble { z-index: 41; }
-.tpop .mdim { position: fixed; inset: 0; z-index: 2; background: rgba(0, 0, 0, .35); border-radius: 14px; }
+.tpop .mdim { position: fixed; inset: 0; z-index: 2; background: rgba(0, 0, 0, .5); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); border-radius: 14px; }
 .tpop .dd { z-index: 3; }
 .tpop .tps { position: relative; z-index: 3; }
 h2.label .hstar { width: 14px; height: 14px; color: #7B838A; flex: none; margin-right: -2px; }
@@ -354,7 +354,7 @@ button, a, .calp .c { touch-action: manipulation; }
 .infobox.bubble { transform-origin: calc(100% - 19px) 0; }
 .tpop .menu { transform-origin: 100% 0; }
 /* Team popup (Season table): the page scrolls the tapped row under the header, the popup fills the rest of the screen */
-.tdim { position: fixed; inset: 0; z-index: 30; touch-action: none; background: rgba(0, 0, 0, .45); }
+.tdim { position: fixed; inset: 0; z-index: 30; touch-action: none; background: rgba(0, 0, 0, .62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
 .tpop { position: fixed; z-index: 31; left: max(8px, calc((100vw - 760px) / 2 + 8px)); right: max(8px, calc((100vw - 760px) / 2 + 8px)); bottom: calc(74px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0, 0, 0, .6); }
 .tpop::before { display: none; content: ""; position: absolute; top: -7px; left: 44px; width: 12px; height: 12px; background: #1B1F23; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); transform: rotate(45deg); }
 .tpop .tph { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 14px 14px 0; }
@@ -446,7 +446,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 .tabbar [aria-current="page"] { color: var(--accent); font-weight: 600; }
 .tabbar > *:hover { color: var(--fg); }
 /* Pop-overs of the top section and the tab bar (same look as the ⓘ bubble) */
-.hdim { position: fixed; inset: 0; z-index: 39; background: rgba(0, 0, 0, .45); touch-action: none; }
+.hdim { position: fixed; inset: 0; z-index: 39; background: rgba(0, 0, 0, .62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); touch-action: none; }
 .hpop { position: fixed; z-index: 40; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 14px 36px rgba(0, 0, 0, .6); }
 .hpop .arr { position: absolute; top: -7px; width: 12px; height: 12px; background: #1B1F23; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); transform: rotate(45deg); }
 .hpop .arr.down { top: auto; bottom: -7px; border: 0; border-right: 1px solid var(--btn-line); border-bottom: 1px solid var(--btn-line); }
