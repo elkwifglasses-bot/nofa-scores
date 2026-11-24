@@ -305,6 +305,7 @@ a.hl:hover { color: var(--fg); }
 .ttab .thead .tsort.c .arr { position: absolute; right: -1px; top: 50%; transform: translateY(-50%); }
 
 .star { color: inherit; }
+button, a, .calp .c { touch-action: manipulation; }
 /* Start screen */
 #splash { position: fixed; inset: 0; z-index: 100; background: #0E1012; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding-bottom: 4vh; }
 #splash[hidden] { display: none; }
@@ -804,9 +805,10 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   // ---- resolve the period each view shows (also used by Favorites) ----
   function resolve(v) {
     if (v === 'day') {
-      const days = allDays();
-      const p = days.filter((d) => D.some((m) => m.d === d && m.rt != null)), def = (p.length ? p : days).slice(-1)[0];
-      if (st.day == null || !days.includes(st.day)) st.day = def;
+      const md = allDays();
+      const p = md.filter((d) => D.some((m) => m.d === d && m.rt != null)), def = (p.length ? p : md).slice(-1)[0];
+      if (st.day == null || !(md.includes(st.day) || (md.length && st.day >= md[0] && st.day <= plusDays(md[md.length - 1], 7)))) st.day = def;
+      const days = md.includes(st.day) ? md : md.concat([st.day]).sort();
       return { days, i: days.indexOf(st.day), from: st.day, to: st.day, label: short(st.day), atDefault: st.day === def };
     }
     // Upcoming week / next round: the open fixtures of the leagues' next rounds, with predictions
@@ -1118,7 +1120,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   }
   function calPick(d) {
     const R = calRange(), future = d > R.end;
-    if (calLast === d && !future && allDays().includes(d)) {
+    if (calLast === d && !future) {
       st.day = d; st.next = false; calLast = null;
       history.replaceState(null, '', '#day'); closeHp(); render(); return;
     }
@@ -1238,7 +1240,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     else if (act === 'comp') { st.comp = id; st.round = null; if (st.next && !hasNext()) st.next = false; savePrefs(); }
     else if (act === 'prev' || act === 'next') {
       const step = act === 'prev' ? -1 : 1;
-      if (v === 'day') { const ds = allDays(); const i = ds.indexOf(st.day) + step; if (ds[i]) st.day = ds[i]; }
+      if (v === 'day') { const ds = allDays(); const nx = step > 0 ? ds.find((d) => d > st.day) : ds.slice().reverse().find((d) => d < st.day); if (nx) st.day = nx; }
       else if (v === 'matchweek' && st.next) { if (step < 0) { st.next = false; st.week = null; st.round = null; const ws = weeks(); if (ws.length) st.week = ws[ws.length - 1]; const rs = Array.from(new Set(D.filter((m) => m.c === st.comp).map((m) => m.r))).sort((x, y) => x - y); if (rs.length) st.round = rs[rs.length - 1]; } }
       else if (v === 'matchweek' && st.comp === 'all') { const ws = weeks(); const i = ws.indexOf(st.week) + step; if (ws[i]) st.week = ws[i]; else if (step > 0 && hasNext()) st.next = true; }
       else if (v === 'matchweek') { const rs = Array.from(new Set(D.filter((m) => m.c === st.comp).map((m) => m.r))).sort((x, y) => x - y); const i = rs.indexOf(st.round) + step; if (rs[i] != null) st.round = rs[i]; else if (step > 0 && hasNext()) st.next = true; }
@@ -1460,7 +1462,16 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   setTimeout(hideSplash, 5000);
   load().then(hideSplash, hideSplash);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') load(); });
-  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  // Updates: check for a new version on every start and whenever the app comes back to the foreground;
+  // when a new version takes over, reload once so it shows right away
+  if ('serviceWorker' in navigator) {
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+    }).catch(() => {}));
+  }
 })();
 </script>
 </body>
