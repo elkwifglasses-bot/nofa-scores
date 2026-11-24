@@ -950,14 +950,16 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const n = rated.filter(inComp).length;
     let h = '<div class="grid">';
     // A list shows its best five; "Show worst" adds the bottom five (with their real positions), and ⋮ marks the ranks in between when there are more than 10
-    const toggle = (key, open, word) => '<button type="button" class="ghost more" data-act="worst" data-id="' + key + '" aria-expanded="' + open + '">' + (open ? 'Hide ' : 'Show ') + word + ICON.chev + '</button>';
+    const toggle = (key, open, word, label) => '<button type="button" class="ghost more" data-act="worst" data-id="' + key + '" aria-expanded="' + open + '">' + (label || ((open ? 'Hide ' : 'Show ') + word)) + ICON.chev + '</button>';
+    // A league's team table opens up completely ("Show all teams"); the all-leagues table and the match lists add the bottom five
     const expand = (items, key, draw, withBtn, isTeams) => {
       const word = isTeams && !['avg', 'rk'].includes(st.tsort.k) ? 'bottom five' : 'worst';
+      const full = isTeams && key !== 'T|all';
       const open = worst.has(key), n = items.length;
       let idx = items.map((_, i) => i);
-      if (!open) idx = idx.slice(0, 5); else if (n > 10) idx = idx.slice(0, 5).concat([-1], idx.slice(n - 5));
+      if (!open) idx = idx.slice(0, 5); else if (n > 10 && !full) idx = idx.slice(0, 5).concat([-1], idx.slice(n - 5));
       const body = idx.map((i) => i < 0 ? '<div class="gapdots" aria-label="positions 6 to ' + (n - 5) + ' hidden">⋮</div>' : draw(items[i], i)).join('');
-      return { html: body + (withBtn && n > 5 ? toggle(key, open, word) : ''), cls: n >= 100 ? ' rk3' : '' };
+      return { html: body + (withBtn && n > 5 ? toggle(key, open, word, full ? (open ? 'Show fewer' : 'Show all ' + n + ' teams') : '') : ''), cls: n >= 100 ? ' rk3' : '' };
     };
     const box = (key, teams, games, flagged, meta, right) => {
       if (st.compact) {
