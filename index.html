@@ -207,7 +207,7 @@ button.ghost.info[aria-expanded="true"] { color: var(--fg); }
 .crow.haspos { --side: 50px; }
 .rk3 .crow.haspos { --side: 60px; }
 .crow.wide-r { --side: 46px; }
-.crow .line { position: relative; display: grid; grid-template-columns: var(--side) minmax(0, 1fr) auto minmax(0, 1fr) var(--side); align-items: center; column-gap: 7px; padding: 14px 12px; }
+.crow .line { position: relative; display: grid; grid-template-columns: var(--side) minmax(0, 1fr) auto minmax(0, 1fr) var(--side); align-items: center; column-gap: 7px; padding: 17.5px 12px; }
 .crow .hit { position: absolute; inset: 0; z-index: 0; min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
 .crow .hit:hover { background: #181B1E; }
 .crow .hit:focus-visible { outline-offset: -2px; }
@@ -301,6 +301,8 @@ a.hl:hover { color: var(--fg); }
 .ttab .thead .tsort.c .arr { position: absolute; right: -1px; top: 50%; transform: translateY(-50%); }
 
 .star { color: inherit; }
+.selsec > h2.label .flag { width: 16px; height: 11px; border-radius: 2px; }
+.selsec > .grid { margin-top: 2px; }
 .pbar .sq.back svg { transform: scaleX(-1); }
 .infobox .potv { display: inline; }
 .infobox .potv .chip.pot { display: inline-flex; vertical-align: -2px; }
@@ -821,7 +823,7 @@ a.hl:hover { color: var(--fg); }
     matchweek: 'All matches from Tuesday to Monday, sorted by rating. Choose a league to see one round instead.<br>' + KEY + '<br>The arrows move week by week (or round by round); the button next to them jumps back to the latest one. › after the latest week shows the next week (or round) with a prediction for each match.<br>' + FLAMEKEY,
     best: 'Teams: M = matches played, Rng = best minus worst match rating (high = unpredictable, low = consistent), Avg = the avg rating of all their matches – who is most worth watching this season. Team avgs use a narrower colour scale: green from 6.3, bright green from 7.0, red below 5.3. Tap a column heading to sort the table, tap it again to reverse.<br>Matches: the best rated matches so far; “Show worst” adds the worst. The number next to each league is its avg rating.'
   };
-  const sectionHead = (v, P) => '<div class="favhead sect"><h2 class="label">' + (v === 'best' ? 'All teams' : 'All matches') + '</h2>' +
+  const sectionHead = (v, P) => '<div class="favhead sect"><h2 class="label">' + (v === 'best' ? 'League' : 'Matches') + '</h2>' +
     '<button type="button" class="ghost info" data-act="info" aria-expanded="' + infoOpen + '" aria-controls="infobox" aria-label="About this tab" title="About this tab">' + ICON.info + '</button>' +
     (infoOpen ? '<div class="infobox bubble" id="infobox" role="dialog" aria-label="About this tab">' + INFO[v] + (P && P.next ? '<br><b>' + (st.comp === 'all' ? 'Next week' : 'This round') + ':</b> ' + potCount(P.ms) : '') + '</div>' : '') + '</div>';
 
@@ -836,7 +838,11 @@ a.hl:hover { color: var(--fg); }
     if (st.comp !== 'all' && !comps().includes(st.comp)) st.comp = 'all';
     const P = resolve(v);
     const content = v === 'matchweek' ? renderMatchweek(P) : v === 'best' ? renderBest() : renderDay(P);
-    main.innerHTML = periodBar(v, P) + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v, P) + pills() + content;
+    // Under the league pills: a header naming the selection (All leagues / the league), like the section headers of the next week.
+    // The next week with all leagues already brings its own sections (top picks, one per league).
+    const sel = st.comp === 'all' ? '<span>All leagues</span>' : label(st.comp);
+    const body = v === 'matchweek' && P.next && st.comp === 'all' ? content : '<section class="selsec"><h2 class="label">' + sel + '</h2>' + content + '</section>';
+    main.innerHTML = periodBar(v, P) + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v, P) + pills() + body;
   }
 
   document.addEventListener('click', (e) => {
