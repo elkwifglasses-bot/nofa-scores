@@ -305,6 +305,32 @@ a.hl:hover { color: var(--fg); }
 .ttab .thead .tsort.c .arr { position: absolute; right: -1px; top: 50%; transform: translateY(-50%); }
 
 .star { color: inherit; }
+/* Match popup: scoreboard card, centred between the top section and the tab bar */
+.mdim2 { position: fixed; inset: 0; z-index: 44; background: rgba(0, 0, 0, .45); touch-action: none; }
+.mwrap { position: fixed; z-index: 45; left: 0; right: 0; display: flex; align-items: center; justify-content: center; padding: 0 max(8px, env(safe-area-inset-left, 0px)); pointer-events: none; }
+.mcard { pointer-events: auto; position: relative; width: 100%; max-width: 560px; max-height: 100%; display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 18px; box-shadow: 0 14px 36px rgba(0, 0, 0, .6); padding: 14px 14px 0; overflow: hidden; }
+.mcard .mx { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; min-height: 32px; padding: 0; border-radius: 8px; color: var(--muted); }
+.mmeta { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 12px; color: var(--muted); }
+.mmeta .flag { width: 16px; height: 11px; border-radius: 2px; }
+.mdate { text-align: center; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.board { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; margin: 14px 0 14px; }
+.mtm { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; text-align: center; }
+.mtm b { font: 700 15px var(--display); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mtm i { font-style: normal; font-size: 11.5px; color: var(--muted); }
+.crest { width: 38px; height: 38px; border-radius: 50%; background: #2B3136; display: flex; align-items: center; justify-content: center; font: 700 15px var(--display); color: #C9CED3; }
+.mmid { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.mmid .chip { width: 84px; min-width: 84px; height: 52px; font-size: 26px; border-radius: 14px; margin: 0; }
+.mmid .chip.mscore { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--fg); font-size: 24px; letter-spacing: -0.01em; }
+.mmid .lbl { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.macts { display: grid; grid-template-columns: 1fr 1fr 44px; gap: 8px; }
+.mbtn { min-height: 40px; height: 40px; border-radius: 10px; font-size: 13px; gap: 7px; padding: 0 8px; background: #23282D; border: 1px solid #2F353A; color: var(--fg); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.mbtn svg { width: 17px; height: 17px; }
+.mbtn[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); font-weight: 600; }
+.mbtn.sq { padding: 0; }
+.mbtn.off { color: #4F575E; }
+.mbody { overflow-y: auto; overscroll-behavior: contain; margin: 10px -14px 0; padding: 0 0 4px; }
+.mbody:empty { margin-top: 0; padding-bottom: 14px; }
+.mbody .panel { margin: 0 12px 12px; }
 .idim { z-index: 39; }
 .infobox.bubble { z-index: 41; }
 .tpop .mdim { position: fixed; inset: 0; z-index: 2; background: rgba(0, 0, 0, .35); border-radius: 14px; }
@@ -508,6 +534,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   <div id="dbar"></div>
 </div></header>
 <div id="hpop"></div>
+<div id="mpop"></div>
 <div class="wrap" id="wrap">
   <div id="tpop"></div>
   <main id="main" aria-live="polite">
@@ -746,12 +773,12 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const acts = '<button type="button" class="ib" data-act="score" data-id="' + esc(id) + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Hide score' : 'Show score') + '" title="' + (on ? 'Hide score' : 'Show score') + '">' + (on ? ICON.eyeoff : ICON.eye) + '</button>' +
       '<button type="button" class="ib" data-act="why" data-id="' + esc(id) + '" aria-pressed="' + w + '" aria-label="Rating breakdown" title="Rating breakdown">' + ICON.breakdown + '</button>';
     const label = esc(m.h + ' vs ' + m.a + (played ? ', rating ' + m.rt.toFixed(1) : ''));
-    const hit = played ? '<button type="button" class="hit" data-act="open" data-id="' + esc(key) + '" aria-expanded="' + open + '" aria-label="' + label + '"></button>' : '';
+    const hit = played ? '<button type="button" class="hit" data-act="match" data-id="' + esc(id) + '" aria-haspopup="dialog" aria-label="' + label + '"></button>' : '';
     // Same centred row everywhere; in ranked lists (Season) the position sits in front of the flag
     let h = '<div class="row crow' + (pos != null ? ' haspos' : '') + (open ? ' open' : '') + '"><div class="line">' + hit +
         '<span class="side l' + (withFlag ? '' : ' dim') + '">' + (withFlag ? FLAG : FLAGG)[m.c] + (pos != null ? '<span class="pos">' + pos + '</span>' : '') + '</span>' +
         '<span class="hn">' + nm(m.h) + '</span>' + chip + '<span class="an">' + nm(m.a, 1) + '</span><span class="side r">' + hl + '</span></div>';
-    if (open) { h += '<div class="acts2">' + acts + '</div>'; if (on) h += factsBox(m); if (w) h += whyBox(m); }
+    void acts; void open; void on; void w;
     return h + '</div>';
   }
   const card = (rows) => '<div class="card">' + rows.join('') + '</div>';
@@ -1208,6 +1235,66 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const s2 = document.querySelector('.search'); if (s2) { const c = s2.querySelector('.clr'); if (favQ && !c) s2.insertAdjacentHTML('beforeend', '<button type="button" class="clr" data-act="favclear" aria-label="Clear search">✕</button>'); if (!favQ && c) c.remove(); } }
   document.addEventListener('input', (e) => { if (e.target.id === 'favq') { favQ = e.target.value; refreshFav(); } });
 
+  // ---- Match popup ("scoreboard card"): tap a played match; it sits in the middle between the top section and the tab bar ----
+  let mpop = null, mScore = false, mWhy = false;
+  const LONGD = (s) => { const d = dt(s); return DAYL[d.getUTCDay()] + ', ' + d.getUTCDate() + ' ' + MONL[d.getUTCMonth()]; };
+  function placeMatch() {
+    const o = document.querySelector('#mpop .mwrap'); if (!o) return;
+    const tb = document.querySelector('.tabbar');
+    o.style.top = (document.getElementById('top').getBoundingClientRect().bottom + 8) + 'px';
+    o.style.bottom = (window.innerHeight - (tb ? tb.getBoundingClientRect().top : window.innerHeight) + 8) + 'px';
+  }
+  function renderMatch() {
+    const box = document.getElementById('mpop'), old = box.querySelector('.mbody'), keepTop = old ? old.scrollTop : 0;
+    const m = mpop && D.find((x) => x.id === mpop);
+    if (!m) { mpop = null; box.innerHTML = ''; return; }
+    const x = m.x || {}, link = m.q ? 'https://www.youtube.com/results?search_query=' + encodeURIComponent(m.q).replace(/%2B/g, '+') : '';
+    const team = (n, t, after) => '<div class="mtm"><div class="crest" aria-hidden="true">' + esc(plain(n).replace(/^(FC|AC|AS|SC|RC|CA)\s+/i, '').charAt(0)) + '</div><b>' + nm(n, after) + '</b>' + (t && t.pos ? '<i>' + ord(t.pos) + '</i>' : '') + '</div>';
+    const mid = mScore
+      ? '<span class="chip mscore" title="Score">' + esc(String(m.s).replace(/\s*[–-]\s*/, '–')) + '</span><span class="lbl">score</span>'
+      : '<span class="chip mrt ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span><span class="lbl">rating</span>';
+    const hlBtn = link ? '<a class="mbtn sq" href="' + esc(link) + '" target="_blank" rel="noopener" aria-label="Highlights on YouTube" title="Highlights on YouTube">' + ICON.play + '</a>'
+      : '<span class="mbtn sq off" role="img" aria-label="No highlights link" title="No highlights link for the ' + esc(C[m.c]) + '">' + ICON.noplay + '</span>';
+    box.innerHTML = '<div class="mdim2" data-mclose="1"></div><div class="mwrap"><div class="mcard" role="dialog" aria-label="' + esc(name(m.h) + ' vs ' + name(m.a)) + '">' +
+      '<button type="button" class="mx" data-act="mclose" aria-label="Close">✕</button>' +
+      '<div class="mmeta">' + FLAG[m.c] + '<span>' + C[m.c] + ' · ' + RN[m.c] + ' ' + m.r + '</span></div><div class="mdate">' + LONGD(m.d) + '</div>' +
+      '<div class="board">' + team(m.h, x.h) + '<div class="mmid">' + mid + '</div>' + team(m.a, x.a, 1) + '</div>' +
+      '<div class="macts"><button type="button" class="mbtn" data-act="mscore" aria-pressed="' + mScore + '">' + (mScore ? ICON.eyeoff : ICON.eye) + '<span>' + (mScore ? 'Hide score' : 'Show score') + '</span></button>' +
+      '<button type="button" class="mbtn" data-act="mwhy" aria-pressed="' + mWhy + '">' + ICON.breakdown + '<span>Breakdown</span></button>' + hlBtn + '</div>' +
+      '<div class="mbody">' + (mScore ? factsBox(m) : '') + (mWhy ? whyBox(m) : '') + '</div></div></div>';
+    placeMatch();
+    const b2 = box.querySelector('.mbody'); if (b2) b2.scrollTop = keepTop;
+  }
+  function openMatch(id) {
+    mpop = id; mScore = false; mWhy = false; renderMatch();
+    anim(document.querySelector('#mpop .mdim2'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+    anim(document.querySelector('#mpop .mcard'), [{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 240 });
+  }
+  function closeMatch() {
+    const c = document.querySelector('#mpop .mcard'), d = document.querySelector('#mpop .mdim2');
+    const fin = () => { mpop = null; renderMatch(); };
+    if (!c || !moving()) return fin();
+    anim(d, [{ opacity: 1 }, { opacity: 0 }], { duration: 170, fill: 'forwards' });
+    after(anim(c, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.96)' }], { duration: 170, fill: 'forwards' }), fin);
+  }
+  // Show score / Breakdown: the part slides open below the buttons (the card grows, staying centred)
+  function toggleMatch(which) {
+    const key = which === 'mscore' ? 'facts' : 'why', isOn = which === 'mscore' ? mScore : mWhy;
+    const panel = document.querySelector('#mpop [data-p="' + key + '"]');
+    const card = document.querySelector('#mpop .mcard'), h0 = card ? card.offsetHeight : 0;
+    const apply = () => {
+      if (which === 'mscore') mScore = !mScore; else mWhy = !mWhy;
+      renderMatch();
+      const c2 = document.querySelector('#mpop .mcard'), h1 = c2 ? c2.offsetHeight : 0;
+      if (c2 && h0 && h1 !== h0) anim(c2, [{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: 240 });
+      if (!isOn) { const p = document.querySelector('#mpop [data-p="' + key + '"]'); anim(p, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 240, delay: 60, fill: 'backwards' }); }
+      if (which === 'mscore') anim(document.querySelector('#mpop .mmid .chip'), [{ transform: 'scale(.8)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 220 });
+      const f = document.querySelector('#mpop [data-act="' + which + '"]'); if (f) f.focus({ preventScroll: true });
+    };
+    if (isOn && panel && moving()) after(anim(panel, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: 'forwards' }), apply); else apply();
+  }
+  window.addEventListener('resize', () => { if (mpop) placeMatch(); });
+
   function render() {
     const v = view();
     document.body.classList.add('compact');
@@ -1237,6 +1324,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (pop && v !== 'best') pop = null;
     renderPop();
     renderHp();
+    if (mpop) renderMatch();
   }
 
   // ---- State changes behind every button (kept separate so the animations can run before or after them) ----
@@ -1298,6 +1386,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   }
 
   document.addEventListener('click', (e) => {
+    // Match popup: a tap outside only closes it
+    if (mpop && !e.target.closest('#mpop .mcard')) { e.preventDefault(); closeMatch(); return; }
+    if (mpop) { const mb = e.target.closest('button[data-act]'); if (mb) { const a = mb.dataset.act; if (a === 'mclose') { closeMatch(); return; } if (a === 'mscore' || a === 'mwhy') { toggleMatch(a); return; } } }
     // An open ⓘ bubble closes when you tap anywhere outside it
     if (infoOpen && !e.target.closest('.bubble')) { e.preventDefault(); closeInfo(() => keep(() => {})); return; }
     // An open pop-over (calendar, last update, Options) closes when you tap anywhere outside it
@@ -1308,6 +1399,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (!b) return;
     const act = b.dataset.act, id = b.dataset.id, v = view();
 
+    if (act === 'match') { openMatch(id); return; }
     // Top section and tab bar pop-overs
     if (act === 'bell' || act === 'cal' || act === 'options') { const k = act === 'options' ? 'opt' : act; if (hp === k) closeHp(); else if (hp) closeHp(() => openHp(k)); else openHp(k); return; }
     if (act === 'calday') { calPick(id); return; }
@@ -1430,7 +1522,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const area = document.getElementById('wrap');
     area.addEventListener('touchstart', (e) => {
       sw = null;
-      if (pop || hp || busy || e.touches.length !== 1 || view() === 'best' || view() === 'fav') return;
+      if (pop || hp || mpop || busy || e.touches.length !== 1 || view() === 'best' || view() === 'fav') return;
       if (e.target.closest('.tpop, .search, input')) return;
       const el = document.querySelector('#main .slide'); if (!el) return;
       sw = { x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0, on: false, el };
@@ -1457,6 +1549,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   window.addEventListener('hashchange', () => { infoOpen = false; if (hp) { hp = null; } if (location.hash === '#outlook') { st.next = true; history.replaceState(null, '', '#week'); } render(); anim(document.querySelector('#main .slide'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 }); });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
+    if (mpop) { closeMatch(); return; }
     if (hp) { closeHp(); return; }
     if (pop) { if (popMenu) { popMenu = false; renderPop(); } else closePop(); return; }
     if (infoOpen) closeInfo(() => { keep(() => {}); const f = document.querySelector('[data-act="info"]'); if (f) f.focus({ preventScroll: true }); });
