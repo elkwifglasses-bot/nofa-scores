@@ -754,7 +754,6 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       const val = name === 'Starting score' ? String(x[1]).replace(/^\+/, '') : String(x[1]).replace(/^-/, '−');
       h += '<div class="bkl"><div class="bn">' + esc(name) + (detail ? '<div class="bc">' + esc(detail) + '</div>' : '') + '</div><span class="bp ' + ptClass(name, x[1]) + '">(' + esc(val) + ')</span></div>';
     });
-    if (m.rt != null) h += '<div class="bkl tot"><div class="bn">Rating</div><span class="chip ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span></div>';
     return '<div class="panel" data-p="why">' + h + '</div>';
   }
 
