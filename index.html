@@ -305,6 +305,7 @@ a.hl:hover { color: var(--fg); }
 .ttab .thead .tsort.c .arr { position: absolute; right: -1px; top: 50%; transform: translateY(-50%); }
 
 .star { color: inherit; }
+h2.label .hstar { width: 14px; height: 14px; color: #7B838A; flex: none; margin-right: -2px; }
 button, a, .calp .c { touch-action: manipulation; }
 /* Start screen */
 #splash { position: fixed; inset: 0; z-index: 100; background: #0E1012; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding-bottom: 4vh; }
@@ -881,7 +882,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       body = ms.length ? card(ms.map((m) => row(m, [roundOf(m), v === 'day' ? '' : short(m.d)], null, true))) : '<div class="card"><div class="empty small">' + (FAV.size ? 'No match of your teams ' + (v === 'day' ? 'on this day' : st.comp === 'all' ? 'this week' : 'in this round') + '.' : 'Pick your teams in Favourites.') + '</div></div>';
       count = cnt(ms);
     }
-    return '<section class="fav"><div class="favhead"><h2 class="label">Favourites <span class="favsub">' + esc(count) + '</span></h2>' +
+    return '<section class="fav"><div class="favhead"><h2 class="label">' + '<svg class="hstar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>' + 'Favourites <span class="favsub">' + esc(count) + '</span></h2>' +
       '<button type="button" class="ghost" data-act="favtoggle" aria-expanded="' + !st.favCollapsed + '" aria-controls="favbody">' + (st.favCollapsed ? 'Show' : 'Hide') + ICON.chev + '</button></div>' +
       '<div id="favbody"' + (st.favCollapsed ? ' hidden' : '') + '>' + body + '</div></section>';
   }
@@ -1174,14 +1175,14 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   const byLeagueName = (T) => (a, b) => ORDER.indexOf(T.get(a)) - ORDER.indexOf(T.get(b)) || fold(plain(a)).localeCompare(fold(plain(b)));
   const frow = (n, T) => '<div class="frow">' + FLAG[T.get(n)] + '<span class="fn">' + esc(plain(n)) + '</span><span class="fl2">' + C[T.get(n)] + '</span>' +
     '<button type="button" class="fstar" data-act="favstar" data-id="' + esc(n) + '" aria-pressed="' + FAV.has(n) + '" aria-label="' + (FAV.has(n) ? 'Remove ' : 'Add ') + esc(plain(n)) + (FAV.has(n) ? ' from' : ' to') + ' favourites">' + (FAV.has(n) ? '★' : '☆') + '</button></div>';
-  const fsec = (title, rows, empty) => '<section class="fsec"><h2 class="label">' + title + '</h2>' + (rows.length ? card(rows) : '<div class="card"><div class="empty small">' + empty + '</div></div>') + '</section>';
+  const fsec = (title, rows, empty, key) => '<section class="fsec"' + (key ? ' data-sec="' + key + '"' : '') + '><h2 class="label">' + title + '</h2>' + (rows.length ? card(rows) : '<div class="card"><div class="empty small">' + empty + '</div></div>') + '</section>';
   function favLists() {
     const T = teamsAll(), q = fold(favQ.trim()), inC = (n) => favComp === 'all' || T.get(n) === favComp;
     const mine = Array.from(FAV).filter((n) => T.has(n)).sort(byLeagueName(T));
     let h = '';
     if (q) { const res = Array.from(T.keys()).filter((n) => inC(n) && (fold(n).includes(q) || fold(plain(n)).includes(q))).sort(byLeagueName(T));
       h += fsec('Results', res.map((n) => frow(n, T)), 'No team found' + (favComp === 'all' ? '.' : ' in the ' + C[favComp] + '.')); }
-    h += fsec('Your teams', mine.map((n) => frow(n, T)), 'No favourites yet – tap ☆ next to a team.');
+    h += fsec('Your teams', mine.map((n) => frow(n, T)), 'No favourites yet – tap ☆ next to a team.', 'mine');
     if (!q) h += fsec('All teams · ' + (favComp === 'all' ? 'All leagues' : C[favComp]), Array.from(T.keys()).filter(inC).sort(byLeagueName(T)).map((n) => frow(n, T)), 'No teams stored yet.');
     return h;
   }
@@ -1307,8 +1308,20 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (act === 'logtoggle') { const opening = !logOpen; const lg = document.querySelector('#hpop .log');
       if (opening) { logOpen = true; renderHp(); grow(document.querySelector('#hpop .log'), 260); } else shrink([lg], () => { logOpen = false; renderHp(); }); return; }
     // Favourites tab
-    if (act === 'favstar') { FAV.has(id) ? FAV.delete(id) : FAV.add(id); saveFav(); refreshFav();
-      document.querySelectorAll('#favlists [data-act="favstar"]').forEach((x) => { if (x.dataset.id === id) anim(x, [{ transform: 'scale(.6)' }, { transform: 'scale(1.15)' }, { transform: 'none' }], { duration: 260 }); }); return; }
+    if (act === 'favstar') {
+      const adding = !FAV.has(id), mineRow = (n) => Array.from(document.querySelectorAll('#favlists [data-sec="mine"] [data-act="favstar"]')).find((x) => x.dataset.id === n);
+      const pops = () => document.querySelectorAll('#favlists [data-act="favstar"]').forEach((x) => { if (x.dataset.id === id) anim(x, [{ transform: 'scale(.5) rotate(-30deg)' }, { transform: 'scale(1.25) rotate(8deg)' }, { transform: 'none' }], { duration: 340 }); });
+      const apply = () => {
+        adding ? FAV.add(id) : FAV.delete(id); saveFav();
+        const lists = document.getElementById('favlists'), h0 = lists ? lists.offsetHeight : 0;
+        refreshFav(); pops();
+        if (adding) { const r = mineRow(id); const fr = r && r.closest('.frow');
+          if (fr) { grow(fr, 280); anim(fr, [{ backgroundColor: 'rgba(245, 196, 81, .16)' }, { backgroundColor: 'rgba(245, 196, 81, 0)' }], { duration: 900, delay: 200, fill: 'backwards' }); }
+          const card0 = document.querySelector('#favlists [data-sec="mine"] .card'); if (card0 && FAV.size === 1) grow(card0, 260); }
+        void h0;
+      };
+      if (!adding) { const r = mineRow(id), fr = r && r.closest('.frow'); shrink(fr ? [fr] : [], apply); } else apply();
+      return; }
     if (act === 'favcomp') { favComp = id; renderFav(); fadeUp(Array.from(document.querySelectorAll('#favlists > .fsec')), 40); return; }
     if (act === 'favclear') { favQ = ''; renderFav(); const q = document.getElementById('favq'); if (q) q.focus(); return; }
 
