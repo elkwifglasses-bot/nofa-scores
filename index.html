@@ -403,24 +403,22 @@ html.popopen { overflow: hidden; }
 .pbar .sq.back svg { transform: scaleX(-1); }
 .infobox .potv { display: inline; }
 .infobox .potv .chip.pot { display: inline-flex; vertical-align: -2px; }
-.infobox .chip.pot svg { width: 9px; height: 12px; }
+.infobox .chip.pot svg { width: 12px; height: 14px; }
 
-/* The box between the team names (rating, score, "vs" or flames) always has the same width; a bit more air to the names */
+/* The box between the team names (rating, score, "vs" or a prediction bolt) always has the same width; a bit more air to the names */
 .crow .line > .chip { width: 52px; min-width: 52px; padding: 0; margin-inline: 4px; }
 .crow.ranked .line > .chip { margin-inline: 0; }
 .crow .chip.score { font-size: 13px; letter-spacing: -0.01em; }
-/* Predicted potential for matches still to come: 3 / 2 / 1 lit flames in a dotted box (real ratings are filled boxes) */
+/* Prediction for matches still to come: filled bolt = must watch, outlined bolt = one to watch, in a dotted box (real ratings are filled boxes) */
 .chip.pot { background: transparent; border: 2px dotted #4A5158; gap: 0; }
-.chip.pot.p3 { border-color: var(--accent); }
-.chip.pot.p2 { border-color: var(--t2-line); }
-.chip.pot svg { width: 10px; height: 14px; flex: none; }
-.chip.pot .f { fill: #30363C; }
-.chip.pot.p3 .f.on { fill: var(--accent); }
-.chip.pot.p2 .f.on { fill: var(--t2-soft); }
-.chip.pot.p1 .f.on { fill: #7B838A; }
+.chip.pot.p3 { border-color: var(--accent); color: var(--accent); }
+.chip.pot.p2 { border-color: var(--t2-line); color: var(--t2-soft); }
+.chip.pot svg { width: 19px; height: 22px; flex: none; }
 .crow .day { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
 .potv { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
 .potv .sep { color: var(--muted); font-weight: 400; }
+.infobox svg.kb { width: 12px; height: 14px; vertical-align: -2px; }
+.infobox svg.kb.p3 { color: var(--accent); } .infobox svg.kb.p2 { color: var(--t2-soft); }
 .potv .chip.pot { width: auto; min-width: 0; height: auto; border: 0; padding: 0; }
 /* Opened match: score panel (factors per team) and breakdown panel (what counted, points in brackets) */
 .panel { margin: 0 12px 12px; background: var(--inset); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; }
@@ -701,8 +699,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 
   // ---- Predicted potential for matches still to come ----
   // Each team's average goals per match and average combined xG (league average when a team has no data yet),
-  // both standardised within the round and added up. The round's top 3 are "high", the bottom 3 "low", the rest "medium"
-  // (top/bottom 2 in rounds of 6–8 matches, 1 in rounds of 3–5). Shown as 3 / 2 / 1 lit flames, never as a number.
+  // both standardised within the round and added up. The round's top 3 are "must watch" (filled bolt), the bottom 3 get no mark ("vs"),
+  // the rest "one to watch" (outlined bolt). Super League: top/bottom 2. Smaller rounds: 2 in rounds of 6–8 matches, 1 in rounds of 3–5. Never shown as a number.
   let PRED = new Map();
   const fxKey = (c, h, a) => c + '|' + h + '|' + a;
   const goalsOf = (s) => { const g = String(s || '').match(/(\d+)\s*[–-]\s*(\d+)/); return g ? [+g[1], +g[2]] : null; };
@@ -721,14 +719,16 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       const z = (k) => { const v = rows.map((r) => r[k]), mu = mean(v), sd = Math.sqrt(mean(v.map((a) => (a - mu) ** 2))) || 1; rows.forEach((r) => { r['z' + k] = (r[k] - mu) / sd; }); };
       z('g'); z('x');
       rows.forEach((r) => { r.p = r.zg + r.zx; });
-      const n = rows.length, k = n >= 9 ? 3 : n >= 6 ? 2 : n >= 3 ? 1 : 0;
+      const n = rows.length, k = Math.min(c === 'sl' ? 2 : 3, n >= 9 ? 3 : n >= 6 ? 2 : n >= 3 ? 1 : 0);
       rows.slice().sort((p, q) => q.p - p.p).forEach((r, i) => PRED.set(fxKey(c, r.f.h, r.f.a), { c, r: fx.r, d: r.f.d, h: r.f.h, a: r.f.a, p: r.p, lvl: i < k ? 3 : i >= n - k ? 1 : 2 }));
     });
   }
-  const POT = { 3: 'High potential', 2: 'Medium potential', 1: 'Low potential' };
-  const FLAME = '<path d="M8 1c1 3 4 4.5 4 8a4 4 0 0 1-8 0c0-2 1-3 1.6-4 .3 1.4 1 2 1.6 2C7.6 5 7 3 8 1z"/>';
-  const flames = (lvl) => [0, 1, 2].map((i) => '<svg viewBox="2 0 12 16" aria-hidden="true"><g class="f' + (i < lvl ? ' on' : '') + '">' + FLAME + '</g></svg>').join('');
-  const potChip = (lvl) => '<span class="chip pot p' + lvl + '" role="img" aria-label="' + POT[lvl] + '" title="' + POT[lvl] + ' (prediction)">' + flames(lvl) + '</span>';
+  const POT = { 3: 'Must watch', 2: 'One to watch' };
+  const BOLT = 'M13 2L4 14h7l-1 8 9-12h-7z';
+  const bolt = (lvl) => '<svg viewBox="0 0 24 24" aria-hidden="true"' + (lvl === 3 ? ' fill="currentColor"' : ' fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"') + '><path d="' + BOLT + '"/></svg>';
+  // Lowest level: no mark, just "vs"
+  const potChip = (lvl) => lvl === 1 ? '<span class="chip vs" title="Prediction: not among the round’s most promising">vs</span>'
+    : '<span class="chip pot p' + lvl + '" role="img" aria-label="' + POT[lvl] + ' (prediction)" title="' + POT[lvl] + ' (prediction)">' + bolt(lvl) + '</span>';
   // The fixtures of a league's next round that are not rated yet, as rows (a stored, unrated match keeps its own entry)
   const openFixtures = (c) => { const fx = FX[c]; if (!fx) return []; return (fx.matches || []).filter((f) => !D.some((m) => m.c === c && m.h === f.h && m.a === f.a && m.rt != null))
     .map((f) => D.find((m) => m.c === c && m.h === f.h && m.a === f.a) || { id: 'fx:' + fxKey(c, f.h, f.a), c, r: fx.r, d: f.d, h: f.h, a: f.a, rt: null, s: '', w: [] }); };
@@ -787,7 +787,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   }
 
   // Match row: centred pairing (flag | home · box · away | ▶ or weekday). The box is the rating, the score once revealed,
-  // or the predicted potential (flames) for a match still to come. Tap a played match for the score (eye) and the breakdown (bars).
+  // or the prediction (bolt) for a match still to come. Tap a played match for the score (eye) and the breakdown (bars).
   function row(m, metaParts, pos, withFlag) {
     const id = m.id, key = (withFlag ? 'x:' : '') + id, played = m.rt != null, on = played && rev.has(id), w = why.has(id), open = played && openRows.has(key);
     const pr = played ? null : predOf(m);
@@ -967,11 +967,11 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     return card(ms.map((m) => row(m, [], null, st.comp === 'all')));
   }
 
-  // Potential count for the upcoming matches shown, for the ⓘ text: n matches · 🔥🔥🔥 n · 🔥🔥 n · 🔥 n
+  // Prediction count for the upcoming matches shown, for the ⓘ text: n matches: filled bolt n · outlined bolt n
   const potCount = (ms) => {
     const n = { 3: 0, 2: 0, 1: 0 }; ms.forEach((m) => { const p = predOf(m); if (p) n[p.lvl]++; });
     return '<span class="potv">' + ms.length + (ms.length === 1 ? ' match' : ' matches') + ': ' +
-      [3, 2, 1].map((l) => '<span class="chip pot p' + l + '" role="img" aria-label="' + POT[l] + '">' + flames(l) + '</span>&nbsp;' + n[l]).join(' <span class="sep">·</span> ') + '</span>';
+      [3, 2].map((l) => '<span class="chip pot p' + l + '" role="img" aria-label="' + POT[l] + '">' + bolt(l) + '</span>&nbsp;' + n[l]).join(' <span class="sep">·</span> ') + '</span>';
   };
 
   function renderNext(P) {
@@ -1060,10 +1060,10 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 
   // One ⓘ per tab, at the right end of the "All matches" / "All teams" header
   const KEY = '<span class="k t1">8.5+</span> must watch · <span class="k t2">7+</span> worth it · <span class="k t3">4+</span> average · <span class="k tr">below 4</span> skip';
-  const FLAMEKEY = 'Flames are a prediction for matches still to come, based on both teams’ goals and xG so far: 3 = among the round’s most promising, 1 = among its least. Only a rough hint – the round’s best match is in the top 3 about half the time.';
+  const BOLTKEY = 'Lightning bolts are a prediction for matches still to come, based on both teams’ goals and xG so far: ' + bolt(3).replace('<svg', '<svg class="kb p3"') + ' must watch = among the round’s most promising (top 3, top 2 in the Super League), ' + bolt(2).replace('<svg', '<svg class="kb p2"') + ' one to watch; the least promising just show “vs”. Only a rough hint.';
   const INFO = {
-    day: 'Every match of the selected day, sorted by rating. The rating (0–10) says how worth watching a match is, without giving anything away.<br>' + KEY + '<br>Tap a match to reveal the score with each team’s figures, or to see how the rating is built. ▶ opens the highlights.<br>' + FLAMEKEY,
-    matchweek: 'All matches from Tuesday to Monday, sorted by rating. Choose a league to see one round instead.<br>' + KEY + '<br>The arrows move week by week (or round by round); the button next to them jumps back to the latest one. › after the latest week shows the next week (or round) with a prediction for each match.<br>' + FLAMEKEY,
+    day: 'Every match of the selected day, sorted by rating. The rating (0–10) says how worth watching a match is, without giving anything away.<br>' + KEY + '<br>Tap a match to reveal the score with each team’s figures, or to see how the rating is built. ▶ opens the highlights.<br>' + BOLTKEY,
+    matchweek: 'All matches from Tuesday to Monday, sorted by rating. Choose a league to see one round instead.<br>' + KEY + '<br>The arrows move week by week (or round by round); the button next to them jumps back to the latest one. › after the latest week shows the next week (or round) with a prediction for each match.<br>' + BOLTKEY,
     best: 'Teams: M = matches played, Rng = best minus worst match rating (high = unpredictable, low = consistent), Avg = the avg rating of all their matches – who is most worth watching this season. Team avgs use a narrower colour scale: green from 6.3, bright green from 7.0, red below 5.3. Tap a column heading to sort the table, tap it again to reverse.<br>Matches: the best rated matches so far; “Show worst” adds the worst. The number next to each league is its avg rating.'
   };
   const sectionHead = (v, P) => '<div class="favhead sect"><h2 class="label">' + (v === 'best' ? 'League' : 'Matches') + '</h2>' +
