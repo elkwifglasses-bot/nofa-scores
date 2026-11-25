@@ -54,7 +54,7 @@ header { position: sticky; top: 0; z-index: 20; background: var(--green-top); pa
 .hin { max-width: 760px; margin: 0 auto; padding: 10px max(8px, env(safe-area-inset-right, 0px)) 0 max(8px, env(safe-area-inset-left, 0px)); }
 .tr1 { display: flex; align-items: center; justify-content: space-between; padding: 2px 6px 10px; }
 .ticons { display: flex; gap: 4px; }
-.ticons[hidden] { display: none; }
+.ticons.off { visibility: hidden; } /* hidden but still takes its space, so the top bar keeps the same height on every tab */
 .ti { position: relative; width: 40px; height: 40px; min-height: 40px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--fg); }
 .ti:hover { background: rgba(255, 255, 255, .06); }
 .ti[aria-expanded="true"] { background: rgba(255, 255, 255, .09); }
@@ -1486,7 +1486,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     });
     // Every tab uses the same width as Matches (760px), the tab bar's buttons too
     // Update status and calendar only belong to the Matches tab (Day / Week); the other tabs show neither
-    const inMatches = v === 'day' || v === 'matchweek'; document.querySelector('.ticons').hidden = !inMatches;
+    const inMatches = v === 'day' || v === 'matchweek'; document.querySelector('.ticons').classList.toggle('off', !inMatches);
     const cal = document.querySelector('[data-act="cal"]'); cal.disabled = !inMatches || !loaded || !D.length;
     bellDot();
     const main = document.getElementById('main'), dbar = document.getElementById('dbar');
