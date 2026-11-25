@@ -378,15 +378,21 @@ button.mtm:hover { background: rgba(255, 255, 255, .05); }
 h2.label .hstar { width: 14px; height: 14px; color: #7B838A; flex: none; margin-right: -2px; }
 button, a, .calp .c { touch-action: manipulation; }
 /* Start screen */
-#splash { position: fixed; inset: 0; z-index: 100; background: #0E1012; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding-bottom: 4vh; }
+#splash { position: fixed; inset: 0; z-index: 100; background: #0E1012; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding-bottom: 4vh; overflow: hidden; }
+/* Background: a wall of club badges that fades out towards the middle, behind the logo and tagline */
+#splash .sp-bg { position: absolute; inset: 0; opacity: .28; -webkit-mask-image: radial-gradient(ellipse 77% 55% at 50% 48%, transparent 37%, rgba(0,0,0,.35) 66%, #000 100%); mask-image: radial-gradient(ellipse 77% 55% at 50% 48%, transparent 37%, rgba(0,0,0,.35) 66%, #000 100%); }
+#splash .sp-bg svg { position: absolute; width: 38px; height: 38px; color: inherit; animation: none; }
+#splash > svg, #splash .sp-t { position: relative; }
 #splash[hidden] { display: none; }
-#splash svg { width: 104px; height: 104px; color: var(--accent); }
-#splash .sp-t { font: 600 17px var(--display); letter-spacing: .01em; color: var(--fg); }
+#splash > svg { width: 150px; height: 150px; color: var(--accent); }
+#splash .sp-t { font: 600 24px/1.25 var(--display); letter-spacing: .01em; color: var(--fg); text-align: center; }
 @media (prefers-reduced-motion: no-preference) {
-  #splash svg { animation: sp-in .9s cubic-bezier(.2,.7,.2,1) both; }
+  #splash > svg { animation: sp-in .9s cubic-bezier(.2,.7,.2,1) both; }
+  #splash .sp-bg { animation: sp-bg 1.2s ease-out both; }
   #splash .sp-t { animation: sp-t .6s cubic-bezier(.2,.7,.2,1) .25s both; }
 }
 @keyframes sp-in { from { transform: scale(.9); } to { transform: none; } }
+@keyframes sp-bg { from { opacity: 0; transform: scale(1.04); } to { opacity: .28; transform: none; } }
 @keyframes sp-t { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 /* Everything under the period bar moves as one when the day / week / round changes */
 .slide { display: flex; flex-direction: column; gap: var(--gap-block); touch-action: pan-y; }
@@ -612,8 +618,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 </head>
 <body>
 <div id="splash" aria-hidden="true" hidden>
+  <div class="sp-bg"></div>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.2l4.2 3-1.6 4.9H9.4L7.8 10.2z" fill="currentColor" stroke="none"/></svg>
-  <div class="sp-t">score free football scores</div>
+  <div class="sp-t">score free<br>football scores</div>
 </div>
 <script>
   // Start screen: only when the installed app starts fresh (it carries on from Android's own start screen); ?splash=1 shows it in a browser
@@ -1825,6 +1832,15 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     } catch (e) { if (!loaded) failed = true; }
     const y = window.scrollY; render(); window.scrollTo(0, y);
   }
+  // Start screen background: every club badge, in a staggered grid that covers the screen (a fixed shuffle, so it looks the same each time)
+  (function () {
+    const sp = document.getElementById('splash'), bg = sp && sp.querySelector('.sp-bg'); if (!bg || sp.hidden) return;
+    const all = Object.keys(BSPEC).sort((a, b) => bh(a + 'x') - bh(b + 'x')), G2 = 44, GY = 41, cols = Math.ceil(innerWidth / G2) + 2, rows = Math.ceil(innerHeight / GY) + 2;
+    let h = '';
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { const [lg, ...n] = all[(r * (cols + 5) + c) % all.length].split('|');
+      h += badge(lg, n.join('|'), 38).replace('<svg ', '<svg style="left:' + (c * G2 - (r % 2 ? 0 : G2 / 2) - 10) + 'px;top:' + (r * GY - 14) + 'px" '); }
+    bg.innerHTML = h;
+  })();
   // Start screen stays about 2 s (longer only while the data is still on its way, at most 5 s), then fades into the app
   let splashGone = false;
   function hideSplash() {
