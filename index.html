@@ -555,7 +555,6 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 .tgsvg { display: block; overflow: visible; }
 .tgsvg .z1 { fill: #fff; opacity: .075; } .tgsvg .z2 { fill: #fff; opacity: .045; } .tgsvg .z3 { fill: #fff; opacity: .02; }
 .tgsvg .gl { stroke: #2B3035; stroke-width: 1; }
-.tgsvg .ga { stroke: #98A0A7; stroke-width: 1.2; stroke-dasharray: 3 3; }
 .tgsvg .gp { fill: none; stroke: var(--fg); stroke-width: 2; stroke-linejoin: round; }
 .tgsvg .gd { stroke: var(--surface); stroke-width: 2; }
 .tgsvg .d1 { fill: var(--accent); } .tgsvg .d2 { fill: var(--t2-line); } .tgsvg .d3 { fill: #7B838A; } .tgsvg .dr { fill: var(--tr); }
@@ -563,7 +562,6 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 [data-scheme="mono"] .tgsvg .d2 { fill: var(--t2-soft); }
 .tgsvg .gring { fill: none; stroke: var(--fg); stroke-opacity: .5; stroke-width: 1.5; }
 .tgsvg .gx { fill: var(--muted); font: 400 10.5px var(--text); }
-.tpop .tga { position: absolute; z-index: 1; font-size: 10.5px; line-height: 14px; color: var(--muted); pointer-events: none; white-space: nowrap; }
 .tpop .gdot { position: absolute; width: 34px; height: 34px; min-height: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; }
 .tpop .gdot:hover { background: rgba(255, 255, 255, .05); }
 .tpop .gbub { position: absolute; z-index: 5; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 0; padding: 12px 14px; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .55); white-space: nowrap; text-align: left; }
@@ -1148,20 +1146,18 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const body = box.querySelector('.tpb'); if (body) body.scrollTop = popList;
   }
   // Team graph: one dot per rated match, oldest left; the 10 most recent fill the width, older ones are reached by scrolling left.
-  // Grey bands hint at the rating zones (8.5 / 7 / 4); dots take the rating colour; dashed line = the team's average, labelled
-  // in a column of its own on the right (so no dot ever sits under it). The tapped dot's bubble floats above everything.
+  // Grey bands hint at the rating zones (8.5 / 7 / 4); dots take the rating colour. The tapped dot's bubble floats above everything.
   let gDraw = false; // play the draw-in once (opening the team, or showing the graph again)
   function drawGraph(team, avg, ms) {
     const el = document.querySelector('.tpop .tg'); if (!el) return;
     const old = el.querySelector('.tgs'); if (old) gScroll = old.scrollLeft;
-    const LBL = 52, W = (el.clientWidth || 340) - LBL, H = 130, pt = 10, pb = 22, pl = 14, pr = 12, ih = H - pt - pb, n = ms.length;
+    const W = el.clientWidth || 340, H = 173, pt = 12, pb = 24, pl = 14, pr = 12, ih = H - pt - pb, n = ms.length;
     const step = n > 10 ? (W - pl - pr) / 9 : n > 1 ? (W - pl - pr) / (n - 1) : 0, CW = n > 10 ? Math.round(pl + pr + step * (n - 1)) : W;
     const X = (i) => (n === 1 ? W / 2 : pl + step * i), Y = (v) => pt + ih * (1 - v / 10);
     const dc = (r) => (r >= 8.5 ? 'd1' : r >= 7 ? 'd2' : r >= 4 ? 'd3' : 'dr');
     let g = '<svg class="tgsvg" width="' + CW + '" height="' + H + '" aria-hidden="true">';
     [[8.5, 10, 'z1'], [7, 8.5, 'z2'], [4, 7, 'z3']].forEach(([a, b, z]) => { g += '<rect class="' + z + '" x="0" y="' + Y(b) + '" width="' + CW + '" height="' + (Y(a) - Y(b)) + '"/>'; });
     [0, 4, 7, 8.5, 10].forEach((v) => { g += '<line class="gl" x1="0" x2="' + CW + '" y1="' + Y(v) + '" y2="' + Y(v) + '"/>'; });
-    g += '<line class="ga" x1="0" x2="' + CW + '" y1="' + Y(avg).toFixed(1) + '" y2="' + Y(avg).toFixed(1) + '"/>';
     if (n > 1) g += '<polyline class="gp" points="' + ms.map((m, i) => X(i).toFixed(1) + ',' + Y(m.rt).toFixed(1)).join(' ') + '"/>';
     ms.forEach((m, i) => { g += '<circle class="gd ' + dc(m.rt) + '" data-i="' + i + '" cx="' + X(i).toFixed(1) + '" cy="' + Y(m.rt).toFixed(1) + '" r="4.5"/>'; if (m.id === gSel) g += '<circle class="gring" cx="' + X(i).toFixed(1) + '" cy="' + Y(m.rt).toFixed(1) + '" r="9"/>'; });
     ms.forEach((m, i) => { if ((n - 1 - i) % 3) return; const d = dt(m.d), x = X(i), an = n > 1 && x < 24 ? 'start' : n > 1 && x > CW - 24 ? 'end' : 'middle';
@@ -1172,8 +1168,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (si >= 0) { const m = ms[si];
       bub = '<button type="button" class="gbub" data-act="gdot" data-id="' + esc(m.id) + '" aria-label="Open the match"><span class="gbd">' + short(m.d) + ' · ' + (m.h === team ? 'home' : 'away') + ' · ' + RN[m.c] + ' ' + m.r + '</span>' +
         '<span class="gbm"><span>' + nm(m.h) + '</span><span class="chip small ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span><span>' + nm(m.a, 1) + '</span></span><span class="gbt"></span></button>'; }
-    el.innerHTML = '<div class="tgs" style="width:' + W + 'px"><div class="tgc" style="width:' + CW + 'px;height:' + H + 'px">' + g + b + '</div></div>' +
-      '<span class="tga" style="left:' + (W + 6) + 'px;top:' + (Y(avg) - 7).toFixed(1) + 'px">avg ' + avg.toFixed(1) + '</span>' + bub;
+    el.innerHTML = '<div class="tgs" style="width:' + W + 'px"><div class="tgc" style="width:' + CW + 'px;height:' + H + 'px">' + g + b + '</div></div>' + bub;
     const sc = el.querySelector('.tgs'); sc.scrollLeft = gScroll == null ? sc.scrollWidth : gScroll;
     const bb = el.querySelector('.gbub');
     // The bubble lives outside the scrolling strip (so it is never clipped and covers the avg label); it follows the dot when scrolling
@@ -1187,7 +1182,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (gDraw) { gDraw = false; drawIn(el, ms.map((m, i) => [X(i), Y(m.rt)]), n); }
   }
   // Draw-in: the line grows from left to right over the 10 most recent matches (older ones are already there), each dot pops in
-  // as the line reaches it, then the average line fades in. Skipped when the phone asks for reduced motion.
+  // as the line reaches it. Skipped when the phone asks for reduced motion.
   function drawIn(el, pts, n) {
     if (!moving()) return;
     const k0 = Math.max(0, n - 10), cum = [0]; for (let i = 1; i < n; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
@@ -1196,8 +1191,6 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (pl && L > 0) { pl.style.strokeDasharray = L + ' ' + L; anim(pl, [{ strokeDashoffset: L - L0 }, { strokeDashoffset: 0 }], { duration: DUR, easing: 'cubic-bezier(.4,0,.2,1)' }); }
     el.querySelectorAll('.gd').forEach((c) => { const i = +c.dataset.i; if (i < k0) return;
       anim(c, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.25)', opacity: 1, offset: 0.7 }, { transform: 'scale(1)', opacity: 1 }], { duration: 260, delay: n === 1 ? 0 : ((cum[i] - L0) / span) * DUR * 0.92, fill: 'backwards' }); });
-    anim(el.querySelector('.ga'), [{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: DUR, fill: 'backwards' });
-    anim(el.querySelector('.tga'), [{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: DUR, fill: 'backwards' });
   }
   // The popup fills the space between the top section and the tab bar; the page behind stays where it is
   function placePop() {
