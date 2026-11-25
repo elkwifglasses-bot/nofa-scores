@@ -49,13 +49,12 @@
 body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--text); }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 25; background: var(--green-top); }
 .wrap { max-width: 760px; margin: 0 auto; padding-block: 14px calc(92px + env(safe-area-inset-bottom, 0px)); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
-.wrap.wide { max-width: 1180px; }
 /* Top section: full width, very dark green – logo, update status, calendar, a divider line, then the date bar */
 header { position: sticky; top: 0; z-index: 20; background: var(--green-top); padding-top: env(safe-area-inset-top, 0px); border-bottom: 1px solid var(--top-line); }
 .hin { max-width: 760px; margin: 0 auto; padding: 10px max(8px, env(safe-area-inset-right, 0px)) 0 max(8px, env(safe-area-inset-left, 0px)); }
-.wide-h .hin { max-width: 1180px; }
 .tr1 { display: flex; align-items: center; justify-content: space-between; padding: 2px 6px 10px; }
 .ticons { display: flex; gap: 4px; }
+.ticons[hidden] { display: none; }
 .ti { position: relative; width: 40px; height: 40px; min-height: 40px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--fg); }
 .ti:hover { background: rgba(255, 255, 255, .06); }
 .ti[aria-expanded="true"] { background: rgba(255, 255, 255, .09); }
@@ -230,7 +229,8 @@ button.ghost.info[aria-expanded="true"] { color: var(--fg); }
 .crow.wide-r { --side: 46px; }
 .crow .line { position: relative; display: grid; grid-template-columns: var(--side) minmax(0, 1fr) auto minmax(0, 1fr) var(--side); align-items: center; column-gap: 7px; padding: 15.5px 12px; }
 .crow .hit { position: absolute; inset: 0; z-index: 0; min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
-.crow .hit:hover { background: #181B1E; }
+.crow .hit:hover, .crow .hit:active { background: #181B1E; }
+.crow .hit { -webkit-tap-highlight-color: transparent; }
 .crow .hit:focus-visible { outline-offset: -2px; }
 .crow .side, .crow .hn, .crow .an, .crow .chip { position: relative; z-index: 1; pointer-events: none; }
 .crow .side { display: flex; align-items: center; gap: 6px; min-width: 0; }
@@ -333,6 +333,9 @@ a.hl:hover { color: var(--fg); }
 .mdate { text-align: center; font-size: 12px; color: var(--muted); margin-top: 2px; }
 .board { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; margin: 14px 0 14px; }
 .mtm { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; text-align: center; }
+button.mtm { min-height: 0; height: auto; padding: 4px 6px; background: transparent; border: 0; border-radius: 12px; font: inherit; color: var(--fg); }
+button.mtm:hover { background: rgba(255, 255, 255, .05); }
+.mtm .crest { display: flex; }
 .mtm b { font: 700 15px var(--display); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mtm i { font-style: normal; font-size: 11.5px; color: var(--muted); }
 .crest { width: 38px; height: 38px; border-radius: 50%; background: #2B3136; display: flex; align-items: center; justify-content: center; font: 700 15px var(--display); color: #C9CED3; }
@@ -340,12 +343,13 @@ a.hl:hover { color: var(--fg); }
 .mmid .chip { width: 84px; min-width: 84px; height: 52px; font-size: 26px; border-radius: 14px; margin: 0; }
 .mmid .chip.mscore { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--fg); font-size: 24px; letter-spacing: -0.01em; }
 .mmid .lbl { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.macts { display: grid; grid-template-columns: 1fr 1px 1fr 1fr 1fr; gap: 6px; margin: 0 -2px; padding: 0 0 12px; flex: none; }
+.macts { display: grid; grid-template-columns: 1fr 10px 1fr 1fr 1fr; gap: 5px; margin: 0 -2px; padding: 0 0 12px; flex: none; }
 .mbtn { min-height: 54px; height: 54px; border-radius: 11px; font-size: 12px; gap: 3px; flex-direction: column; padding: 0 4px; background: #23282D; border: 1px solid #2F353A; color: var(--fg); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .mbtn svg { width: 17px; height: 17px; }
+.mbtn span { white-space: nowrap; }
 .mbtn[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); font-weight: 600; }
 .mbtn:disabled { opacity: 1; color: #4F575E; }
-.macts .msep { align-self: center; width: 1px; height: 34px; background: #3A4046; }
+.macts .msep { align-self: center; justify-self: center; display: flex; color: #5F676E; }
 .mbtn.off { color: #4F575E; }
 .mbody { overflow-y: auto; overscroll-behavior: contain; margin: 0 -14px; padding: 0; flex: 0 1 auto; min-height: 0; }
 .mbody:empty { display: none; }
@@ -423,13 +427,18 @@ html.popopen { overflow: hidden; }
 .crow .chip.score { font-size: 13px; letter-spacing: -0.01em; }
 /* Prediction for matches still to come: filled bolt = must watch, outlined bolt = one to watch, in a dotted box (real ratings are filled boxes) */
 .chip.pot { background: transparent; border: 2px dotted #4A5158; gap: 0; }
-.chip.pot.p3 { border-color: var(--accent); color: var(--accent); }
+.chip.pot.p3 { border-color: var(--accent); border-style: solid; color: var(--accent); }
 .chip.pot.p2 { border-color: var(--t2-line); color: var(--t2-soft); }
 .chip.pot svg { width: 16px; height: 19px; flex: none; }
-.crow .day { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.crow .day { display: flex; flex-direction: column; align-items: flex-end; font-size: 10.5px; line-height: 1.2; color: var(--muted); white-space: nowrap; }
+.crow .day b { font-weight: 600; color: #B9C0C6; }
 .potv { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
 .potv .sep { color: var(--muted); font-weight: 400; }
 .infobox svg.kb { width: 12px; height: 14px; vertical-align: -2px; }
+.infobox .isec + .isec { border-top: 1px solid var(--btn-line); margin-top: 9px; padding-top: 9px; }
+.infobox .kj { display: inline-flex; vertical-align: -3px; color: var(--fg); }
+.infobox .kj svg { width: 15px; height: 15px; }
+.infobox .kj.flip svg { transform: scaleX(-1); }
 .infobox svg.kb.p3 { color: var(--accent); } .infobox svg.kb.p2 { color: var(--t2-soft); }
 .potv .chip.pot { width: auto; min-width: 0; height: auto; border: 0; padding: 0; }
 /* Opened match: score panel (factors per team) and breakdown panel (what counted, points in brackets) */
@@ -462,13 +471,14 @@ html.popopen { overflow: hidden; }
 #dbar .sq { width: 36px; height: 36px; min-height: 36px; border: 0; background: transparent; color: var(--fg); border-radius: 9px; }
 #dbar .sq:hover { background: rgba(255, 255, 255, .06); }
 #dbar .sq:disabled { opacity: .3; }
-#dbar .pt { flex-direction: row; align-items: baseline; justify-content: center; gap: 8px; white-space: nowrap; line-height: 1.2; }
+#dbar .pt { flex-direction: row; align-items: baseline; justify-content: center; gap: 6px; white-space: nowrap; line-height: 1.2; }
 #dbar .pt h1 { font: 600 13.5px var(--text); flex: none; }
+#dbar .pt .pdot { color: var(--top-sub); font-size: 12px; flex: none; margin: 0 -2px; }
 #dbar .pt .sub { font-size: 12px; color: var(--top-sub); flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .tabbar { transform: translateZ(0); backface-visibility: hidden; will-change: transform; contain: layout paint; }
 header { transform: translateZ(0); backface-visibility: hidden; }
 #wrap { overflow-x: clip; }
-.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 22; display: grid; grid-template-columns: repeat(4, 1fr); background: #0C0E10; border-top: 1px solid var(--divider); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 22; display: grid; grid-template-columns: repeat(4, 1fr); padding-inline: max(0px, calc((100vw - 760px) / 2)); background: #0C0E10; border-top: 1px solid var(--divider); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .tabbar > a, .tabbar > button { height: 62px; min-height: 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #7B838A; text-decoration: none; font: 500 11.5px var(--text); background: transparent; border: 0; border-radius: 0; padding: 0; }
 .tabbar svg { width: 22px; height: 22px; }
 .tabbar [aria-current="page"] { color: var(--accent); font-weight: 600; }
@@ -578,13 +588,15 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 .tpop .gbm { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13.5px; }
 .tpop .gbt { position: absolute; bottom: -7px; width: 12px; height: 12px; background: inherit; border-right: 1px solid var(--btn-line); border-bottom: 1px solid var(--btn-line); transform: rotate(45deg); }
 .tpop .gbub.below .gbt { bottom: auto; top: -7px; border: 0; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); }
+/* Rating numbers a little larger (B2) */
+.crow .chip:not(.score):not(.vs):not(.pot) { font-size: 14.5px; }
 /* Rating boxes: one shape (3:2) everywhere, in three sizes – match rows 45×30, small boxes 39×26, the opened match 66×44 */
-.chip.small, .compact .chip, .tpop .tpn .chip, .bkl.tot .chip { width: 39px; min-width: 39px; height: 26px; border-radius: 8px; padding: 0; }
-.mmid .chip { width: 66px; min-width: 66px; height: 44px; font-size: 22px; border-radius: 12px; }
+.chip.small, .compact .chip, .tpop .tpn .chip, .bkl.tot .chip { width: 39px; min-width: 39px; height: 26px; border-radius: 8px; padding: 0; font-size: 14px; }
+.mmid .chip { width: 66px; min-width: 66px; height: 44px; font-size: 24px; border-radius: 12px; }
 .crow .chip, .crow .line > .chip { width: 45px; min-width: 45px; height: 30px; border-radius: 9px; }
 .potv .chip.pot { width: auto; min-width: 0; height: auto; }
 .mmid .chip.mscore { font-size: 20px; }
-.tpop .tpn .chip { width: 48px; min-width: 48px; height: 32px; border-radius: 9px; font-size: 16px; }
+.tpop .tpn .chip { width: 48px; min-width: 48px; height: 32px; border-radius: 9px; font-size: 17.5px; }
 </style>
 </head>
 <body>
@@ -697,7 +709,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   const label = (c) => FLAG[c] + '<span>' + C[c] + '</span>';
 
   const ICON = {
-    journal: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3v18"/><path d="M4 7h4M4 12h4M4 17h4"/><path d="M11 8h5M11 11.5h5"/></svg>',
+    journal: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h13v13a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v9a2 2 0 0 1-2 2"/><path d="M7 8h7M7 11.5h7M7 15h4"/></svg>',
     prev: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
     next: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>',
     eye: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
@@ -747,8 +759,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 
   // ---- Predicted potential for matches still to come ----
   // Each team's average goals per match and average combined xG (league average when a team has no data yet),
-  // both standardised within the round and added up. The round's top 3 are "must watch" (filled bolt), the bottom 3 get no mark ("vs"),
-  // the rest "one to watch" (outlined bolt). Super League: top/bottom 2. Smaller rounds: 2 in rounds of 6–8 matches, 1 in rounds of 3–5. Never shown as a number.
+  // both standardised within the round and added up. Each league round gets one "high potential" match (filled bolt, solid box),
+  // two "medium potential" (outlined bolt) and the rest "low potential" ("vs"). Never shown as a number.
   let PRED = new Map();
   const fxKey = (c, h, a) => c + '|' + h + '|' + a;
   const goalsOf = (s) => { const g = String(s || '').match(/(\d+)\s*[–-]\s*(\d+)/); return g ? [+g[1], +g[2]] : null; };
@@ -767,16 +779,16 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       const z = (k) => { const v = rows.map((r) => r[k]), mu = mean(v), sd = Math.sqrt(mean(v.map((a) => (a - mu) ** 2))) || 1; rows.forEach((r) => { r['z' + k] = (r[k] - mu) / sd; }); };
       z('g'); z('x');
       rows.forEach((r) => { r.p = r.zg + r.zx; });
-      const n = rows.length, k = Math.min(c === 'sl' ? 2 : 3, n >= 9 ? 3 : n >= 6 ? 2 : n >= 3 ? 1 : 0);
-      rows.slice().sort((p, q) => q.p - p.p).forEach((r, i) => PRED.set(fxKey(c, r.f.h, r.f.a), { c, r: fx.r, d: r.f.d, h: r.f.h, a: r.f.a, p: r.p, lvl: i < k ? 3 : i >= n - k ? 1 : 2 }));
+      // Per league round: the most promising match = high potential, the next two = medium, all others = low
+      rows.slice().sort((p, q) => q.p - p.p).forEach((r, i) => PRED.set(fxKey(c, r.f.h, r.f.a), { c, r: fx.r, d: r.f.d, h: r.f.h, a: r.f.a, p: r.p, lvl: i < 1 ? 3 : i < 3 ? 2 : 1 }));
     });
   }
-  const POT = { 3: 'Must watch', 2: 'One to watch' };
+  const POT = { 3: 'High potential', 2: 'Medium potential', 1: 'Low potential' };
   const BOLT = 'M13 2L4 14h7l-1 8 9-12h-7z';
   const bolt = (lvl) => '<svg viewBox="0 0 24 24" aria-hidden="true"' + (lvl === 3 ? ' fill="currentColor"' : ' fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"') + '><path d="' + BOLT + '"/></svg>';
   // Lowest level: no mark, just "vs"
-  const potChip = (lvl) => lvl === 1 ? '<span class="chip vs" title="Prediction: not among the round’s most promising">vs</span>'
-    : '<span class="chip pot p' + lvl + '" role="img" aria-label="' + POT[lvl] + ' (prediction)" title="' + POT[lvl] + ' (prediction)">' + bolt(lvl) + '</span>';
+  const potChip = (lvl) => lvl === 1 ? '<span class="chip vs" role="img" aria-label="vs, low potential (prediction)">vs</span>'
+    : '<span class="chip pot p' + lvl + '" role="img" aria-label="' + POT[lvl] + ' (prediction)">' + bolt(lvl) + '</span>';
   // The fixtures of a league's next round that are not rated yet, as rows (a stored, unrated match keeps its own entry)
   const openFixtures = (c) => { const fx = FX[c]; if (!fx) return []; return (fx.matches || []).filter((f) => !D.some((m) => m.c === c && m.h === f.h && m.a === f.a && m.rt != null))
     .map((f) => D.find((m) => m.c === c && m.h === f.h && m.a === f.a) || { id: 'fx:' + fxKey(c, f.h, f.a), c, r: fx.r, d: f.d, h: f.h, a: f.a, rt: null, s: '', w: [] }); };
@@ -808,7 +820,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     let h = '<div class="sth"><span>' + nm(m.h) + '</span><span></span><span>' + nm(m.a, 1) + '</span></div>';
     lines.forEach((ln) => { if ((ln[3] === 'sm' || !m.x) && ln[1] == null && ln[2] == null) return; h += '<div class="stl' + (ln[3] === 'sm' ? ' sm' : '') + '">' + cell(ln[1], ln[2], ln, '') + '<span class="k">' + ln[0] + '</span>' + cell(ln[2], ln[1], ln, ' r') + '</div>'; });
     if (typeof x.derby === 'boolean') h += '<div class="stl foot"><span class="k">' + (x.derby ? 'Derby' : 'Not a derby') + '</span></div>';
-    else if (!m.x) h += '<div class="stl foot"><span class="k">More figures per team are stored for matches from 23 Nov 2026 on</span></div>';
+    else if (!m.x) h += '<div class="stl foot"><span class="k">Per-team figures (only available for matches from 23 Nov 2026 on)</span></div>';
     return '<div class="panel" data-p="facts">' + h + '</div>';
   }
   // What counted for each step: stored by the daily run as a third value; for older matches worked out where it is unambiguous
@@ -829,7 +841,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     (m.w || []).forEach((x) => {
       const full = whyLabel(x[0]), name = full.replace(/\s*\(.*\)$/, ''), detail = x[2] || whatCounted(name, full, x[1], m);
       const val = name === 'Starting score' ? String(x[1]).replace(/^\+/, '') : String(x[1]).replace(/^-/, '−');
-      h += '<div class="bkl"><div class="bn">' + esc(name) + (detail ? '<div class="bc">' + esc(detail) + '</div>' : '') + '</div><span class="bp ' + ptClass(name, x[1]) + '">(' + esc(val) + ')</span></div>';
+      h += '<div class="bkl"><div class="bn">' + esc(name) + (detail ? '<div class="bc">' + esc(detail) + '</div>' : '') + '</div><span class="bp ' + ptClass(name, x[1]) + '">' + esc(val) + '</span></div>';
     });
     return '<div class="panel" data-p="why">' + h + '</div>';
   }
@@ -840,9 +852,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const id = m.id, key = (withFlag ? 'x:' : '') + id, played = m.rt != null, on = played && rev.has(id), w = why.has(id), open = played && openRows.has(key);
     const pr = played ? null : predOf(m);
     const link = m.q ? 'https://www.youtube.com/results?search_query=' + encodeURIComponent(m.q).replace(/%2B/g, '+') : '';
-    const hl = !played ? (m.d ? '<span class="day" title="' + esc(short(m.d)) + '">' + wd(m.d) + '</span>' : '') : link
+    const hl = !played ? (m.d ? '<span class="day" title="' + esc(short(m.d)) + '"><b>' + wd(m.d) + '</b>' + esc(short(m.d).replace(/^\S+ /, '')) + '</span>' : '') : link
       ? '<a class="hl" href="' + esc(link) + '" target="_blank" rel="noopener" aria-label="Highlights on YouTube" title="Highlights on YouTube">' + ICON.play + '</a>'
-      : '<span class="hl off" role="img" aria-label="No highlights link" title="No highlights link for the ' + esc(C[m.c]) + '">' + ICON.noplay + '</span>';
+      : '<span class="hl off" role="img" aria-label="No highlights link" title="No highlights available for the ' + esc(C[m.c]) + '">' + ICON.noplay + '</span>';
     const chip = on ? '<span class="chip score" title="Score">' + esc(String(m.s).replace(/\s*[–-]\s*/, '–')) + '</span>'
       : played ? '<span class="chip ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span>'
       : pr ? potChip(pr.lvl) : '<span class="chip vs">vs</span>';
@@ -851,7 +863,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const label = esc(m.h + ' vs ' + m.a + (played ? ', rating ' + m.rt.toFixed(1) : ''));
     const hit = played ? '<button type="button" class="hit" data-act="match" data-id="' + esc(id) + '" aria-haspopup="dialog" aria-label="' + label + '"></button>' : '';
     // Same centred row everywhere; in ranked lists (Season) the position sits in front of the flag
-    let h = '<div class="row crow' + (pos != null ? ' haspos' : '') + (open ? ' open' : '') + '"><div class="line">' + hit +
+    let h = '<div class="row crow' + (pos != null ? ' haspos' : '') + (!played && m.d ? ' wide-r' : '') + (open ? ' open' : '') + '"><div class="line">' + hit +
         '<span class="side l' + (withFlag ? '' : ' dim') + '">' + (withFlag ? FLAG : FLAGG)[m.c] + (pos != null ? '<span class="pos">' + pos + '</span>' : '') + '</span>' +
         '<span class="hn">' + nm(m.h) + '</span>' + chip + '<span class="an">' + nm(m.a, 1) + '</span><span class="side r">' + hl + '</span></div>';
     void acts; void open; void on; void w;
@@ -870,12 +882,13 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   // Period bar at the top of every tab: title centred; Day and Week get ‹ ›, plus a "latest" button when you've moved away from the latest day/week/round
   const pbar = (title, sub, nav) => {
     const ph = '<span class="sq ph" aria-hidden="true"></span>';
-    if (!nav) return '<div class="pbar">' + ph + ph + '<div class="pt"><h1>' + esc(title) + '</h1><div class="sub">' + esc(sub) + '</div></div>' + ph + ph + '</div>';
+    const pt = '<div class="pt"><h1>' + esc(title) + '</h1>' + (String(sub).trim() ? '<span class="pdot" aria-hidden="true">·</span>' : '') + '<div class="sub">' + esc(sub) + '</div></div>';
+    if (!nav) return '<div class="pbar">' + ph + ph + pt + ph + ph + '</div>';
     // The "latest" button sits on the side the latest period is on: right when looking back, left when looking ahead (nav.ahead)
     const ph1 = '<span class="sq ph" aria-hidden="true"></span>';
     const lb = nav.latest ? '<button type="button" class="sq' + (nav.ahead ? ' back' : '') + '" data-act="latest" aria-label="Back to the latest ' + nav.what + '" title="Latest ' + nav.what + '">' + ICON.latest + '</button>' : ph1;
     return '<div class="pbar"><button type="button" class="sq" data-act="prev" aria-label="Previous ' + nav.what + '"' + (nav.canPrev ? '' : ' disabled') + '>' + ICON.prev + '</button>' + (nav.ahead ? lb : ph1) +
-      '<div class="pt"><h1>' + esc(title) + '</h1><div class="sub">' + esc(sub) + '</div></div>' +
+      pt +
       (nav.ahead ? ph1 : lb) +
       '<button type="button" class="sq" data-act="next" aria-label="Next ' + nav.what + '"' + (nav.canNext ? '' : ' disabled') + '>' + ICON.next + '</button></div>';
   };
@@ -990,7 +1003,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       count = nt + (nt === 1 ? ' team' : ' teams');
     } else {
       const ms = D.filter((m) => isFav(m) && m.d >= P.from && m.d <= P.to).sort((a, b) => a.d < b.d ? -1 : 1);
-      body = ms.length ? card(ms.map((m) => row(m, [roundOf(m), v === 'day' ? '' : short(m.d)], null, true))) : '<div class="card"><div class="empty small">' + (FAV.size ? 'No match of your teams ' + (v === 'day' ? 'on this day' : st.comp === 'all' ? 'this week' : 'in this round') + '.' : 'Pick your teams in Favourites.') + '</div></div>';
+      body = ms.length ? card(ms.map((m) => row(m, [roundOf(m), v === 'day' ? '' : short(m.d)], null, true))) : '<div class="card"><div class="empty small">' + (FAV.size ? 'None of your favourite teams play ' + (v === 'day' ? 'on this day' : st.comp === 'all' ? 'this week' : 'in this round') + '.' : 'Pick your teams in Favourites.') + '</div></div>';
       count = cnt(ms);
     }
     return '<section class="fav"><div class="favhead"><h2 class="label">' + '<svg class="hstar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>' + 'Favourites <span class="favsub">' + esc(count) + '</span></h2>' +
@@ -1019,7 +1032,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   const potCount = (ms) => {
     const n = { 3: 0, 2: 0, 1: 0 }; ms.forEach((m) => { const p = predOf(m); if (p) n[p.lvl]++; });
     return '<span class="potv">' + ms.length + (ms.length === 1 ? ' match' : ' matches') + ': ' +
-      [3, 2].map((l) => '<span class="chip pot p' + l + '" role="img" aria-label="' + POT[l] + '">' + bolt(l) + '</span>&nbsp;' + n[l]).join(' <span class="sep">·</span> ') + '</span>';
+      [3, 2].map((l) => '<span class="chip pot p' + l + '" role="img" aria-label="' + POT[l] + '">' + bolt(l) + '</span>&nbsp;' + n[l] + ' ' + (l === 3 ? 'high' : 'medium')).join(' <span class="sep">·</span> ') + ' <span class="sep">·</span> ' + n[1] + ' low</span>';
   };
 
   function renderNext(P) {
@@ -1107,16 +1120,28 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   }
 
   // One ⓘ per tab, at the right end of the "All matches" / "All teams" header
-  const KEY = '<span class="k t1">8.5+</span> must watch · <span class="k t2">7+</span> worth it · <span class="k t3">4+</span> average · <span class="k tr">below 4</span> skip';
-  const BOLTKEY = 'Lightning bolts are a prediction for matches still to come, based on both teams’ goals and xG so far: ' + bolt(3).replace('<svg', '<svg class="kb p3"') + ' must watch = among the round’s most promising (top 3, top 2 in the Super League), ' + bolt(2).replace('<svg', '<svg class="kb p2"') + ' one to watch; the least promising just show “vs”. Only a rough hint.';
+  const KEY = '<b class="ih">Key:</b><br><span class="k t1">8.5+</span> Must watch<br><span class="k t2">7+</span> Worth it<br><span class="k t3">4+</span> Average<br><span class="k tr">4−</span> Skip';
+  // ⓘ texts (reviewed with Lukas in the texts review doc, round 3), one block per section with a divider line between them.
+  // The jump-back icon is shown as it appears in the bar (both directions).
+  const JUMP = (flip) => '<span class="kj' + (flip ? ' flip' : '') + '">' + ICON.latest + '</span>';
+  const SECS = (...parts) => parts.map((p) => '<div class="isec">' + p + '</div>').join('');
+  const RATED = 'The rating (0–10) indicates how worth watching a match is – giving very little away.';
+  const TAPKEY = '<b class="ih">Tapping a match:</b><br>Tap a match to open it and see a spoiler-free summary, how the rating is built, the highlights and the score if you want it.';
+  const POTKEY = '<b class="ih">Key:</b><br>' + bolt(3).replace('<svg', '<svg class="kb p3"') + ' High potential – the most promising match of each league round<br>' +
+    bolt(2).replace('<svg', '<svg class="kb p2"') + ' Medium potential – could be worth it<br>“vs” Low potential – all other matches.';
   const INFO = {
-    day: 'Every match of the selected day, sorted by rating. The rating (0–10) says how worth watching a match is, without giving anything away.<br>' + KEY + '<br>Tap a match to reveal the score with each team’s figures, or to see how the rating is built. ▶ opens the highlights.<br>' + BOLTKEY,
-    matchweek: 'All matches from Tuesday to Monday, sorted by rating. Choose a league to see one round instead.<br>' + KEY + '<br>The arrows move week by week (or round by round); the button next to them jumps back to the latest one. › after the latest week shows the next week (or round) with a prediction for each match.<br>' + BOLTKEY,
-    best: 'Teams: M = matches played, Rng = best minus worst match rating (high = unpredictable, low = consistent), Avg = the avg rating of all their matches – who is most worth watching this season. Team avgs use a narrower colour scale: green from 6.3, bright green from 7.0, red below 5.3. Tap a column heading to sort the table, tap it again to reverse.<br>Matches: the best rated matches so far; “Show worst” adds the worst. The number next to each league is its avg rating.'
+    day: SECS('Every match of the selected day, highest rated first.<br>' + RATED, KEY,
+      '<b class="ih">Navigation:</b><br>‹ › move one day back or forward.<br>' + JUMP(true) + ' ' + JUMP(false) + ' jumps back to the current day.', TAPKEY),
+    matchweek: SECS('Every match of the week (from Tuesday to Monday), highest rated first. Pick a league to see its rounds instead.<br>' + RATED, KEY,
+      '<b class="ih">Navigation:</b><br>‹ › move one week (or round) back or forward.<br>' + JUMP(true) + ' ' + JUMP(false) + ' jumps back to the current week.<br>Jump forward to next week to see all upcoming matches and their potential to be worth watching.', TAPKEY),
+    // Next week / next round (predictions)
+    next: SECS('All of next week’s upcoming matches (from Tuesday to Monday). Pick a league to see its next round instead.<br>Upcoming matches get a prediction instead of a rating.', POTKEY,
+      '<b class="ih">Navigation:</b><br>‹ › move one week (or round) back or forward.<br>' + JUMP(true) + ' ' + JUMP(false) + ' jumps back to the current week.'),
+    best: SECS('Teams, ranked by how watchable their matches are:<br><b>#</b> = rank in the league<br><b>M</b> = matches played<br><b>RNG</b> = range, best minus worst match rating (high = unpredictable, low = consistent)<br><b>AVG</b> = average rating of all their matches.')
   };
   const sectionHead = (v, P) => '<div class="favhead sect"><h2 class="label">' + (v === 'best' ? 'League' : 'Matches') + '</h2>' +
     '<button type="button" class="ghost info" data-act="info" aria-expanded="' + infoOpen + '" aria-controls="infobox" aria-label="About this tab" title="About this tab">' + ICON.info + '</button>' +
-    (infoOpen ? '<div class="hdim idim"></div><div class="infobox bubble" id="infobox" role="dialog" aria-label="About this tab">' + INFO[v] + (P && P.next ? '<br><b>' + (st.comp === 'all' ? 'Next week' : 'This round') + ':</b> ' + potCount(P.ms) : '') + '</div>' : '') + '</div>';
+    (infoOpen ? '<div class="hdim idim"></div><div class="infobox bubble" id="infobox" role="dialog" aria-label="About this tab">' + INFO[v === 'matchweek' && P && P.next ? 'next' : v] + '</div>' : '') + '</div>';
 
   // ---- Team popup (tap a team in the Season table) ----
   let pop = null, popY = 0, popSort = 'new', popMenu = false, popList = 0;
@@ -1138,7 +1163,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const tog = (k, open, ctl) => '<button type="button" class="ghost tst" data-act="tsec" data-id="' + k + '" aria-expanded="' + open + '" aria-controls="' + ctl + '">' + (open ? 'Hide' : 'Show') + ICON.chev + '</button>';
     let h = '<div class="tdim" data-close="1"></div><div class="tpop" role="dialog" aria-label="' + esc(name(n)) + '">' +
       '<div class="tph"><div><div class="tpn"><span>' + nm(n, 1) + '</span><span class="chip ' + atier(me.avg) + '" title="Average rating">' + me.avg.toFixed(1) + '</span></div>' +
-      '<div class="tpl">' + FLAG[c] + '<span>' + C[c] + ' · ' + ord(me.rk) + ' by avg rating</span></div></div>' +
+      '<div class="tpl">' + FLAG[c] + '<span>' + C[c] + ' · #' + me.rk + ' by avg rating</span></div></div>' +
       '<button type="button" class="tpx" data-act="tclose" aria-label="Close" title="Close">✕</button></div>' +
       '<div class="tpb">' +
       // Graph section (on top), then the match list; each can be hidden like Favourites
@@ -1278,7 +1303,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       h += '</div>';
     }
     h += '<div class="cleg"><span><i></i>rated</span><span><i class="fx"></i>to come</span><span><i class="td"></i>today</span></div>';
-    h += '<div class="cnote">' + (calLast ? 'Tap ' + short(calLast).replace(/ \w+$/, '') + ' again for just that day' : 'Tap a day for its week · tap it again for just that day') + '</div>';
+    h += '<div class="cnote">' + (calLast ? 'Tap ' + short(calLast).replace(/ \w+$/, '') + ' again for just that day' : 'Tap a day to select the full week · tap again for just that day') + '</div>';
     return h;
   }
   function calPick(d) {
@@ -1316,7 +1341,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     return '<b>Options</b><div class="oh">Colours</div><div class="schs" role="group" aria-label="Colour scheme">' + SCHEMES.map(([k, l]) =>
       '<button type="button" class="sch" data-act="scheme" data-id="' + k + '" aria-pressed="' + (k === cur) + '"><span class="sw" data-scheme="' + k + '" aria-hidden="true"><i class="t1"></i><i class="t2"></i><i class="t3"></i><i class="tr"></i></span>' + l +
       '<span class="ck" aria-hidden="true">' + (k === cur ? '✓' : '') + '</span></button>').join('') + '</div>' +
-      '<div class="soon">Notifications and more options are coming.</div>'; };
+      '<div class="soon">More options are coming.</div>'; };
   function renderHp() {
     const box = document.getElementById('hpop');
     document.querySelectorAll('[data-act="bell"],[data-act="cal"],[data-act="options"]').forEach((b) => b.setAttribute('aria-expanded', String(hp === (b.dataset.act === 'options' ? 'opt' : b.dataset.act))));
@@ -1329,7 +1354,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const btn = document.querySelector(hp === 'opt' ? '.tabbar [data-tab="opt"]' : '[data-act="' + hp + '"]').getBoundingClientRect();
     const vw = document.documentElement.clientWidth, edge = Math.max(8, (vw - 760) / 2 + 8);
     if (hp === 'opt') { p.style.bottom = (window.innerHeight - btn.top + 10) + 'px'; p.style.right = edge + 'px'; }
-    else { p.style.top = (document.getElementById('top').getBoundingClientRect().bottom + 8) + 'px'; if (hp === 'bell') { p.style.left = edge + 'px'; p.style.right = edge + 'px'; p.style.maxWidth = '520px'; p.style.marginLeft = 'auto'; } else p.style.right = edge + 'px'; }
+    else { p.style.top = (btn.bottom + 9) + 'px'; if (hp === 'bell') { p.style.left = edge + 'px'; p.style.right = edge + 'px'; p.style.maxWidth = '520px'; p.style.marginLeft = 'auto'; } else p.style.right = edge + 'px'; }
     if (hp === 'bell' && vw > 536) p.style.left = 'auto', p.style.width = '520px';
     const pr = p.getBoundingClientRect(); arr.style.left = Math.round(btn.left + btn.width / 2 - pr.left - 6) + 'px';
     const lg = p.querySelector('.log'); if (lg) lg.scrollTop = logTop;
@@ -1396,21 +1421,22 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const m = mpop && D.find((x) => x.id === mpop);
     if (!m) { mpop = null; box.innerHTML = ''; return; }
     const x = m.x || {}, link = m.q ? 'https://www.youtube.com/results?search_query=' + encodeURIComponent(m.q).replace(/%2B/g, '+') : '', mScore = mMode === 'score';
-    const team = (n, t, after) => '<div class="mtm"><div class="crest" aria-hidden="true">' + esc(plain(n).replace(/^(FC|AC|AS|SC|RC|CA)\s+/i, '').charAt(0)) + '</div><b>' + nm(n, after) + '</b>' + (t && t.pos ? '<i>' + ord(t.pos) + '</i>' : '') + '</div>';
+    // Tapping a team (name or letter circle) opens its team window
+    const team = (n, t, after) => '<button type="button" class="mtm" data-act="mteam" data-id="' + esc('m|' + m.c + '|' + n) + '" aria-label="' + esc(name(n)) + ': all matches" title="' + esc(name(n)) + ': all matches"><span class="crest" aria-hidden="true">' + esc(plain(n).replace(/^(FC|AC|AS|SC|RC|CA)\s+/i, '').charAt(0)) + '</span><b>' + nm(n, after) + '</b>' + (t && t.pos ? '<i>' + ord(t.pos) + '</i>' : '') + '</button>';
     const mid = mScore
       ? '<span class="chip mscore" title="Score">' + esc(String(m.s).replace(/\s*[–-]\s*/, '–')) + '</span><span class="lbl">score</span>'
       : '<span class="chip mrt ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span><span class="lbl">rating</span>';
-    const tab = (k, act, ic, label, dis) => '<button type="button" class="mbtn" data-act="' + act + '" aria-pressed="' + (mMode === k) + '"' + (dis ? ' disabled title="No summary for this match yet"' : '') + '>' + ic + '<span>' + label + '</span></button>';
+    const tab = (k, act, ic, label, dis) => '<button type="button" class="mbtn" data-act="' + act + '" aria-pressed="' + (mMode === k) + '"' + (dis ? ' disabled title="No summary for this match"' : '') + '>' + ic + '<span>' + label + '</span></button>';
     const hlBtn = link ? '<a class="mbtn" href="' + esc(link) + '" target="_blank" rel="noopener" aria-label="Highlights on YouTube" title="Highlights on YouTube">' + ICON.play + '<span>Highlights</span></a>'
-      : '<span class="mbtn off" role="img" aria-label="No highlights link" title="No highlights link for the ' + esc(C[m.c]) + '">' + ICON.noplay + '<span>Highlights</span></span>';
+      : '<span class="mbtn off" role="img" aria-label="No highlights link" title="No highlights available for the ' + esc(C[m.c]) + '">' + ICON.noplay + '<span>Highlights</span></span>';
     const sumBox = () => '<div class="panel msum" data-p="sum"><div class="msh">Summary</div><p>' + esc(m.sum) + '</p></div>';
     box.innerHTML = '<div class="mdim2" data-mclose="1"></div><div class="mwrap"><div class="mcard" role="dialog" aria-label="' + esc(name(m.h) + ' vs ' + name(m.a)) + '">' +
       '<button type="button" class="mx" data-act="mclose" aria-label="Close">✕</button>' +
-      '<div class="mmeta">' + FLAG[m.c] + '<span>' + C[m.c] + ' · ' + RN[m.c] + ' ' + m.r + '</span></div><div class="mdate">' + LONGD(m.d) + '</div>' +
+      '<div class="mmeta">' + FLAG[m.c] + '<span>' + C[m.c] + ' · ' + RN[m.c] + ' ' + m.r + '</span></div><div class="mdate">' + short(m.d) + '</div>' +
       '<div class="board">' + team(m.h, x.h) + '<div class="mmid">' + mid + '</div>' + team(m.a, x.a, 1) + '</div>' +
       '<div class="mbody">' + (mMode === 'sum' && m.sum ? sumBox() : mMode === 'why' ? whyBox(m) : mScore ? factsBox(m) : '') + '</div>' +
       // Buttons at the bottom: Show score on its own at the far left (a divider sets it apart), then Summary, Breakdown, Highlights
-      '<div class="macts">' + tab('score', 'mscore', mScore ? ICON.eyeoff : ICON.eye, mScore ? 'Hide score' : 'Show score') + '<span class="msep" aria-hidden="true"></span>' +
+      '<div class="macts">' + tab('score', 'mscore', mScore ? ICON.eyeoff : ICON.eye, mScore ? 'Hide score' : 'Show score') + '<span class="msep" aria-hidden="true"><svg width="8" height="40" viewBox="0 0 8 40"><path d="M4 0l3 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-3 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></span>' +
       tab('sum', 'msum', ICON.journal, 'Summary', !m.sum) + tab('why', 'mwhy', ICON.breakdown, 'Breakdown') + hlBtn + '</div></div></div>';
     placeMatch();
     const b2 = box.querySelector('.mbody'); if (b2) b2.scrollTop = keepTop;
@@ -1458,9 +1484,10 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
       if (a.dataset.tab === 'matches') a.setAttribute('href', mt);
     });
-    document.getElementById('wrap').classList.toggle('wide', v === 'best');
-    document.getElementById('top').classList.toggle('wide-h', v === 'best');
-    const cal = document.querySelector('[data-act="cal"]'); cal.disabled = !(v === 'day' || v === 'matchweek') || !loaded || !D.length;
+    // Every tab uses the same width as Matches (760px), the tab bar's buttons too
+    // Update status and calendar only belong to the Matches tab (Day / Week); the other tabs show neither
+    const inMatches = v === 'day' || v === 'matchweek'; document.querySelector('.ticons').hidden = !inMatches;
+    const cal = document.querySelector('[data-act="cal"]'); cal.disabled = !inMatches || !loaded || !D.length;
     bellDot();
     const main = document.getElementById('main'), dbar = document.getElementById('dbar');
     if (!loaded) { dbar.innerHTML = pbar(' ', ' '); main.innerHTML = emptyCard(failed ? 'Ratings can’t be loaded right now. Check your connection and open the app again.' : 'Loading ratings…'); return; }
@@ -1475,7 +1502,6 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const body = v === 'matchweek' && P.next && st.comp === 'all' ? content : '<section class="selsec"><h2 class="label">' + sel + '</h2>' + content + '</section>';
     dbar.innerHTML = periodBar(v, P);
     main.innerHTML = '<div class="slide">' + favorites(v, P) + '<div class="sepline" role="presentation"></div>' + sectionHead(v, P) + pills() + body + '</div>';
-    if (pop && v !== 'best') pop = null;
     renderPop();
     renderHp();
     if (mpop) renderMatch();
@@ -1542,7 +1568,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   document.addEventListener('click', (e) => {
     // Match popup: a tap outside only closes it
     if (mpop && !e.target.closest('#mpop .mcard')) { e.preventDefault(); closeMatch(); return; }
-    if (mpop) { const mb = e.target.closest('button[data-act]'); if (mb) { const a = mb.dataset.act; if (a === 'mclose') { closeMatch(); return; } if (a === 'mscore' || a === 'mwhy' || a === 'msum') { toggleMatch(a); return; } } }
+    if (mpop) { const mb = e.target.closest('button[data-act]'); if (mb) { const a = mb.dataset.act; if (a === 'mclose') { closeMatch(); return; } if (a === 'mscore' || a === 'mwhy' || a === 'msum') { toggleMatch(a); return; } if (a === 'mteam') { const tid = mb.dataset.id; mpop = null; renderMatch(); openPop(tid); return; } } }
     // An open ⓘ bubble closes when you tap anywhere outside it
     if (infoOpen && !e.target.closest('.bubble')) { e.preventDefault(); closeInfo(() => keep(() => {})); return; }
     // An open pop-over (calendar, last update, Options) closes when you tap anywhere outside it
@@ -1711,7 +1737,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     area.addEventListener('touchend', end);
     area.addEventListener('touchcancel', () => { if (sw && sw.on) reset(sw.el); sw = null; });
   })();
-  window.addEventListener('hashchange', () => { infoOpen = false; if (hp) { hp = null; } if (location.hash === '#outlook') { st.next = true; history.replaceState(null, '', '#week'); } render(); anim(document.querySelector('#main .slide'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 }); });
+  window.addEventListener('hashchange', () => { infoOpen = false; if (hp) { hp = null; } pop = null; if (location.hash === '#outlook') { st.next = true; history.replaceState(null, '', '#week'); } render(); anim(document.querySelector('#main .slide'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 }); });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (mpop) { closeMatch(); return; }
