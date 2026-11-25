@@ -376,7 +376,7 @@ button, a, .calp .c { touch-action: manipulation; }
 .tpop { position: fixed; z-index: 31; left: max(18px, calc((100vw - 720px) / 2 + 18px)); right: max(18px, calc((100vw - 720px) / 2 + 18px)); bottom: calc(74px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0, 0, 0, .6); }
 .tpop::before { display: none; content: ""; position: absolute; top: -7px; left: 44px; width: 12px; height: 12px; background: #1B1F23; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); transform: rotate(45deg); }
 .tpop .tph { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 14px 14px 0; }
-.tpop .tpn { display: flex; align-items: center; gap: 10px; font: 700 20px/1.2 var(--display); min-width: 0; }
+.tpop .tpn { display: flex; align-items: center; gap: 12px; font: 700 24px/1.2 var(--display); min-width: 0; }
 .tpop .tpn .chip { min-width: 40px; height: 26px; border-radius: 8px; font-size: 13px; }
 .tpop .tpl { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12.5px; margin-top: 3px; }
 .tpop .tpl .flag { width: 16px; height: 11px; border-radius: 2px; }
@@ -545,7 +545,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 .favwrap { display: flex; flex-direction: column; gap: var(--gap-block); }
 .fsec { display: flex; flex-direction: column; gap: var(--gap-inner); }
 /* Team window: List / Graph switch and the ratings graph */
-.tpop .tpg { padding: 2px 0 12px; }
+.tpop .tpg { padding: 0 0 10px; }
+.tpop .tsh.tshg { padding-bottom: 0; }
+.tpop .tshg + .tpg { margin-top: -4px; }
 .tpop .tg { position: relative; margin: 0 6px; }
 .tpop .tg::after { content: ""; display: block; clear: both; }
 .tpop .tgs { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; }
@@ -570,13 +572,13 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 .tpop .gbm { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13.5px; }
 .tpop .gbt { position: absolute; bottom: -7px; width: 12px; height: 12px; background: inherit; border-right: 1px solid var(--btn-line); border-bottom: 1px solid var(--btn-line); transform: rotate(45deg); }
 .tpop .gbub.below .gbt { bottom: auto; top: -7px; border: 0; border-left: 1px solid var(--btn-line); border-top: 1px solid var(--btn-line); }
-.tpop .tgn { padding: 6px 14px 0; font-size: 12px; color: var(--muted); }
 /* Rating boxes: one shape (3:2) everywhere, in three sizes – match rows 45×30, small boxes 39×26, the opened match 66×44 */
 .chip.small, .compact .chip, .tpop .tpn .chip, .bkl.tot .chip { width: 39px; min-width: 39px; height: 26px; border-radius: 8px; padding: 0; }
 .mmid .chip { width: 66px; min-width: 66px; height: 44px; font-size: 22px; border-radius: 12px; }
 .crow .chip, .crow .line > .chip { width: 45px; min-width: 45px; height: 30px; border-radius: 9px; }
 .potv .chip.pot { width: auto; min-width: 0; height: auto; }
 .mmid .chip.mscore { font-size: 20px; }
+.tpop .tpn .chip { width: 48px; min-width: 48px; height: 32px; border-radius: 9px; font-size: 16px; }
 </style>
 </head>
 <body>
@@ -1133,8 +1135,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       '<button type="button" class="tpx" data-act="tclose" aria-label="Close" title="Close">✕</button></div>' +
       '<div class="tpb">' +
       // Graph section (on top), then the match list; each can be hidden like Favourites
-      '<section class="tsec"><div class="tsh"><h2 class="label">Graph <span class="favsub">oldest left · newest right</span></h2>' + tog('g', gOpen, 'tsg') + '</div>' +
-      '<div id="tsg" class="tpg"' + (gOpen ? '' : ' hidden') + '><div class="tg"></div><div class="tgn">Tap a point to see the match; tap again to open it.</div></div></section>' +
+      '<section class="tsec"><div class="tsh tshg"><h2 class="label">Graph</h2>' + tog('g', gOpen, 'tsg') + '</div>' +
+      '<div id="tsg" class="tpg"' + (gOpen ? '' : ' hidden') + '><div class="tg"></div></div></section>' +
       '<section class="tsec"><div class="tsh"><h2 class="label">Matches <span class="favsub">' + ms.length + '</span></h2><div class="tshr">' + (lOpen ? '<div class="dd">' +
       '<button type="button" class="ddb" data-act="tsortmenu" aria-haspopup="menu" aria-expanded="' + popMenu + '" aria-label="Sort: ' + cur + '">' + ICON_SORT + '<span>' + cur + '</span>' + ICON.chev + '</button>' +
       (popMenu ? '<div class="mdim"></div><div class="menu" role="menu">' + SORTS.map(([k, l]) => '<button type="button" role="menuitemradio" aria-checked="' + (k === popSort) + '" data-act="tsortby" data-id="' + k + '"><span class="ck">' + (k === popSort ? '✓' : '') + '</span>' + l + '</button>').join('') + '</div>' : '') +
@@ -1151,7 +1153,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   function drawGraph(team, avg, ms) {
     const el = document.querySelector('.tpop .tg'); if (!el) return;
     const old = el.querySelector('.tgs'); if (old) gScroll = old.scrollLeft;
-    const W = el.clientWidth || 340, H = 173, pt = 12, pb = 24, pl = 14, pr = 12, ih = H - pt - pb, n = ms.length;
+    const W = el.clientWidth || 340, H = 173, pt = 6, pb = 24, pl = 14, pr = 12, ih = H - pt - pb, n = ms.length;
     const step = n > 10 ? (W - pl - pr) / 9 : n > 1 ? (W - pl - pr) / (n - 1) : 0, CW = n > 10 ? Math.round(pl + pr + step * (n - 1)) : W;
     const X = (i) => (n === 1 ? W / 2 : pl + step * i), Y = (v) => pt + ih * (1 - v / 10);
     const dc = (r) => (r >= 8.5 ? 'd1' : r >= 7 ? 'd2' : r >= 4 ? 'd3' : 'dr');
