@@ -446,6 +446,7 @@ html.popopen { overflow: hidden; }
 .chip.pot { background: transparent; border: 2px dotted #4A5158; gap: 0; }
 .chip.pot.p3 { border-color: var(--accent); border-style: solid; color: var(--accent); }
 .chip.pot.p2 { border-color: var(--t2-line); color: var(--t2-soft); }
+.chip.pot.p1 { color: var(--muted); }
 .chip.pot svg { width: 16px; height: 19px; flex: none; }
 .crow .day { display: flex; flex-direction: column; align-items: flex-end; font-size: 10.5px; line-height: 1.2; color: var(--muted); white-space: nowrap; }
 .crow .day b { font-weight: 600; color: #B9C0C6; }
@@ -456,7 +457,7 @@ html.popopen { overflow: hidden; }
 .infobox .kj { display: inline-flex; vertical-align: -3px; color: var(--fg); }
 .infobox .kj svg { width: 15px; height: 15px; }
 .infobox .kj.flip svg { transform: scaleX(-1); }
-.infobox svg.kb.p3 { color: var(--accent); } .infobox svg.kb.p2 { color: var(--t2-soft); }
+.infobox svg.kb.p3 { color: var(--accent); } .infobox svg.kb.p2 { color: var(--t2-soft); } .infobox svg.kb.p1 { color: var(--muted); }
 .potv .chip.pot { width: auto; min-width: 0; height: auto; border: 0; padding: 0; }
 /* Opened match: score panel (factors per team) and breakdown panel (what counted, points in brackets) */
 .panel { margin: 0 12px 12px; background: var(--inset); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; }
@@ -855,10 +856,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   }
   const POT = { 3: 'High potential', 2: 'Medium potential', 1: 'Low potential' };
   const BOLT = 'M13 2L4 14h7l-1 8 9-12h-7z';
-  const bolt = (lvl) => '<svg viewBox="0 0 24 24" aria-hidden="true"' + (lvl === 3 ? ' fill="currentColor"' : ' fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"') + '><path d="' + BOLT + '"/></svg>';
+  const bolt = (lvl) => '<svg viewBox="0 0 24 24" aria-hidden="true"' + (lvl >= 2 ? ' fill="currentColor"' : ' fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"') + '><path d="' + BOLT + '"/></svg>';
   // Lowest level: no mark, just "vs"
-  const potChip = (lvl) => lvl === 1 ? '<span class="chip vs" role="img" aria-label="vs, low potential (prediction)">vs</span>'
-    : '<span class="chip pot p' + lvl + '" role="img" aria-label="' + POT[lvl] + ' (prediction)">' + bolt(lvl) + '</span>';
+  const potChip = (lvl) => '<span class="chip pot p' + lvl + '" role="img" aria-label="' + POT[lvl] + ' (prediction)">' + bolt(lvl) + '</span>';
   // The fixtures of a league's next round that are not rated yet, as rows (a stored, unrated match keeps its own entry)
   const openFixtures = (c) => { const fx = FX[c]; if (!fx) return []; return (fx.matches || []).filter((f) => !D.some((m) => m.c === c && m.h === f.h && m.a === f.a && m.rt != null))
     .map((f) => D.find((m) => m.c === c && m.h === f.h && m.a === f.a) || { id: 'fx:' + fxKey(c, f.h, f.a), c, r: fx.r, d: f.d, h: f.h, a: f.a, rt: null, s: '', w: [] }); };
@@ -1198,7 +1198,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   const RATED = 'The rating (0–10) indicates how worth watching a match is – giving very little away.';
   const TAPKEY = '<b class="ih">Tapping a match:</b><br>Tap a match to open it and see a spoiler-free summary, how the rating is built, the highlights and the score if you want it.';
   const POTKEY = '<b class="ih">Key:</b><br>' + bolt(3).replace('<svg', '<svg class="kb p3"') + ' High potential – the most promising match of each league round<br>' +
-    bolt(2).replace('<svg', '<svg class="kb p2"') + ' Medium potential – could be worth it<br>“vs” Low potential – all other matches.';
+    bolt(2).replace('<svg', '<svg class="kb p2"') + ' Medium potential – could be worth it<br>' +
+    bolt(1).replace('<svg', '<svg class="kb p1"') + ' Low potential – all other matches.';
   const INFO = {
     day: SECS('Every match of the selected day, highest rated first.<br>' + RATED, KEY,
       '<b class="ih">Navigation:</b><br>‹ › move one day back or forward.<br>' + JUMP(true) + ' ' + JUMP(false) + ' jumps back to the current day.', TAPKEY),
