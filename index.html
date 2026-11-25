@@ -247,7 +247,7 @@ button.ghost.info[aria-expanded="true"] { color: var(--fg); }
 .hl { display: inline-flex; align-items: center; justify-content: center; color: var(--muted); text-decoration: none; }
 a.hl:hover { color: var(--fg); }
 .hl.off { color: #4F575E; }
-.chip.vs { background: transparent; color: var(--muted); font: 400 13px var(--text); }
+.chip.vs { background: transparent; color: var(--muted); font: 400 13px var(--text); border: 2px dotted #4A5158; }
 .chip.score { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1.5px var(--fg); white-space: nowrap; letter-spacing: -0.02em; }
 .compact .chip.score { font-size: 13px; }
 .acts2 { display: flex; justify-content: center; gap: 8px; padding: 0 12px 11px; }
@@ -291,7 +291,7 @@ a.hl:hover { color: var(--fg); }
 /* Ranked match rows: flag at the very left, position next to it */
 .crow.haspos .side.l { justify-content: flex-start; }
 /* Teams table: flag | # | Team | M | Rng | Avg, numbers centred in their columns */
-.ttab .trow { display: grid; grid-template-columns: 16px 26px minmax(0, 1fr) 30px 36px 38px; column-gap: 6px; align-items: center; padding: 14px 12px; border-top: 1px solid var(--divider); width: 100%; min-height: 0; border-radius: 0; background: transparent; color: var(--fg); font: inherit; text-align: left; }
+.ttab .trow { display: grid; grid-template-columns: 16px 22px 20px minmax(0, 1fr) 30px 36px 38px; column-gap: 6px; align-items: center; padding: 14px 12px; border-top: 1px solid var(--divider); width: 100%; min-height: 0; border-radius: 0; background: transparent; color: var(--fg); font: inherit; text-align: left; }
 .ttab .trow.thead { padding: 4px 12px 6px; border-top: 0; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #7B838A; }
 .ttab .thead + .trow { border-top: 0; }
 .ttab .trow.thead + .trow, .ttab .thead ~ .gapdots { }
@@ -338,7 +338,18 @@ button.mtm:hover { background: rgba(255, 255, 255, .05); }
 .mtm .crest { display: flex; }
 .mtm b { font: 700 15px var(--display); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mtm i { font-style: normal; font-size: 11.5px; color: var(--muted); }
-.crest { width: 38px; height: 38px; border-radius: 50%; background: #2B3136; display: flex; align-items: center; justify-content: center; font: 700 15px var(--display); color: #C9CED3; }
+.crest { display: flex; align-items: center; justify-content: center; }
+/* Club badges (geometric, greyscale) */
+.bdg { flex: none; display: block; }
+.bdg text { font-family: var(--display); font-weight: 700; }
+.crow .hn, .crow .an { display: flex; align-items: center; gap: 6px; }
+.crow .hn { justify-content: flex-end; }
+.crow .tx { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* optical centring: Inter's capitals sit a touch above the middle of the line box, so names nudge down to line up with badge, box and icon */
+.crow .tx { position: relative; top: 1.5px; }
+.ttab .tb { display: flex; align-items: center; }
+.ttab .thead .tsort:not(.c) { grid-column: span 2; }
+.frow .fl2 { display: inline-flex; align-items: center; gap: 6px; }
 .mmid { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .mmid .chip { width: 84px; min-width: 84px; height: 52px; font-size: 26px; border-radius: 14px; margin: 0; }
 .mmid .chip.mscore { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--fg); font-size: 24px; letter-spacing: -0.01em; }
@@ -582,7 +593,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 .tgsvg .gx { fill: var(--muted); font: 400 10.5px var(--text); }
 .tpop .gdot { position: absolute; width: 34px; height: 34px; min-height: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; }
 .tpop .gdot:hover { background: rgba(255, 255, 255, .05); }
-.tpop .gbub { position: absolute; z-index: 5; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 0; padding: 12px 14px; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .55); white-space: nowrap; text-align: left; }
+.tpop .gbub { position: absolute; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 0; padding: 12px 14px; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .55); white-space: nowrap; text-align: center; }
 .tpop .gbub:hover { background: #1F2327; }
 .tpop .gbd { font-size: 11.5px; color: var(--muted); font-weight: 400; }
 .tpop .gbm { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13.5px; }
@@ -661,6 +672,58 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     sa: svgf('<rect width="10" height="20" fill="' + G.green + '"/><rect x="10" width="10" height="20" fill="' + G.white + '"/><rect x="20" width="10" height="20" fill="' + G.red + '"/>', 'Italy'),
     bl: svgf('<rect width="30" height="6.67" fill="' + G.black + '"/><rect y="6.67" width="30" height="6.67" fill="' + G.red + '"/><rect y="13.33" width="30" height="6.67" fill="' + G.gold + '"/>', 'Germany'),
     l1: svgf('<rect width="10" height="20" fill="' + G.blue + '"/><rect x="10" width="10" height="20" fill="' + G.white + '"/><rect x="20" width="10" height="20" fill="' + G.red + '"/>', 'France'),
+  };
+  // Club badges: our own geometric greyscale designs, not club crests. The outline family loosely follows the outline of the
+  // real crest (C round, S shield, O oval, Q square, D diamond); the pattern is spread within a league so neighbours differ.
+  const BDEF = {
+    pl: 'Arsenal:ARS:S,Aston Villa:AVL:S,Bournemouth:BOU:C,Brentford:BRE:C,Brighton:BHA:C,Chelsea:CHE:C,Coventry:COV:S,Crystal Palace:CRY:S,Everton:EVE:S,Fulham:FUL:S,Hull:HUL:S,Ipswich:IPS:S,Leeds:LEE:S,Liverpool:LIV:S,Man City:MCI:C,Man United:MUN:S,Newcastle:NEW:C,Nott\'m Forest:NFO:S,Sunderland:SUN:S,Tottenham:TOT:Q',
+    ll: 'Alaves:ALA:S,Athletic Club:ATH:S,Atletico Madrid:ATM:S,Barcelona:BAR:S,Betis:BET:S,Celta Vigo:CEL:S,Deportivo La Coruna:DEP:C,Elche:ELC:S,Espanyol:ESP:C,Getafe:GET:S,Levante:LEV:S,Malaga:MAL:S,Osasuna:OSA:S,Racing Santander:RAC:S,Rayo Vallecano:RAY:S,Real Madrid:RMA:C,Real Sociedad:RSO:C,Sevilla:SEV:S,Valencia:VAL:C,Villarreal:VIL:S',
+    sa: 'Atalanta:ATA:C,Bologna:BOL:S,Cagliari:CAG:O,Como:COM:S,Fiorentina:FIO:S,Frosinone:FRO:S,Genoa:GEN:S,Inter:INT:C,Juventus:JUV:Q,Lazio:LAZ:S,Lecce:LEC:S,Milan:MIL:O,Monza:MON:C,Napoli:NAP:C,Parma:PAR:S,Roma:ROM:S,Sassuolo:SAS:S,Torino:TOR:O,Udinese:UDI:S,Venezia:VEN:S',
+    bl: 'Augsburg:FCA:Q,Bayern:FCB:C,Dortmund:BVB:C,Elversberg:SVE:S,Frankfurt:SGE:Q,Freiburg:SCF:S,Gladbach:BMG:S,Hamburger SV:HSV:D,Hoffenheim:TSG:S,Koln:KOE:C,Leverkusen:B04:C,Mainz:M05:C,Paderborn:SCP:S,RB Leipzig:RBL:C,Schalke:S04:C,Stuttgart:VFB:S,Union Berlin:FCU:S,Werder Bremen:SVW:D',
+    l1: 'Angers:SCO:C,Auxerre:AJA:S,Brest:SB29:S,Le Havre:HAC:S,Le Mans:LMF:C,Lens:RCL:S,Lille:LIL:S,Lorient:FCL:C,Lyon:OL:C,Marseille:OM:S,Monaco:ASM:S,Nice:OGCN:S,PSG:PSG:C,Paris FC:PFC:C,Rennes:SRFC:S,Strasbourg:RCS:S,Toulouse:TFC:C,Troyes:ESTAC:C',
+    sl: 'FC Basel:FCB:S,FC Zurich:FCZ:S,Grasshoppers:GC:C,Lausanne:LS:C,Lugano:LUG:S,Luzern:FCL:C,Servette:SFC:S,Sion:SIO:S,St. Gallen:FCSG:Q,Thun:THU:S,Vaduz:VAD:S,YB:YB:C',
+  };
+  const bh = (s) => { let x = 2166136261; for (const ch of s) { x ^= ch.charCodeAt(0); x = Math.imul(x, 16777619) >>> 0; } return x; };
+  const BOUT = { C: '<circle cx="20" cy="20" r="18"/>', C2: '<circle cx="20" cy="20" r="14.5"/>', H: '<path d="M20 2 L36 11 V29 L20 38 L4 29 V11Z"/>',
+    S1: '<path d="M6 5 H34 V19 C34 28 28 34 20 37.5 C12 34 6 28 6 19 Z"/>', S2: '<path d="M6 5 H34 V22 A14 14 0 0 1 6 22 Z"/>',
+    S3: '<path d="M6 5 H34 V27 Q34 31 30 31 H24 L20 36.5 L16 31 H10 Q6 31 6 27Z"/>', S4: '<path d="M6 6 Q13 9 20 4 Q27 9 34 6 V19 C34 28 28 34 20 37.5 C12 34 6 28 6 19 Z"/>',
+    S5: '<path d="M5 6 H35 V24 L20 37 L5 24Z"/>', O: '<ellipse cx="20" cy="20" rx="14.5" ry="18.5"/>', Q: '<rect x="5" y="5" width="30" height="30" rx="7"/>',
+    Q2: '<path d="M11 4 H29 L36 11 V29 L29 36 H11 L4 29 V11Z"/>', D: '<path d="M20 2 L38 20 L20 38 L2 20Z"/>' };
+  const BFAM = { C: ['C', 'C2', 'H'], S: ['S1', 'S2', 'S3', 'S4', 'S5'], O: ['O'], Q: ['Q', 'Q2'], D: ['D'] };
+  const BG = ['#2B3035', '#3A4047', '#4E555C', '#646C74', '#7E868D'];
+  const BPAT = [
+    () => '', (a) => '<rect x="20" width="20" height="40" fill="' + a + '"/>', (a) => '<rect x="20" width="20" height="20" fill="' + a + '"/><rect y="20" width="20" height="20" fill="' + a + '"/>',
+    (a) => [8, 18, 28].map((x) => '<rect x="' + x + '" width="5" height="40" fill="' + a + '"/>').join(''),
+    (a) => [6, 13, 20, 27, 34].map((x) => '<rect x="' + x + '" width="2.2" height="40" fill="' + a + '"/>').join(''),
+    (a) => [8, 18, 28].map((y) => '<rect y="' + y + '" width="40" height="5" fill="' + a + '"/>').join(''),
+    (a) => '<rect y="15" width="40" height="10" fill="' + a + '"/>', (a) => '<rect x="15" width="10" height="40" fill="' + a + '"/>',
+    (a) => '<path d="M0 6 L6 0 L40 34 L34 40Z" fill="' + a + '"/>', (a) => '<path d="M0 26 L20 14 L40 26 V34 L20 22 L0 34Z" fill="' + a + '"/>',
+    (a) => { let s = ''; for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) if ((i + j) % 2) s += '<rect x="' + i * 8 + '" y="' + j * 8 + '" width="8" height="8" fill="' + a + '"/>'; return s; },
+    (a) => '<rect x="16.5" width="7" height="40" fill="' + a + '"/><rect y="16.5" width="40" height="7" fill="' + a + '"/>',
+    (a) => '<path d="M0 4 L4 0 L20 16 L36 0 L40 4 L24 20 L40 36 L36 40 L20 24 L4 40 L0 36 L16 20Z" fill="' + a + '"/>',
+    (a) => '<circle cx="20" cy="20" r="11" fill="none" stroke="' + a + '" stroke-width="4"/>', (a) => '<rect width="40" height="13" fill="' + a + '"/>',
+    (a) => '<rect y="20" width="40" height="20" fill="' + a + '"/>', (a) => '<path d="M0 0 H40 L0 40Z" fill="' + a + '"/>', (a) => '<path d="M8 0 H32 L20 30Z" fill="' + a + '"/>',
+    (a) => [[12, 12], [28, 12], [12, 28], [28, 28], [20, 20]].map(([x, y]) => '<circle cx="' + x + '" cy="' + y + '" r="3.2" fill="' + a + '"/>').join(''),
+    (a) => '<path d="M0 40 L20 8 L40 40Z" fill="' + a + '"/>'];
+  const BSPEC = {};
+  Object.entries(BDEF).forEach(([lg, s]) => {
+    const cs = s.split(',').map((x) => x.split(':')), off = bh(lg) % BPAT.length;
+    cs.slice().sort((x, y) => bh(x[0]) - bh(y[0])).forEach(([n, code, f], i) => {
+      const k = bh(n), fam = BFAM[f]; let p = (off + i * 7) % BPAT.length;
+      if (f === 'D' && [1, 2, 15, 16].includes(p)) p = (p + 3) % BPAT.length;
+      if (f === 'C' && p === 10) p = (p + 4) % BPAT.length;
+      const bi = k % 3; BSPEC[lg + '|' + n] = { o: fam[(k >>> 5) % fam.length], p, base: BG[bi], acc: BG[Math.min(bi + 1 + ((k >>> 3) % 2), 4)], code };
+    });
+  });
+  let buid = 0;
+  // badge(league, team, size): unknown teams get a plain round badge with their first letters
+  const badge = (c, n, sz) => {
+    const s = BSPEC[c + '|' + n] || { o: 'C', p: 0, base: BG[1], acc: BG[2], code: String(n).replace(/^(FC|AC|AS|SC|RC|CA)\s+/i, '').slice(0, 3).toUpperCase() };
+    const shp = BOUT[s.o], id = 'bq' + (buid++), t = s.code, ring = s.o === 'C2';
+    const code = '<rect x="' + (20 - (t.length * 3.1 + 4)) + '" y="13.8" width="' + (t.length * 6.2 + 8) + '" height="12.4" rx="3.5" fill="#101315" opacity=".78"/><text x="20" y="20" dy=".36em" text-anchor="middle" font-size="' + (t.length > 3 ? 7.6 : 9.4) + '" fill="#ECEEF0">' + t + '</text>';
+    return '<svg class="bdg" width="' + sz + '" height="' + sz + '" viewBox="0 0 40 40" aria-hidden="true"><defs><clipPath id="' + id + '">' + shp + '</clipPath></defs>' +
+      (ring ? '<circle cx="20" cy="20" r="18.5" fill="#2B3035" stroke="#8A9299" stroke-width="1.2"/>' : '') +
+      '<g clip-path="url(#' + id + ')"><rect width="40" height="40" fill="' + s.base + '"/>' + BPAT[s.p](s.acc) + '</g>' + shp.replace('/>', ' fill="none" stroke="#9AA2A9" stroke-width="1.3"/>') + code + '</svg>';
   };
   const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], DAYL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], MONL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -865,7 +928,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     // Same centred row everywhere; in ranked lists (Season) the position sits in front of the flag
     let h = '<div class="row crow' + (pos != null ? ' haspos' : '') + (!played && m.d ? ' wide-r' : '') + (open ? ' open' : '') + '"><div class="line">' + hit +
         '<span class="side l' + (withFlag ? '' : ' dim') + '">' + (withFlag ? FLAG : FLAGG)[m.c] + (pos != null ? '<span class="pos">' + pos + '</span>' : '') + '</span>' +
-        '<span class="hn">' + nm(m.h) + '</span>' + chip + '<span class="an">' + nm(m.a, 1) + '</span><span class="side r">' + hl + '</span></div>';
+        '<span class="hn"><span class="tx">' + nm(m.h) + '</span>' + badge(m.c, m.h, 20) + '</span>' + chip + '<span class="an">' + badge(m.c, m.a, 20) + '<span class="tx">' + nm(m.a, 1) + '</span></span><span class="side r">' + hl + '</span></div>';
     void acts; void open; void on; void w;
     return h + '</div>';
   }
@@ -921,7 +984,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   const tSort = (rows) => { const f = tVal[st.tsort.k], d = st.tsort.d; return rows.slice().sort((p, q) => { const a = f(p), b = f(q); return (a < b ? -1 : a > b ? 1 : 0) * d || q.avg - p.avg; }); };
   const ranked2 = (table) => table.map((x, i) => ({ ...x, rk: i + 1 }));
   const tRow = (x, rank, withFlag, act) => {
-    const inner = '<span class="tf">' + (withFlag ? FLAG : FLAGG)[x.c] + '</span><span class="c pos">' + (x.rk || rank) + '</span><span class="nm">' + nm(x.n, 1) + '</span>' +
+    const inner = '<span class="tf">' + (withFlag ? FLAG : FLAGG)[x.c] + '</span><span class="c pos">' + (x.rk || rank) + '</span><span class="tb">' + badge(x.c, x.n, 20) + '</span><span class="nm">' + nm(x.n, 1) + '</span>' +
       '<span class="c n" title="Matches played">' + x.k + '</span><span class="c n" title="Best minus worst match rating">' + (x.b - x.lo).toFixed(1) + '</span><span class="c avg ' + atier(x.avg).replace('t', 'a') + '" title="Average rating">' + x.avg.toFixed(1) + '</span>';
     return act ? '<button type="button" class="trow tbtn" ' + act + '>' + inner + '</button>' : '<div class="trow">' + inner + '</div>';
   };
@@ -1162,7 +1225,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const cur = SORTS.find((x) => x[0] === popSort)[1];
     const tog = (k, open, ctl) => '<button type="button" class="ghost tst" data-act="tsec" data-id="' + k + '" aria-expanded="' + open + '" aria-controls="' + ctl + '">' + (open ? 'Hide' : 'Show') + ICON.chev + '</button>';
     let h = '<div class="tdim" data-close="1"></div><div class="tpop" role="dialog" aria-label="' + esc(name(n)) + '">' +
-      '<div class="tph"><div><div class="tpn"><span>' + nm(n, 1) + '</span><span class="chip ' + atier(me.avg) + '" title="Average rating">' + me.avg.toFixed(1) + '</span></div>' +
+      '<div class="tph"><div><div class="tpn">' + badge(c, n, 32) + '<span>' + nm(n, 1) + '</span><span class="chip ' + atier(me.avg) + '" title="Average rating">' + me.avg.toFixed(1) + '</span></div>' +
       '<div class="tpl">' + FLAG[c] + '<span>' + C[c] + ' · #' + me.rk + ' by avg rating</span></div></div>' +
       '<button type="button" class="tpx" data-act="tclose" aria-label="Close" title="Close">✕</button></div>' +
       '<div class="tpb">' +
@@ -1181,27 +1244,29 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   }
   // Team graph: one dot per rated match, oldest left; the 10 most recent fill the width, older ones are reached by scrolling left.
   // Grey bands hint at the rating zones (8.5 / 7 / 4); dots take the rating colour. The tapped dot's bubble floats above everything.
+  const YMIN = 2.5; // y axis starts at 2.5 (no match has been rated lower); a lower rating sits on the bottom line
   let gDraw = false; // play the draw-in once (opening the team, or showing the graph again)
   function drawGraph(team, avg, ms) {
     const el = document.querySelector('.tpop .tg'); if (!el) return;
     const old = el.querySelector('.tgs'); if (old) gScroll = old.scrollLeft;
     const W = el.clientWidth || 340, H = 173, pt = 6, pb = 24, pl = 14, pr = 12, ih = H - pt - pb, n = ms.length;
     const step = n > 10 ? (W - pl - pr) / 9 : n > 1 ? (W - pl - pr) / (n - 1) : 0, CW = n > 10 ? Math.round(pl + pr + step * (n - 1)) : W;
-    const X = (i) => (n === 1 ? W / 2 : pl + step * i), Y = (v) => pt + ih * (1 - v / 10);
-    const dc = (r) => (r >= 8.5 ? 'd1' : r >= 7 ? 'd2' : r >= 4 ? 'd3' : 'dr');
+    const X = (i) => (n === 1 ? W / 2 : pl + step * i), Y = (v) => pt + ih * (1 - (Math.max(YMIN, v) - YMIN) / (10 - YMIN));
     let g = '<svg class="tgsvg" width="' + CW + '" height="' + H + '" aria-hidden="true">';
     [[8.5, 10, 'z1'], [7, 8.5, 'z2'], [4, 7, 'z3']].forEach(([a, b, z]) => { g += '<rect class="' + z + '" x="0" y="' + Y(b) + '" width="' + CW + '" height="' + (Y(a) - Y(b)) + '"/>'; });
-    [0, 4, 7, 8.5, 10].forEach((v) => { g += '<line class="gl" x1="0" x2="' + CW + '" y1="' + Y(v) + '" y2="' + Y(v) + '"/>'; });
+    [YMIN, 4, 7, 8.5, 10].forEach((v) => { g += '<line class="gl" x1="0" x2="' + CW + '" y1="' + Y(v) + '" y2="' + Y(v) + '"/>'; });
     if (n > 1) g += '<polyline class="gp" points="' + ms.map((m, i) => X(i).toFixed(1) + ',' + Y(m.rt).toFixed(1)).join(' ') + '"/>';
+    const dc = (r) => (r >= 8.5 ? 'd1' : r >= 7 ? 'd2' : r >= 4 ? 'd3' : 'dr');
     ms.forEach((m, i) => { g += '<circle class="gd ' + dc(m.rt) + '" data-i="' + i + '" cx="' + X(i).toFixed(1) + '" cy="' + Y(m.rt).toFixed(1) + '" r="4.5"/>'; if (m.id === gSel) g += '<circle class="gring" cx="' + X(i).toFixed(1) + '" cy="' + Y(m.rt).toFixed(1) + '" r="9"/>'; });
     ms.forEach((m, i) => { if ((n - 1 - i) % 3) return; const d = dt(m.d), x = X(i), an = n > 1 && x < 24 ? 'start' : n > 1 && x > CW - 24 ? 'end' : 'middle';
       g += '<text class="gx" x="' + x.toFixed(1) + '" y="' + (H - 6) + '" text-anchor="' + an + '">' + d.getUTCDate() + ' ' + MON[d.getUTCMonth()] + '</text>'; });
     g += '</svg>';
     const b = ms.map((m, i) => '<button type="button" class="gdot" data-act="gdot" data-id="' + esc(m.id) + '" style="left:' + (X(i) - 16).toFixed(1) + 'px;top:' + (Y(m.rt) - 16).toFixed(1) + 'px" aria-label="' + esc(short(m.d) + ', ' + (m.h === team ? 'home v ' + name(m.a) : 'away at ' + name(m.h)) + ', rating ' + m.rt.toFixed(1)) + '"></button>').join('');
     const si = ms.findIndex((m) => m.id === gSel); let bub = '';
-    if (si >= 0) { const m = ms[si];
-      bub = '<button type="button" class="gbub" data-act="gdot" data-id="' + esc(m.id) + '" aria-label="Open the match"><span class="gbd">' + short(m.d) + ' · ' + (m.h === team ? 'home' : 'away') + ' · ' + RN[m.c] + ' ' + m.r + '</span>' +
-        '<span class="gbm"><span>' + nm(m.h) + '</span><span class="chip small ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span><span>' + nm(m.a, 1) + '</span></span><span class="gbt"></span></button>'; }
+    if (si >= 0) { const m = ms[si], home = m.h === team, opp = home ? m.a : m.h;
+      bub = '<button type="button" class="gbub" data-act="gdot" data-id="' + esc(m.id) + '" aria-label="Open the match"><span class="gbd">' + short(m.d) + ' · ' + RN[m.c] + ' ' + m.r + ' · ' + (home ? 'Home' : 'Away') + '</span>' +
+        '<span class="gbm">' + badge(m.c, opp, 20) + '<span>' + nm(opp, 1) + '</span>' +
+        '<span class="chip small ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span></span><span class="gbt"></span></button>'; }
     el.innerHTML = '<div class="tgs" style="width:' + W + 'px"><div class="tgc" style="width:' + CW + 'px;height:' + H + 'px">' + g + b + '</div></div>' + bub;
     const sc = el.querySelector('.tgs'); sc.scrollLeft = gScroll == null ? sc.scrollWidth : gScroll;
     const bb = el.querySelector('.gbub');
@@ -1381,7 +1446,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   const fold = (t) => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   function teamsAll() { const t = new Map(); D.forEach((m) => { t.set(m.h, m.c); t.set(m.a, m.c); }); Object.values(FX).forEach((fx) => (fx.matches || []).forEach((f) => { if (!t.has(f.h)) t.set(f.h, fx.c); if (!t.has(f.a)) t.set(f.a, fx.c); })); return t; }
   const byLeagueName = (T) => (a, b) => ORDER.indexOf(T.get(a)) - ORDER.indexOf(T.get(b)) || fold(plain(a)).localeCompare(fold(plain(b)));
-  const frow = (n, T) => '<div class="frow">' + FLAG[T.get(n)] + '<span class="fn">' + esc(plain(n)) + '</span><span class="fl2">' + C[T.get(n)] + '</span>' +
+  const frow = (n, T) => '<div class="frow">' + badge(T.get(n), n, 22) + '<span class="fn">' + esc(plain(n)) + '</span><span class="fl2">' + FLAG[T.get(n)] + C[T.get(n)] + '</span>' +
     '<button type="button" class="fstar" data-act="favstar" data-id="' + esc(n) + '" aria-pressed="' + FAV.has(n) + '" aria-label="' + (FAV.has(n) ? 'Remove ' : 'Add ') + esc(plain(n)) + (FAV.has(n) ? ' from' : ' to') + ' favourites">' + (FAV.has(n) ? '★' : '☆') + '</button></div>';
   const fsec = (title, rows, empty, key) => '<section class="fsec"' + (key ? ' data-sec="' + key + '"' : '') + '><h2 class="label">' + title + '</h2>' + (rows.length ? card(rows) : '<div class="card"><div class="empty small">' + empty + '</div></div>') + '</section>';
   function favLists() {
@@ -1422,7 +1487,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (!m) { mpop = null; box.innerHTML = ''; return; }
     const x = m.x || {}, link = m.q ? 'https://www.youtube.com/results?search_query=' + encodeURIComponent(m.q).replace(/%2B/g, '+') : '', mScore = mMode === 'score';
     // Tapping a team (name or letter circle) opens its team window
-    const team = (n, t, after) => '<button type="button" class="mtm" data-act="mteam" data-id="' + esc('m|' + m.c + '|' + n) + '" aria-label="' + esc(name(n)) + ': all matches" title="' + esc(name(n)) + ': all matches"><span class="crest" aria-hidden="true">' + esc(plain(n).replace(/^(FC|AC|AS|SC|RC|CA)\s+/i, '').charAt(0)) + '</span><b>' + nm(n, after) + '</b>' + (t && t.pos ? '<i>' + ord(t.pos) + '</i>' : '') + '</button>';
+    const team = (n, t, after) => '<button type="button" class="mtm" data-act="mteam" data-id="' + esc('m|' + m.c + '|' + n) + '" aria-label="' + esc(name(n)) + ': all matches" title="' + esc(name(n)) + ': all matches"><span class="crest" aria-hidden="true">' + badge(m.c, n, 46) + '</span><b>' + nm(n, after) + '</b>' + (t && t.pos ? '<i>' + ord(t.pos) + '</i>' : '') + '</button>';
     const mid = mScore
       ? '<span class="chip mscore" title="Score">' + esc(String(m.s).replace(/\s*[–-]\s*/, '–')) + '</span><span class="lbl">score</span>'
       : '<span class="chip mrt ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span><span class="lbl">rating</span>';
