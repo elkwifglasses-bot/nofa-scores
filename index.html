@@ -340,11 +340,12 @@ a.hl:hover { color: var(--fg); }
 .mmid .chip { width: 84px; min-width: 84px; height: 52px; font-size: 26px; border-radius: 14px; margin: 0; }
 .mmid .chip.mscore { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--fg); font-size: 24px; letter-spacing: -0.01em; }
 .mmid .lbl { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.macts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0 -2px; padding: 0 0 12px; flex: none; }
+.macts { display: grid; grid-template-columns: 1fr 1px 1fr 1fr 1fr; gap: 6px; margin: 0 -2px; padding: 0 0 12px; flex: none; }
 .mbtn { min-height: 54px; height: 54px; border-radius: 11px; font-size: 12px; gap: 3px; flex-direction: column; padding: 0 4px; background: #23282D; border: 1px solid #2F353A; color: var(--fg); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .mbtn svg { width: 17px; height: 17px; }
 .mbtn[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); font-weight: 600; }
 .mbtn:disabled { opacity: 1; color: #4F575E; }
+.macts .msep { align-self: center; width: 1px; height: 34px; background: #3A4046; }
 .mbtn.off { color: #4F575E; }
 .mbody { overflow-y: auto; overscroll-behavior: contain; margin: 0 -14px; padding: 0; flex: 0 1 auto; min-height: 0; }
 .mbody:empty { display: none; }
@@ -1400,17 +1401,17 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       ? '<span class="chip mscore" title="Score">' + esc(String(m.s).replace(/\s*[–-]\s*/, '–')) + '</span><span class="lbl">score</span>'
       : '<span class="chip mrt ' + tier(m.rt) + '">' + m.rt.toFixed(1) + '</span><span class="lbl">rating</span>';
     const tab = (k, act, ic, label, dis) => '<button type="button" class="mbtn" data-act="' + act + '" aria-pressed="' + (mMode === k) + '"' + (dis ? ' disabled title="No summary for this match yet"' : '') + '>' + ic + '<span>' + label + '</span></button>';
-    const hlBtn = link ? '<a class="mbtn" href="' + esc(link) + '" target="_blank" rel="noopener" aria-label="Highlights on YouTube" title="Highlights on YouTube">' + ICON.play + '<span>YouTube</span></a>'
-      : '<span class="mbtn off" role="img" aria-label="No highlights link" title="No highlights link for the ' + esc(C[m.c]) + '">' + ICON.noplay + '<span>YouTube</span></span>';
+    const hlBtn = link ? '<a class="mbtn" href="' + esc(link) + '" target="_blank" rel="noopener" aria-label="Highlights on YouTube" title="Highlights on YouTube">' + ICON.play + '<span>Highlights</span></a>'
+      : '<span class="mbtn off" role="img" aria-label="No highlights link" title="No highlights link for the ' + esc(C[m.c]) + '">' + ICON.noplay + '<span>Highlights</span></span>';
     const sumBox = () => '<div class="panel msum" data-p="sum"><div class="msh">Summary</div><p>' + esc(m.sum) + '</p></div>';
     box.innerHTML = '<div class="mdim2" data-mclose="1"></div><div class="mwrap"><div class="mcard" role="dialog" aria-label="' + esc(name(m.h) + ' vs ' + name(m.a)) + '">' +
       '<button type="button" class="mx" data-act="mclose" aria-label="Close">✕</button>' +
       '<div class="mmeta">' + FLAG[m.c] + '<span>' + C[m.c] + ' · ' + RN[m.c] + ' ' + m.r + '</span></div><div class="mdate">' + LONGD(m.d) + '</div>' +
       '<div class="board">' + team(m.h, x.h) + '<div class="mmid">' + mid + '</div>' + team(m.a, x.a, 1) + '</div>' +
       '<div class="mbody">' + (mMode === 'sum' && m.sum ? sumBox() : mMode === 'why' ? whyBox(m) : mScore ? factsBox(m) : '') + '</div>' +
-      // Buttons at the bottom, in this order: Summary, Breakdown, Show score, YouTube
-      '<div class="macts">' + tab('sum', 'msum', ICON.journal, 'Summary', !m.sum) + tab('why', 'mwhy', ICON.breakdown, 'Breakdown') +
-      tab('score', 'mscore', mScore ? ICON.eyeoff : ICON.eye, mScore ? 'Hide score' : 'Show score') + hlBtn + '</div></div></div>';
+      // Buttons at the bottom: Show score on its own at the far left (a divider sets it apart), then Summary, Breakdown, Highlights
+      '<div class="macts">' + tab('score', 'mscore', mScore ? ICON.eyeoff : ICON.eye, mScore ? 'Hide score' : 'Show score') + '<span class="msep" aria-hidden="true"></span>' +
+      tab('sum', 'msum', ICON.journal, 'Summary', !m.sum) + tab('why', 'mwhy', ICON.breakdown, 'Breakdown') + hlBtn + '</div></div></div>';
     placeMatch();
     const b2 = box.querySelector('.mbody'); if (b2) b2.scrollTop = keepTop;
   }
