@@ -19,7 +19,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="nofa scores">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<!-- Fonts load without blocking the first paint (the service worker keeps a copy); the start-screen tagline waits for them, at most 0.8 s -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" media="print" onload="this.media='all'; window.__gfDone = true; if (window.__gf) window.__gf();">
 <style>
 /* Layout: mobile-first single column (wider grid for Season); game rows closed by default, tap to open the action bar. Dark-only by design. */
 :root {
@@ -378,20 +379,22 @@ button.mtm:hover { background: rgba(255, 255, 255, .05); }
 h2.label .hstar { width: 14px; height: 14px; color: #7B838A; flex: none; margin-right: -2px; }
 button, a, .calp .c { touch-action: manipulation; }
 /* Start screen */
-#splash { position: fixed; inset: 0; z-index: 100; background: #0E1012; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding-bottom: 4vh; overflow: hidden; }
+#splash { position: fixed; inset: 0; z-index: 100; background: #0E1012; overflow: hidden; }
 /* Background: a wall of club badges that fades out towards the middle, behind the logo and tagline */
 #splash .sp-bg { position: absolute; inset: 0; opacity: .28; -webkit-mask-image: radial-gradient(ellipse 77% 55% at 50% 48%, transparent 37%, rgba(0,0,0,.35) 66%, #000 100%); mask-image: radial-gradient(ellipse 77% 55% at 50% 48%, transparent 37%, rgba(0,0,0,.35) 66%, #000 100%); }
 #splash .sp-bg svg { position: absolute; width: 38px; height: 38px; color: inherit; animation: none; }
-#splash > svg, #splash .sp-t { position: relative; }
 #splash[hidden] { display: none; }
-#splash > svg { width: 150px; height: 150px; color: var(--accent); }
-#splash .sp-t { font: 600 24px/1.25 var(--display); letter-spacing: .01em; color: var(--fg); text-align: center; }
+/* The logo sits exactly where Android's own start screen draws the app icon (centred, same size), so the hand-over doesn't jump.
+   It starts in the icon's green and fades to the chosen colour scheme; the tagline sits below it without moving it. */
+#splash > svg { position: absolute; left: calc(50% - 75px); top: calc(50% - 75px); width: 150px; height: 150px; color: var(--accent); }
+#splash .sp-t { position: absolute; left: 0; right: 0; top: calc(50% + 103px); font: 600 24px/1.25 var(--display); letter-spacing: .01em; color: var(--fg); text-align: center; }
 @media (prefers-reduced-motion: no-preference) {
-  #splash > svg { animation: sp-in .9s cubic-bezier(.2,.7,.2,1) both; }
+  #splash > svg { animation: sp-col 1.2s ease-in-out .2s both; }
   #splash .sp-bg { animation: sp-bg 1.2s ease-out both; }
-  #splash .sp-t { animation: sp-t .6s cubic-bezier(.2,.7,.2,1) .25s both; }
+  #splash .sp-t { opacity: 0; }
+  #splash.ft .sp-t { animation: sp-t .6s cubic-bezier(.2,.7,.2,1) both; }
 }
-@keyframes sp-in { from { transform: scale(.9); } to { transform: none; } }
+@keyframes sp-col { from { color: #4ADE9B; } to { color: var(--accent); } }
 @keyframes sp-bg { from { opacity: 0; transform: scale(1.04); } to { opacity: .28; transform: none; } }
 @keyframes sp-t { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 /* Everything under the period bar moves as one when the day / week / round changes */
@@ -535,6 +538,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 .bellp .st { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none; font-weight: 700; }
 .bellp .st.ok { background: rgba(var(--accent-rgb), .15); color: var(--accent); }
 .bellp .st.bad { background: rgba(240, 96, 106, .15); color: var(--bad); }
+.bellp .st.skip { background: #1F2327; color: var(--muted); } /* a day the daily update skipped: nothing was scheduled */
 .bellp .st.sm { width: 20px; height: 20px; font-size: 12px; }
 .bellp .st svg { width: 15px; height: 15px; } .bellp .st.sm svg { width: 11px; height: 11px; }
 .bellp .nl { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0 42px; }
@@ -621,11 +625,16 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 <div id="splash" aria-hidden="true" hidden>
   <div class="sp-bg"></div>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.2l4.2 3-1.6 4.9H9.4L7.8 10.2z" fill="currentColor" stroke="none"/></svg>
-  <div class="sp-t">score free<br>football scores</div>
+  <div class="sp-t">football scores<br>differently</div>
 </div>
 <script>
   // Start screen: only when the installed app starts fresh (it carries on from Android's own start screen); ?splash=1 shows it in a browser
-  if ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || /[?&]splash=1/.test(location.search)) { document.getElementById('splash').hidden = false; window.__splashAt = performance.now(); }
+  if ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || /[?&]splash=1/.test(location.search)) { document.getElementById('splash').hidden = false; window.__splashAt = performance.now();
+    // Tagline: fade in once its font is there (no visible font switch), or after 0.8 s at the latest
+    var sp = document.getElementById('splash'), tag = function () { sp.classList.add('ft'); };
+    var fonts = function () { if (document.fonts && document.fonts.load) document.fonts.load('600 24px "Space Grotesk"').then(tag, tag); else tag(); };
+    if (window.__gfDone) fonts(); else window.__gf = fonts;
+    setTimeout(tag, 800); }
 </script>
 <header id="top"><div class="hin">
   <div class="tr1">
@@ -861,7 +870,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   const potChip = (lvl) => '<span class="chip pot p' + lvl + '" role="img" aria-label="' + POT[lvl] + ' (prediction)">' + bolt(lvl) + '</span>';
   // The fixtures of a league's next round that are not rated yet, as rows (a stored, unrated match keeps its own entry)
   const openFixtures = (c) => { const fx = FX[c]; if (!fx) return []; return (fx.matches || []).filter((f) => !D.some((m) => m.c === c && m.h === f.h && m.a === f.a && m.rt != null))
-    .map((f) => D.find((m) => m.c === c && m.h === f.h && m.a === f.a) || { id: 'fx:' + fxKey(c, f.h, f.a), c, r: fx.r, d: f.d, h: f.h, a: f.a, rt: null, s: '', w: [] }); };
+    .map((f) => D.find((m) => m.c === c && m.h === f.h && m.a === f.a) || { id: 'fx:' + fxKey(c, f.h, f.a), c, r: fx.r, d: f.d, t: f.t, h: f.h, a: f.a, rt: null, s: '', w: [] }); };
+  // Kickoff time (Swiss time, "HH:MM") of a match still to come: from the match itself or from its stored fixture; '' when not known
+  const kickOf = (m) => { const f = m.t ? m : FX[m.c] && (FX[m.c].matches || []).find((x) => x.h === m.h && x.a === m.a); const t = f && f.t; return typeof t === 'string' && /^\d{1,2}:\d{2}$/.test(t) ? t : ''; };
   const predOf = (m) => PRED.get(fxKey(m.c, m.h, m.a));
   const byPred = (a, b) => ((predOf(b) || { p: -99 }).p - (predOf(a) || { p: -99 }).p) || (a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
 
@@ -922,7 +933,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const id = m.id, key = (withFlag ? 'x:' : '') + id, played = m.rt != null, on = played && rev.has(id), w = why.has(id), open = played && openRows.has(key);
     const pr = played ? null : predOf(m);
     const link = m.q ? 'https://www.youtube.com/results?search_query=' + encodeURIComponent(m.q).replace(/%2B/g, '+') : '';
-    const hl = !played ? (m.d ? '<span class="day" title="' + esc(short(m.d)) + '"><b>' + wd(m.d) + '</b>' + esc(short(m.d).replace(/^\S+ /, '')) + '</span>' : '') : link
+    // Still to come: weekday on top, kickoff time below ("n/a" for whatever is not known)
+    const ko = played ? '' : kickOf(m);
+    const hl = !played ? '<span class="day" title="' + esc((m.d ? short(m.d) : 'Date n/a') + (ko ? ', ' + ko : ', kickoff time n/a')) + '"><b>' + (m.d ? wd(m.d) : 'n/a') + '</b>' + (ko ? esc(ko) : 'n/a') + '</span>' : link
       ? '<a class="hl" href="' + esc(link) + '" target="_blank" rel="noopener" aria-label="Highlights on YouTube" title="Highlights on YouTube">' + ICON.play + '</a>'
       : '<span class="hl off" role="img" aria-label="No highlights link" title="No highlights available for the ' + esc(C[m.c]) + '">' + ICON.noplay + '</span>';
     const chip = on ? '<span class="chip score" title="Score">' + esc(String(m.s).replace(/\s*[–-]\s*/, '–')) + '</span>'
@@ -933,7 +946,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const label = esc(m.h + ' vs ' + m.a + (played ? ', rating ' + m.rt.toFixed(1) : ''));
     const hit = played ? '<button type="button" class="hit" data-act="match" data-id="' + esc(id) + '" aria-haspopup="dialog" aria-label="' + label + '"></button>' : '';
     // Same centred row everywhere; in ranked lists (Season) the position sits in front of the flag
-    let h = '<div class="row crow' + (pos != null ? ' haspos' : '') + (!played && m.d ? ' wide-r' : '') + (open ? ' open' : '') + '"><div class="line">' + hit +
+    let h = '<div class="row crow' + (pos != null ? ' haspos' : '') + (!played ? ' wide-r' : '') + (open ? ' open' : '') + '"><div class="line">' + hit +
         '<span class="side l' + (withFlag ? '' : ' dim') + '">' + (withFlag ? FLAG : FLAGG)[m.c] + (pos != null ? '<span class="pos">' + pos + '</span>' : '') + '</span>' +
         '<span class="hn"><span class="tx">' + nm(m.h) + '</span>' + badge(m.c, m.h, 20) + '</span>' + chip + '<span class="an">' + badge(m.c, m.a, 20) + '<span class="tx">' + nm(m.a, 1) + '</span></span><span class="side r">' + hl + '</span></div>';
     void acts; void open; void on; void w;
@@ -1341,15 +1354,18 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const r = RUNS[0], stt = runState();
     if (!r) return '<div class="nh"><span class="st bad">?</span><div><b>No update recorded yet</b><div class="ns">The daily update writes its log here from now on.</div></div></div>';
     const n = runTotal(r);
-    const title = !r.ok ? 'Last update failed' : stt === 'bad' ? 'No update since ' + short(localIso(new Date(r.start))) : 'Last update ran fine';
-    const line = runDay(r.start) + ' ' + hm(r.start) + (r.end ? '–' + hm(r.end) : '') + ' · ' + (r.ok ? (n ? n + (n === 1 ? ' match' : ' matches') + ' added' : 'no matches yesterday') : esc(r.note || 'see the log'));
-    let h = '<div class="nh"><span class="st ' + (stt === 'ok' ? 'ok' : 'bad') + '">' + (stt === 'ok' ? ICON.check : '!') + '</span><div><b>' + title + '</b><div class="ns">' + line + '</div></div></div>';
+    // A skipped run (r.skipped: nothing was scheduled yesterday, so the update stopped before any research) counts as fine
+    const skip = r.ok && r.skipped && stt === 'ok';
+    const title = !r.ok ? 'Last update failed' : stt === 'bad' ? 'No update since ' + short(localIso(new Date(r.start))) : skip ? 'Skipped: no matches scheduled' : 'Last update ran fine';
+    const line = runDay(r.start) + ' ' + hm(r.start) + (r.end ? '–' + hm(r.end) : '') + ' · ' + (r.ok ? (skip ? 'nothing to rate' : n ? n + (n === 1 ? ' match' : ' matches') + ' added' : 'no matches yesterday') : esc(r.note || 'see the log'));
+    let h = '<div class="nh"><span class="st ' + (skip ? 'skip' : stt === 'ok' ? 'ok' : 'bad') + '">' + (skip ? '–' : stt === 'ok' ? ICON.check : '!') + '</span><div><b>' + title + '</b><div class="ns">' + line + '</div></div></div>';
     if (n) h += '<div class="nl">' + codes(r) + '</div>';
     if (RUNS.length) h += '<button type="button" class="nx" data-act="logtoggle" aria-expanded="' + logOpen + '">' + (logOpen ? 'Hide log' : 'Show log') + ICON.chev + '</button>';
     if (logOpen) {
       h += '<div class="log">' + RUNS.slice(0, 30).map((x) => { const t = runTotal(x);
-        return '<div class="lr"><div class="lt"><span class="st sm ' + (x.ok ? 'ok' : 'bad') + '">' + (x.ok ? ICON.check : '!') + '</span><b>' + runDay(x.start) + '</b><span class="tm">' + hm(x.start) + (x.end ? '–' + hm(x.end) : '') + '</span><span class="tt">' + (x.ok ? t + ' added' : 'failed') + '</span></div>' +
-          '<div class="nl">' + (t ? codes(x) : '<span class="nomatch">' + esc(x.ok ? (x.note || 'No matches yesterday') : (x.note || 'The update did not finish')) + '</span>') + '</div></div>'; }).join('') + '</div>';
+        const sk = x.ok && x.skipped;
+        return '<div class="lr"><div class="lt"><span class="st sm ' + (sk ? 'skip' : x.ok ? 'ok' : 'bad') + '">' + (sk ? '–' : x.ok ? ICON.check : '!') + '</span><b>' + runDay(x.start) + '</b><span class="tm">' + hm(x.start) + (x.end ? '–' + hm(x.end) : '') + '</span><span class="tt">' + (sk ? 'skipped' : x.ok ? t + ' added' : 'failed') + '</span></div>' +
+          '<div class="nl">' + (t ? codes(x) : '<span class="nomatch">' + esc(sk ? (x.note || 'No matches scheduled yesterday') : x.ok ? (x.note || 'No matches yesterday') : (x.note || 'The update did not finish')) + '</span>') + '</div></div>'; }).join('') + '</div>';
     }
     return h;
   }
@@ -1842,11 +1858,11 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       h += badge(lg, n.join('|'), 38).replace('<svg ', '<svg style="left:' + (c * G2 - (r % 2 ? 0 : G2 / 2) - 10) + 'px;top:' + (r * GY - 14) + 'px" '); }
     bg.innerHTML = h;
   })();
-  // Start screen stays about 2 s (longer only while the data is still on its way, at most 5 s), then fades into the app
+  // Start screen stays about 3 s (longer only while the data is still on its way, at most 5 s), then fades into the app
   let splashGone = false;
   function hideSplash() {
     const sp = document.getElementById('splash'); if (!sp || sp.hidden || splashGone) return; splashGone = true;
-    const wait = Math.max(0, 2000 - (performance.now() - (window.__splashAt || 0)));
+    const wait = Math.max(0, 3000 - (performance.now() - (window.__splashAt || 0)));
     setTimeout(() => after(anim(sp, [{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: 'forwards' }), () => sp.remove()), wait);
   }
   setTimeout(hideSplash, 5000);
