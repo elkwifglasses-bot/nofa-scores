@@ -1,8 +1,10 @@
 // nofa scores offline cache.
-// The page itself always comes from the network first (bypassing the browser's HTTP cache), so a new version shows up
-// on the next start; the cached copy is only used offline. Data files: network first as well. Icons etc.: cache, refreshed in the background.
-const CACHE = 'nofa-v2';
+// The page itself comes from the cache first, so the app paints at once (Android's start screen hands over sooner);
+// a fresh copy is fetched in the background every time and is used from the next start. Data files: network first.
+// Fonts (Google Fonts, other origin): cache first, refreshed in the background. Icons etc.: the same.
+const CACHE = 'nofa-v3';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/favicon.svg', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png'];
+const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
@@ -15,12 +17,27 @@ self.addEventListener('activate', (e) => {
 const fresh = (req, key) => fetch(req.url || req, { cache: 'no-cache', credentials: 'same-origin' })
   .then((r) => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then((c) => c.put(key, copy)); } return r; });
 
+// Cached copy at once if there is one, and refresh the cache in the background
+const cacheFirst = (e, key) => caches.match(key).then((hit) => {
+  const net = fetch(e.request).then((r) => { if (r.ok || r.type === 'opaque') { const copy = r.clone(); caches.open(CACHE).then((c) => c.put(key, copy)); } return r; });
+  if (hit) { e.waitUntil(net.catch(() => {})); return hit; }
+  return net.catch(() => hit);
+});
+
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
-  if (e.request.method !== 'GET' || url.origin !== location.origin) return;
-  // The app page: network first, cached copy only when offline
+  if (e.request.method !== 'GET') return;
+  if (url.origin !== location.origin) {
+    if (FONT_HOSTS.includes(url.hostname)) e.respondWith(cacheFirst(e, e.request));
+    return;
+  }
+  // The app page: cached copy first (refreshed in the background for the next start); network when nothing is cached yet
   if (e.request.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('/index.html')) {
-    e.respondWith(fresh(e.request, e.request).catch(() => caches.match(e.request).then((hit) => hit || caches.match('index.html'))));
+    const net = fresh(e.request, e.request);
+    e.respondWith(caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || caches.match('./')).then((hit) => {
+      if (hit) { e.waitUntil(net.catch(() => {})); return hit; }
+      return net.catch(() => caches.match('index.html'));
+    }));
     return;
   }
   if (url.pathname.includes('/data/')) {
@@ -29,8 +46,5 @@ self.addEventListener('fetch', (e) => {
       .catch(() => caches.match(key)));
     return;
   }
-  e.respondWith(caches.match(e.request).then((hit) => {
-    const net = fetch(e.request).then((r) => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); } return r; }).catch(() => hit);
-    return hit || net;
-  }));
+  e.respondWith(cacheFirst(e, e.request));
 });
