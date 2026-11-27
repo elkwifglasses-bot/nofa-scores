@@ -2,7 +2,7 @@
 // The page itself comes from the cache first, so the app paints at once (Android's start screen hands over sooner);
 // a fresh copy is fetched in the background every time and is used from the next start. Data files: network first.
 // Fonts (Google Fonts, other origin): cache first, refreshed in the background. Icons etc.: the same.
-const CACHE = 'nofa-v3';
+const CACHE = 'nofa-v4';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/favicon.svg', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
