@@ -385,7 +385,9 @@ button, a, .calp .c { touch-action: manipulation; }
 #splash .sp-bg svg { position: absolute; width: 38px; height: 38px; color: inherit; animation: none; }
 #splash[hidden] { display: none; }
 /* The logo sits exactly where Android's own start screen draws the app icon (centred, same size), so the hand-over doesn't jump.
-   It starts in the icon's green and fades to the chosen colour scheme; the tagline sits below it without moving it. */
+   Android's start screen is white with the black pentagon (app icon, manifest background_color #FFFFFF); this screen starts
+   exactly like that, then the background fades to dark and the logo to the chosen colour; badges and tagline follow.
+   Without motion (prefers-reduced-motion) it shows the dark end state straight away. */
 /* Size and position measured from screen recordings on Lukas's phone (Android start screen vs. this one, 26 Nov 2026):
    Android draws the icon 12.5% larger and centred on the whole screen, i.e. 21 px above the middle of the app's area
    (status bar 65 px at the top, gesture bar 23 px at the bottom). --sp-size / --sp-dy match it. */
@@ -393,12 +395,14 @@ button, a, .calp .c { touch-action: manipulation; }
 #splash > svg { position: absolute; left: calc(50% - var(--sp-size) / 2); top: calc(50% - var(--sp-size) / 2 + var(--sp-dy)); width: var(--sp-size); height: var(--sp-size); color: var(--accent); }
 #splash .sp-t { position: absolute; left: 0; right: 0; top: calc(50% + var(--sp-size) / 2 + var(--sp-dy) + 28px); font: 600 24px/1.25 var(--display); letter-spacing: .01em; color: var(--fg); text-align: center; }
 @media (prefers-reduced-motion: no-preference) {
-  #splash > svg { animation: sp-col 1.2s ease-in-out .2s both; }
-  #splash .sp-bg { animation: sp-bg 1.2s ease-out both; }
+  #splash { animation: sp-dark .8s ease-in-out .6s both; }
+  #splash > svg { animation: sp-col .8s ease-in-out .6s both; }
+  #splash .sp-bg { animation: sp-bg 1s ease-out 1.4s both; }
   #splash .sp-t { opacity: 0; }
   #splash.ft .sp-t { animation: sp-t .6s cubic-bezier(.2,.7,.2,1) both; }
 }
-@keyframes sp-col { from { color: #4ADE9B; } to { color: var(--accent); } }
+@keyframes sp-dark { from { background-color: #FFFFFF; } to { background-color: #0E1012; } }
+@keyframes sp-col { from { color: #0E1012; } to { color: var(--accent); } }
 @keyframes sp-bg { from { opacity: 0; transform: scale(1.04); } to { opacity: .28; transform: none; } }
 @keyframes sp-t { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 /* Everything under the period bar moves as one when the day / week / round changes */
@@ -635,11 +639,11 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 <script>
   // Start screen: only when the installed app starts fresh (it carries on from Android's own start screen); ?splash=1 shows it in a browser
   if ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || /[?&]splash=1/.test(location.search)) { document.getElementById('splash').hidden = false; window.__splashAt = performance.now();
-    // Tagline: fade in once its font is there (no visible font switch), or after 0.8 s at the latest
-    var sp = document.getElementById('splash'), tag = function () { sp.classList.add('ft'); };
+    // Tagline: fade in once the screen has turned dark (1.6 s) and its font is there (no visible font switch); at 1.6 s at the latest
+    var sp = document.getElementById('splash'), t0 = performance.now(), tag = function () { setTimeout(function () { sp.classList.add('ft'); }, Math.max(0, 1600 - (performance.now() - t0))); };
     var fonts = function () { if (document.fonts && document.fonts.load) document.fonts.load('600 24px "Space Grotesk"').then(tag, tag); else tag(); };
     if (window.__gfDone) fonts(); else window.__gf = fonts;
-    setTimeout(tag, 800); }
+    setTimeout(tag, 1600); }
 </script>
 <header id="top"><div class="hin">
   <div class="tr1">
@@ -1863,11 +1867,11 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       h += badge(lg, n.join('|'), 38).replace('<svg ', '<svg style="left:' + (c * G2 - (r % 2 ? 0 : G2 / 2) - 10) + 'px;top:' + (r * GY - 14) + 'px" '); }
     bg.innerHTML = h;
   })();
-  // Start screen stays about 3 s (longer only while the data is still on its way, at most 5 s), then fades into the app
+  // Start screen stays about 3.6 s: white, fading to dark, then the full screen (longer only while the data is still on its way, at most 5 s), then fades into the app
   let splashGone = false;
   function hideSplash() {
     const sp = document.getElementById('splash'); if (!sp || sp.hidden || splashGone) return; splashGone = true;
-    const wait = Math.max(0, 3000 - (performance.now() - (window.__splashAt || 0)));
+    const wait = Math.max(0, 3600 - (performance.now() - (window.__splashAt || 0)));
     setTimeout(() => after(anim(sp, [{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: 'forwards' }), () => sp.remove()), wait);
   }
   setTimeout(hideSplash, 5000);
