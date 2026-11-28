@@ -1204,14 +1204,14 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 
   // Graph section on top of a Season card (the All-leagues card too), collapsible like the team window's graph
   const graphSec = (c) => ((c === 'all' ? blockPts() : roundPts(c)).length > 1 ? '<div class="lgsec"><div class="lgh"><span class="cap3">Graph</span><span class="lgr">' + (lgOpen ? '<button type="button" class="ghost tst bxt" data-act="lgbox" aria-pressed="' + st.boxes + '" title="Show the spread of each point as a boxplot"><span class="sw" aria-hidden="true"></span>Boxplots</button>' : '') + '<button type="button" class="ghost tst" data-act="lgsec" aria-expanded="' + lgOpen + '">' + (lgOpen ? 'Hide' : 'Show') + ICON.chev + '</button></span></div><div class="lgb"' + (lgOpen ? '' : ' hidden') + '><div class="tg" data-lg="' + c + '"></div></div></div>' : '');
-  // Season match lists: the sort menu's order, 5 shown, "Show more" adds 5 at a time, "Show fewer" goes back to 5
+  // Season match lists (round under the flag, as in the Matches tab): the sort menu's order, 5 shown, "Show more" adds 5 at a time, "Show fewer" goes back to 5
   const smore = {};
   const sCmp = () => ({ high: (a, b) => b.rt - a.rt || (a.d < b.d ? -1 : 1), low: (a, b) => a.rt - b.rt || (a.d < b.d ? -1 : 1), new: (a, b) => (a.d < b.d ? 1 : a.d > b.d ? -1 : b.rt - a.rt), old: (a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : b.rt - a.rt) })[st.ssort];
   function seasonGames(key, games, flagged) {
     const ms = games.slice().sort(sCmp()), n = Math.min(ms.length, smore[key] || 5), cur = LSORTS.find((x) => x[0] === st.ssort)[1];
     const head = '<div class="selh gsh"><div class="cap3 games">Matches</div><button type="button" class="ghost ddb" data-act="lsortmenu" data-id="S|' + key + '" aria-haspopup="menu" aria-expanded="' + (lMenu === 'S|' + key) + '" aria-label="Sort: ' + cur + '">' + ICON_SORT + '<span>' + cur + '</span>' + ICON.chev + '</button>' + (lMenu === 'S|' + key ? sortMenu(st.ssort) : '') + '</div>';
     const btns = (n < ms.length ? '<button type="button" class="ghost more" data-act="smore" data-id="' + key + '">Show more' + ICON.chev + '</button>' : '') + (n > 5 ? '<button type="button" class="ghost more less" data-act="sless" data-id="' + key + '">Show fewer' + ICON.chev + '</button>' : '');
-    return head + '<div class="rows grows" data-k="' + key + '">' + ms.slice(0, n).map((m) => row(m, [], null, flagged)).join('') + (btns ? '<div class="smb">' + btns + '</div>' : '') + '</div>';
+    return head + '<div class="rows grows" data-k="' + key + '">' + ms.slice(0, n).map((m) => row(m, [], null, flagged, true)).join('') + (btns ? '<div class="smb">' + btns + '</div>' : '') + '</div>';
   }
 
   function renderBest() {
