@@ -14,7 +14,7 @@ This file records how the app was built: one entry per day, newest first, with t
   - A day or a span of days. The default is the last seven days up to yesterday; one step forward shows the next seven days.
   - Any span can be picked in the calendar: tap a day, then a second one, for at most 14 days.
   - League pills filter the list, and each match shows its round under the flag.
-  - Sort menu: highest or lowest rated, newest or oldest first.
+  - Sort menu: highest or lowest rated, date ascending or descending (by day, then by rating or prediction).
   - Matches still to come show a predicted rating in a dashed box.
 - **Match window**
   - Spoiler-free summary, rating breakdown and highlights link.
@@ -23,7 +23,7 @@ This file records how the app was built: one entry per day, newest first, with t
 - **Season tab**
   - An All-leagues summary card, and one card per league. Swipe to move between them.
   - Graph per league: average rating per round, with optional boxplots and the next round as a predicted point. The All-leagues graph uses blocks of seven days instead of rounds.
-  - Team table and a sortable match list that shows 5 at a time.
+  - Team table and a sortable match list that shows 5 at a time; "Incl. pred." adds the matches still to come.
 - **Team window**
   - Ratings graph of the last ten matches, scrollable, with the next match as a predicted point and an optional league-average line.
   - Full match list including the matches still to come.
@@ -63,6 +63,7 @@ This file records how the app was built: one entry per day, newest first, with t
 ## Development history
 
 ### 28 November 2026
+- **#30** Date orders sort by day only (not kickoff time), then by rating or prediction; "Date ascending / descending" everywhere instead of "Oldest / Newest first"; Season match lists get an "Incl. pred." switch for the matches still to come (league and All-leagues cards; the graph is unaffected).
 - **#28** Season match lists: round under the flag.
 - **#27** Counts are simply the number of matches in the list (no "to come"); favourites follow the list's order (Season: by rating); the All-leagues graph leaves out seven-day blocks with fewer than 12 matches; Season with All leagues shows only the summary card.
 - **#26** Built-in derby list for the predictions (incl. El Clásico, Der Klassiker, Le Classique). Before, derbies were only known from a flag on recent played matches, so none counted.
