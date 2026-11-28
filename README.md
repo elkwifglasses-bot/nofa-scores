@@ -4,6 +4,8 @@ Spoiler-free watchability ratings (0–10) for matches in the Super League, Prem
 
 The app is a single page (`index.html`) that reads two data files. GitHub Pages publishes it as is; there is nothing to build.
 
+Current version: **v1.0** (28 Nov 2026). How the app was built, version by version: [CHANGELOG.md](CHANGELOG.md).
+
 ## Files
 
 | File | What it is |
