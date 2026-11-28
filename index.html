@@ -908,6 +908,16 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   // in the top or bottom two 0.2, both in the top or bottom four 0.4, derby 0.4, at most 0.6). Checked on this season's matches with only
   // the data known before each kickoff: about 2.5 times better than the old bolts. Stretched by 3 so the differences are visible.
   const PSTRETCH = 3, PW_GOALS = 0.37, PW_STAKES = 0.9, STAKES_AVG = 0.15;
+  // Derbies the prediction knows without having seen the pair play this season (team names as in the data). A pair flagged as derby by
+  // the daily task counts too.
+  const DERBIES = {
+    pl: [['Everton', 'Liverpool'], ['Man City', 'Man United'], ['Arsenal', 'Tottenham'], ['Newcastle', 'Sunderland'], ['Arsenal', 'Chelsea'], ['Chelsea', 'Tottenham'], ['Chelsea', 'Fulham'], ['Brentford', 'Fulham'], ['Brighton', 'Crystal Palace']],
+    ll: [['Barcelona', 'Real Madrid'], ['Atletico Madrid', 'Real Madrid'], ['Barcelona', 'Espanyol'], ['Betis', 'Sevilla'], ['Athletic Club', 'Real Sociedad'], ['Levante', 'Valencia'], ['Valencia', 'Villarreal'], ['Celta Vigo', 'Deportivo La Coruna'], ['Getafe', 'Real Madrid'], ['Atletico Madrid', 'Rayo Vallecano']],
+    sa: [['Inter', 'Milan'], ['Lazio', 'Roma'], ['Juventus', 'Torino'], ['Inter', 'Juventus'], ['Napoli', 'Roma']],
+    bl: [['Bayern', 'Dortmund'], ['Dortmund', 'Schalke'], ['Hamburger SV', 'Werder Bremen'], ['Gladbach', 'Koln'], ['Koln', 'Leverkusen'], ['Frankfurt', 'Mainz'], ['Augsburg', 'Bayern']],
+    l1: [['Marseille', 'PSG'], ['Lens', 'Lille'], ['Monaco', 'Nice'], ['PSG', 'Paris FC'], ['Brest', 'Rennes'], ['Lorient', 'Rennes'], ['Brest', 'Lorient']],
+    sl: [['FC Zurich', 'Grasshoppers'], ['Lausanne', 'Servette'], ['Servette', 'Sion'], ['Lausanne', 'Sion'], ['FC Basel', 'FC Zurich'], ['FC Basel', 'YB']],
+  };
   let PRED = new Map();
   const fxKey = (c, h, a) => c + '|' + h + '|' + a;
   const goalsOf = (s) => { const g = String(s || '').match(/(\d+)\s*[–-]\s*(\d+)/); return g ? [+g[1], +g[2]] : null; };
@@ -917,7 +927,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     ORDER.forEach((c) => {
       const ms = D.filter((m) => m.c === c && m.rt != null), fxs = openFixtures(c).filter((m) => m.rt == null);
       if (!ms.length || !fxs.length) return;
-      const lgR = meanOf(ms.map((m) => m.rt)), T = {}, G = {}, derby = new Set();
+      const lgR = meanOf(ms.map((m) => m.rt)), T = {}, G = {}, derby = new Set((DERBIES[c] || []).map((p) => p.slice().sort().join('|')));
       ms.forEach((m) => {
         if (m.x && m.x.derby) derby.add([m.h, m.a].sort().join('|'));
         const g = goalsOf(m.s); if (!g) return;
