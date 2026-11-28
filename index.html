@@ -1406,6 +1406,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       if (ms.length) out.unshift({ id: 'all|' + from, from, to, v: ms.reduce((x, m) => x + m.rt, 0) / ms.length, n: ms.length, box: quart(ms.map((m) => m.rt)) });
       if (to < first) break;
     }
+    // The next seven days (today to today + 6, as in the Matches tab's "Next seven days"): the average predicted rating of their fixtures
+    const nf = plusDays(last, 1), nt = plusDays(last, 7), ps = [...PRED.values()].filter((p) => p.d && p.d >= nf && p.d <= nt);
+    if (ps.length) out.push({ id: 'all|' + nf, from: nf, to: nt, v: meanOf(ps.map((p) => p.v)), n: ps.length, pred: true });
     return out;
   };
   // Spread of a set of ratings for the boxplots: lowest, lower quartile, median, upper quartile, highest
@@ -1427,7 +1430,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (c === 'all') {
       const pts = blockPts();
       plotGraph(document.querySelector('.lgb .tg[data-lg="all"]'), pts.map((p) => { const d = dt(p.from); return { ...p, xl: d.getUTCDate() + ' ' + MON[d.getUTCMonth()], aria: span(p.from, p.to) + ': average ' + p.v.toFixed(2) + ', ' + p.n + ' matches' }; }), lgS('all'), { act: 'lgdot', boxes: st.boxes, bubble: (p) =>
-        '<span class="gbd">' + span(p.from, p.to) + '</span><span class="gbm"><span>' + p.n + (p.n === 1 ? ' match' : ' matches') + '</span><span class="chip small ' + tier(p.v) + '" title="Average rating">' + p.v.toFixed(2) + '</span></span>' + spreadLine(p) });
+        '<span class="gbd">' + span(p.from, p.to) + '</span>' + (p.pred ? '<span class="gbm"><span>' + p.n + (p.n === 1 ? ' match to come' : ' matches to come') + '</span>' + predChip(Math.round(p.v * 10) / 10, 'small') + '</span><span class="gbd">average predicted rating</span>'
+          : '<span class="gbm"><span>' + p.n + (p.n === 1 ? ' match' : ' matches') + '</span><span class="chip small ' + tier(p.v) + '" title="Average rating">' + p.v.toFixed(2) + '</span></span>' + spreadLine(p)) });
       return;
     }
     const pts = roundPts(c).concat(nextRoundPt(c));
@@ -1443,8 +1447,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     // 'round|<league>|<round>' or 'days|all|<first day>' (seven days of all leagues, from the All-leagues graph)
     const [kind, c, rs] = pop.split('|'), blk = kind === 'days', r = +rs;
     let all = blk ? D.filter((m) => m.rt != null && m.d >= rs && m.d <= plusDays(rs, 6)) : D.filter((m) => m.c === c && m.r === r && m.rt != null);
-    // A round still to come (the predicted point of a league graph): its fixtures, by their predicted rating
-    const fut = !blk && !all.length; if (fut) all = openFixtures(c).filter((m) => m.r === r && predOf(m));
+    // A round or seven days still to come (the predicted point of a graph): the fixtures, by their predicted rating
+    const fut = !all.length; if (fut) all = blk ? ORDER.flatMap((x) => openFixtures(x)).filter((m) => m.d && m.d >= rs && m.d <= plusDays(rs, 6) && predOf(m)) : openFixtures(c).filter((m) => m.r === r && predOf(m));
     const val = (m) => (m.rt != null ? m.rt : predOf(m).v);
     if (!all.length) { pop = null; box.innerHTML = ''; document.documentElement.classList.remove('popopen'); return; }
     const cmp = { new: (a, b) => (a.d < b.d ? 1 : a.d > b.d ? -1 : val(b) - val(a)), old: (a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : val(b) - val(a)), high: (a, b) => val(b) - val(a) || (a.d < b.d ? -1 : 1), low: (a, b) => val(a) - val(b) || (a.d < b.d ? -1 : 1) }[popSort];
@@ -1453,7 +1457,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const title = blk ? span(rs, plusDays(rs, 6)) : RN[c] + ' ' + r;
     let h = '<div class="tdim" data-close="1"></div><div class="tpop" role="dialog" aria-label="' + esc(blk ? 'All leagues, ' + title : C[c] + ', ' + title) + '">' +
       '<div class="tph"><div><div class="tpn"><span>' + title + '</span>' + (fut ? predChip(Math.round(avg * 10) / 10) : '<span class="chip ' + tier(avg) + '" title="Average rating">' + avg.toFixed(2) + '</span>') + '</div>' +
-      '<div class="tpl">' + (blk ? '<span>All leagues</span>' : FLAG[c] + '<span>' + C[c] + ' · ' + (ds[0] === ds[ds.length - 1] ? dm(ds[0]) : span(ds[0], ds[ds.length - 1])) + (fut ? ' · predicted' : '') + '</span>') + '</div></div>' +
+      '<div class="tpl">' + (blk ? '<span>All leagues' + (fut ? ' · predicted' : '') + '</span>' : FLAG[c] + '<span>' + C[c] + ' · ' + (ds[0] === ds[ds.length - 1] ? dm(ds[0]) : span(ds[0], ds[ds.length - 1])) + (fut ? ' · predicted' : '') + '</span>') + '</div></div>' +
       '<button type="button" class="tpx" data-act="tclose" aria-label="Close" title="Close">✕</button></div>' +
       '<div class="tpb"><section class="tsec"><div class="tsh"><h2 class="label">Matches <span class="favsub">' + ms.length + '</span></h2><div class="tshr"><div class="dd">' +
       '<button type="button" class="ddb" data-act="tsortmenu" aria-haspopup="menu" aria-expanded="' + popMenu + '" aria-label="Sort: ' + cur + '">' + ICON_SORT + '<span>' + cur + '</span>' + ICON.chev + '</button>' +
@@ -1681,18 +1685,20 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   }
   // Window of a match still to come: date and kickoff, both teams, the predicted rating and why (always open)
   function renderPredMatch(box, m) {
-    const pr = predOf(m), ko = kickOf(m);
-    const team = (n, p, after) => '<button type="button" class="mtm" data-act="mteam" data-id="' + esc('m|' + m.c + '|' + n) + '" aria-label="' + esc(name(n)) + ': all matches" title="' + esc(name(n)) + ': all matches"><span class="crest" aria-hidden="true">' + badge(m.c, n, 46) + '</span><b>' + nm(n, after) + '</b>' + (p ? '<i>' + ord(p) + '</i>' : '') + '</button>';
+    const pr = predOf(m), ko = kickOf(m), tt = teamTable(D.filter((x) => x.c === m.c && x.rt != null));
+    // Under each name: the team's average match rating so far, as plain text where a played match shows the table position
+    const avgChip = (n) => { const t = tt.find((x) => x.n === n); return t ? '<i title="Average rating of their matches">avg ' + t.avg.toFixed(1) + '</i>' : ''; };
+    const team = (n, p, after) => '<button type="button" class="mtm" data-act="mteam" data-id="' + esc('m|' + m.c + '|' + n) + '" aria-label="' + esc(name(n)) + ': all matches" title="' + esc(name(n)) + ': all matches"><span class="crest" aria-hidden="true">' + badge(m.c, n, 46) + '</span><b>' + nm(n, after) + '</b>' + avgChip(n) + '</button>';
     const sign = (v) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1);
     const line = (nm2, detail, val, cls) => '<div class="bkl"><div class="bn">' + esc(nm2) + (detail ? '<div class="bc">' + esc(detail) + '</div>' : '') + '</div><span class="bp ' + cls + '">' + esc(val) + '</span></div>';
     const why = pr ? '<div class="panel" data-p="why">' +
       line('League average', 'average rating of all ' + C[m.c] + ' matches so far', pr.lgR.toFixed(1), 'pgrey') +
       line('Goals', 'their matches: ' + pr.gH.toFixed(1) + ' and ' + pr.gA.toFixed(1) + ' goals per match (league ' + pr.lgG.toFixed(1) + ')', sign(pr.gPts), pr.gPts < 0 ? 'pneg' : pr.gPts >= 0.5 ? 'pmid' : 'pgrey') +
-      line('Stakes', pr.parts.length ? pr.parts.join(' · ') + ' (' + ord(pr.ph) + ' v ' + ord(pr.pa) + ')' : 'no top, bottom or derby stakes (' + ord(pr.ph) + ' v ' + ord(pr.pa) + ')', sign(pr.sPts), pr.sPts < 0 ? 'pneg' : pr.sPts >= 0.5 ? 'pmid' : 'pgrey') + '</div>' : '';
+      line('Stakes', pr.parts.length ? pr.parts.join(' · ') : 'no top, bottom or derby stakes', sign(pr.sPts), pr.sPts < 0 ? 'pneg' : pr.sPts >= 0.5 ? 'pmid' : 'pgrey') + '</div>' : '';
     box.innerHTML = '<div class="mdim2" data-mclose="1"></div><div class="mwrap"><div class="mcard" role="dialog" aria-label="' + esc(name(m.h) + ' vs ' + name(m.a) + ', still to come') + '">' +
       '<button type="button" class="mx" data-act="mclose" aria-label="Close">✕</button>' +
       '<div class="mmeta">' + FLAG[m.c] + '<span>' + C[m.c] + ' · ' + RN[m.c] + ' ' + m.r + '</span></div><div class="mdate">' + (m.d ? short(m.d) : 'Date n/a') + ' · ' + (ko || 'kickoff n/a') + '</div>' +
-      '<div class="board">' + team(m.h, pr && pr.ph) + '<div class="mmid">' + (pr ? predChip(pr.v, 'mrt') + '<span class="lbl">predicted</span>' : '<span class="chip vs">vs</span>') + '</div>' + team(m.a, pr && pr.pa, 1) + '</div>' +
+      '<div class="board">' + team(m.h) + '<div class="mmid">' + (pr ? predChip(pr.v, 'mrt') + '<span class="lbl">predicted</span>' : '<span class="chip vs">vs</span>') + '</div>' + team(m.a, null, 1) + '</div>' +
       '<div class="mbody">' + why + '</div></div></div>';
     placeMatch();
   }
