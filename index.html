@@ -432,6 +432,7 @@ button, a, .calp .c { touch-action: manipulation; }
 .tpop .menu button[aria-checked="true"] { background: #2B3136; color: var(--fg); font-weight: 600; }
 .tpop .menu .ck { width: 14px; color: var(--accent); font-weight: 700; }
 /* Match lists (Day / Week): sort menu next to the league name under the pills, the same look as the team window's */
+.selh h2.label { gap: 4px; } /* name · count read as one phrase (no double space) */
 .selh { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 32px; }
 .selh .ddb { margin-right: -6px; }
 .dayh { padding: 10px 14px 4px; font-size: 12px; font-weight: 600; color: var(--muted); border-top: 1px solid var(--divider); }
@@ -1059,8 +1060,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       (nav.ahead ? ph1 : lb) +
       '<button type="button" class="sq" data-act="next" aria-label="Next ' + nav.what + '"' + (nav.canNext ? '' : ' disabled') + '>' + ICON.next + '</button></div>';
   };
-  // Match count next to the league name: played matches only ("51 matches"), or "49 to come" when none is played yet
-  const cnt = (ms) => { const p = ms.filter((m) => m.rt != null).length, u = ms.length - p; return !p && u ? u + ' to come' : p + (p === 1 ? ' match' : ' matches'); };
+  // Match count: simply the number of matches in the list (played and still to come alike)
+  const cnt = (ms) => ms.length + (ms.length === 1 ? ' match' : ' matches');
   const roundOf = (m) => RN[m.c] + ' ' + m.r;
   const allDays = () => Array.from(new Set(D.map((m) => m.d))).sort();
   // Days the Day view steps through: days with stored matches plus days with upcoming fixtures
@@ -1124,7 +1125,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     let body = '', count = '';
     if (v !== 'best') {
       // Your teams' matches of the shown day or days, played and to come, from every league whatever league is selected below
-      const ms = D.filter((m) => isFav(m) && m.d >= P.from && m.d <= P.to).concat(extraFixtures((m) => isFav(m) && m.d >= P.from && m.d <= P.to)).sort((a, b) => byWhen(a, b));
+      // In the same order as the match list below (its sort menu)
+      const ms = D.filter((m) => isFav(m) && m.d >= P.from && m.d <= P.to).concat(extraFixtures((m) => isFav(m) && m.d >= P.from && m.d <= P.to)).sort(listSort());
       body = ms.length ? card(ms.map((m) => row(m, [], null, true, true))) : '<div class="card"><div class="empty small">' + (FAV.size ? 'None of your favourite teams play ' + (v === 'day' ? 'on this day' : 'in these days') + '.' : 'Pick your teams in Favourites.') + '</div></div>';
       count = cnt(ms);
     } else {
@@ -1139,7 +1141,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
           const c = mine[0].c, table = ranked2(teamTable(rated.filter((m) => m.c === c))), me = table.find((x) => x.n === team);
           favRows.push({ me, team, c, size: table.length, best: mine.slice().sort(byRating)[0] });
         });
-        tSort(favRows.map((f) => f.me)).forEach((me) => {
+        // By average rating, best first
+        favRows.map((f) => f.me).sort((a, b) => b.avg - a.avg).forEach((me) => {
           const f = favRows.find((x) => x.me === me);
           parts.push(tRow(me, me.rk, true, 'data-act="team" data-id="' + esc('fav|' + f.c + '|' + f.team) + '" title="' + esc(name(f.team)) + ': all matches"'));
         });
@@ -1213,7 +1216,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 
   function renderBest() {
     const rated = D.filter((m) => m.rt != null);
-    const leagues = ORDER.filter((c) => rated.some((m) => m.c === c) && (st.comp === 'all' || c === st.comp));
+    // All leagues: only the All-leagues summary card; one league: that league's card
+    const leagues = ORDER.filter((c) => rated.some((m) => m.c === c) && st.comp !== 'all' && c === st.comp);
     const n = rated.filter(inComp).length;
     let h = '<div class="grid">';
     // A list shows its best five; "Show worst" adds the bottom five (with their real positions), and ⋮ marks the ranks in between when there are more than 10
@@ -1320,7 +1324,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       // Graph section (on top), then the match list; each can be hidden like Favourites
       '<section class="tsec"><div class="tsh tshg"><h2 class="label">Graph</h2><span class="lgr">' + (gOpen ? '<button type="button" class="ghost tst bxt" data-act="tlavg" aria-pressed="' + st.lavg + '" title="Show the league’s average rating per round"><span class="sw" aria-hidden="true"></span>League avg</button>' : '') + tog('g', gOpen, 'tsg') + '</span></div>' +
       '<div id="tsg" class="tpg"' + (gOpen ? '' : ' hidden') + '><div class="tg"></div></div></section>' +
-      '<section class="tsec"><div class="tsh"><h2 class="label">Matches <span class="favsub">' + mine.length + (coming.length ? ' · ' + coming.length + ' to come' : '') + '</span></h2><div class="tshr">' + (lOpen ? '<div class="dd">' +
+      '<section class="tsec"><div class="tsh"><h2 class="label">Matches <span class="favsub">' + ms.length + '</span></h2><div class="tshr">' + (lOpen ? '<div class="dd">' +
       '<button type="button" class="ddb" data-act="tsortmenu" aria-haspopup="menu" aria-expanded="' + popMenu + '" aria-label="Sort: ' + cur + '">' + ICON_SORT + '<span>' + cur + '</span>' + ICON.chev + '</button>' +
       (popMenu ? '<div class="mdim"></div><div class="menu" role="menu">' + SORTS.map(([k, l]) => '<button type="button" role="menuitemradio" aria-checked="' + (k === popSort) + '" data-act="tsortby" data-id="' + k + '"><span class="ck">' + (k === popSort ? '✓' : '') + '</span>' + l + '</button>').join('') + '</div>' : '') +
       '</div>' : '') + tog('l', lOpen, 'tsl') + '</div></div><div id="tsl" class="tplist"' + (lOpen ? '' : ' hidden') + '>';
@@ -1407,18 +1411,19 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   // count towards their own round). Same scale, bands and colours as the team graph.
   const LG = {}, lgS = (c) => (LG[c] = LG[c] || { sel: null, scroll: null });
   let lgOpen = true;
-  // All leagues: one point per 7-day block ending yesterday, 7 days earlier, … (the Matches tab's "Last seven days" and the blocks before)
+  // All leagues: one point per 7-day block ending yesterday, 7 days earlier, … (the Matches tab's "Last seven days" and the blocks before);
+  // blocks with fewer than 12 matches (international breaks, season start) are left out
   const blockPts = () => {
     const rated = D.filter((m) => m.rt != null); if (!rated.length) return [];
     const last = lastDay(), first = rated.map((m) => m.d).sort()[0], out = [];
     for (let to = last; to >= first || out.length === 0; to = plusDays(to, -7)) {
       const from = plusDays(to, -6), ms = rated.filter((m) => m.d >= from && m.d <= to);
-      if (ms.length) out.unshift({ id: 'all|' + from, from, to, v: ms.reduce((x, m) => x + m.rt, 0) / ms.length, n: ms.length, box: quart(ms.map((m) => m.rt)) });
+      if (ms.length >= 12) out.unshift({ id: 'all|' + from, from, to, v: ms.reduce((x, m) => x + m.rt, 0) / ms.length, n: ms.length, box: quart(ms.map((m) => m.rt)) });
       if (to < first) break;
     }
     // The next seven days (today to today + 6, as in the Matches tab's "Next seven days"): the average predicted rating of their fixtures
     const nf = plusDays(last, 1), nt = plusDays(last, 7), ps = [...PRED.values()].filter((p) => p.d && p.d >= nf && p.d <= nt);
-    if (ps.length) out.push({ id: 'all|' + nf, from: nf, to: nt, v: meanOf(ps.map((p) => p.v)), n: ps.length, pred: true });
+    if (ps.length >= 12) out.push({ id: 'all|' + nf, from: nf, to: nt, v: meanOf(ps.map((p) => p.v)), n: ps.length, pred: true });
     return out;
   };
   // Spread of a set of ratings for the boxplots: lowest, lower quartile, median, upper quartile, highest
@@ -1440,14 +1445,14 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (c === 'all') {
       const pts = blockPts();
       plotGraph(document.querySelector('.lgb .tg[data-lg="all"]'), pts.map((p) => { const d = dt(p.from); return { ...p, xl: d.getUTCDate() + ' ' + MON[d.getUTCMonth()], aria: span(p.from, p.to) + ': average ' + p.v.toFixed(2) + ', ' + p.n + ' matches' }; }), lgS('all'), { act: 'lgdot', boxes: st.boxes, bubble: (p) =>
-        '<span class="gbd">' + span(p.from, p.to) + '</span>' + (p.pred ? '<span class="gbm"><span>' + p.n + (p.n === 1 ? ' match to come' : ' matches to come') + '</span>' + predChip(Math.round(p.v * 10) / 10, 'small') + '</span><span class="gbd">average predicted rating</span>'
+        '<span class="gbd">' + span(p.from, p.to) + '</span>' + (p.pred ? '<span class="gbm"><span>' + p.n + (p.n === 1 ? ' match' : ' matches') + '</span>' + predChip(Math.round(p.v * 10) / 10, 'small') + '</span><span class="gbd">average predicted rating</span>'
           : '<span class="gbm"><span>' + p.n + (p.n === 1 ? ' match' : ' matches') + '</span><span class="chip small ' + tier(p.v) + '" title="Average rating">' + p.v.toFixed(2) + '</span></span>' + spreadLine(p)) });
       return;
     }
     const pts = roundPts(c).concat(nextRoundPt(c));
     plotGraph(document.querySelector('.lgb .tg[data-lg="' + c + '"]'), pts.map((p) => ({ ...p, xl: RS[c] + p.r, aria: RN[c] + ' ' + p.r + ': average ' + p.v.toFixed(2) + ', ' + p.n + (p.n === 1 ? ' match' : ' matches') })), lgS(c), { act: 'lgdot', boxes: st.boxes, bubble: (p) =>
       '<span class="gbd">' + RN[c] + ' ' + p.r + ' · ' + (p.from === p.to ? dm(p.from) : span(p.from, p.to)) + '</span>' +
-      (p.pred ? '<span class="gbm"><span>' + p.n + (p.n === 1 ? ' match to come' : ' matches to come') + '</span>' + predChip(Math.round(p.v * 10) / 10, 'small') + '</span><span class="gbd">average predicted rating</span>'
+      (p.pred ? '<span class="gbm"><span>' + p.n + (p.n === 1 ? ' match' : ' matches') + '</span>' + predChip(Math.round(p.v * 10) / 10, 'small') + '</span><span class="gbd">average predicted rating</span>'
         : '<span class="gbm"><span>' + p.n + (p.n === 1 ? ' match' : ' matches') + '</span><span class="chip small ' + tier(p.v) + '" title="Average rating">' + p.v.toFixed(2) + '</span></span>' + spreadLine(p)) });
   }
   const leagueGraphs = () => document.querySelectorAll('.lgb .tg[data-lg]').forEach((el) => leagueGraph(el.dataset.lg));
