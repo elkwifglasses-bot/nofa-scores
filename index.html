@@ -115,7 +115,7 @@ button:disabled { opacity: 0.35; cursor: default; }
 .chip.pred.t3 { background: transparent; color: var(--t3-ink); box-shadow: inset 0 0 0 1.5px #4A5158; }
 .chip.pred.tr { background: transparent; color: var(--tr-text); box-shadow: inset 0 0 0 1.5px var(--tr-bd); }
 /* Season lists: "Show worst" toggle, gap marker, wider rank column for 3-digit positions */
-button.more { align-self: center; margin: 4px auto 2px; min-height: 36px; height: 36px; font-size: 13px; }
+button.more { align-self: center; margin: 4px auto 2px; min-height: 36px; height: 36px; font-size: 12px; }
 .rows > button.more { display: flex; margin: 6px auto 4px; }
 button.more[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .gapdots { text-align: center; color: var(--muted); font-size: 18px; line-height: 1; padding: 4px 0; }
@@ -156,6 +156,7 @@ button.more[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .favhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .favsub { color: var(--muted); font: 500 13px var(--text); letter-spacing: 0; text-transform: none; }
 button.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+.favhead > button.ghost { font-size: 12px; } /* Favourites Hide / Show, like the other small text buttons */
 button.ghost:hover { background: var(--btn); color: var(--fg); }
 button.ghost[aria-expanded="true"] .chev { transform: rotate(180deg); }
 #favbody { display: flex; flex-direction: column; gap: 14px; }
@@ -194,7 +195,7 @@ body.compact { --gap-block: 20px; }
 .compact .titles.pagehead h1.page { font-size: 16px; }
 .compact .sub.explain { display: none; }
 .compact .league h3 { padding: 14px 14px 4px; font-size: 16px; }
-.compact .league .cap3.games { padding: 10px 14px 2px; text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 500; }
+.compact .league .cap3.games { padding: 10px 14px 2px; font: 600 12px/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; } /* like the team window's headings */
 .compact .league .rows > .row:first-child { border-top: 0; }
 .compact .league > button.more { display: flex; margin: 4px auto 8px; }
 .compact .grid { gap: 20px; }
@@ -421,7 +422,7 @@ button, a, .calp .c { touch-action: manipulation; }
 .tpop .tps { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px 10px; }
 .tpop .tpc { font: 600 11.5px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .tpop .dd { position: relative; }
-.tpop .ddb { min-height: 32px; height: 32px; padding: 0 10px; gap: 7px; font-size: 13px; border-radius: 9px; }
+.tpop .ddb { min-height: 32px; height: 32px; padding: 0 10px; gap: 7px; font-size: 12px; border-radius: 9px; }
 .tpop .ddb svg { color: var(--muted); }
 .tpop .menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 2; width: 180px; background: #23282D; border: 1px solid #353B41; border-radius: 10px; box-shadow: 0 10px 24px rgba(0, 0, 0, .55); padding: 4px; display: flex; flex-direction: column; }
 .tpop .menu button { min-height: 36px; height: 36px; justify-content: flex-start; background: transparent; border: 0; border-radius: 7px; color: #C9CED3; font-size: 13.5px; padding: 0 10px; gap: 8px; }
@@ -435,7 +436,7 @@ button, a, .calp .c { touch-action: manipulation; }
 .card > .dayh:first-child { border-top: 0; }
 .dayh + .row { border-top: 0; }
 .favhead .hacts { display: flex; align-items: center; gap: 2px; }
-.selh .ddb { min-height: 32px; height: 32px; padding: 0 10px; gap: 7px; font-size: 13px; border-radius: 9px; }
+.selh .ddb { min-height: 32px; height: 32px; padding: 0 10px; gap: 7px; font-size: 12px; border-radius: 9px; }
 .selh .ddb svg { color: var(--muted); }
 .selh .ddb[aria-expanded="true"] { color: var(--fg); }
 .lmdim { position: fixed; inset: 0; z-index: 25; background: rgba(0, 0, 0, .5); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); touch-action: none; }
@@ -449,7 +450,7 @@ button, a, .calp .c { touch-action: manipulation; }
 .tpop .tsh { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 8px 8px 14px; }
 .tpop .tsh .favsub { text-transform: none; letter-spacing: 0; font-weight: 500; }
 .tpop .tshr { display: flex; align-items: center; gap: 4px; }
-.tpop .tst { min-height: 32px; height: 32px; padding: 0 8px; gap: 4px; font-size: 13px; }
+.tpop .tst { min-height: 32px; height: 32px; padding: 0 8px; gap: 4px; font-size: 12px; }
 .tpop .tplist { border-top: 1px solid var(--divider); }
 .tpop .tmr { border-top: 1px solid var(--divider); }
 .tpop .tmr:first-child { border-top: 0; }
@@ -557,7 +558,15 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 .calp .c.rng { background: var(--accent); color: var(--accent-ink); font-weight: 700; border-radius: 0; box-shadow: none; }
 .calp .c.rng:nth-child(7n+1), .calp .c.rng.rs { border-top-left-radius: 9px; border-bottom-left-radius: 9px; }
 .calp .c.rng:nth-child(7n), .calp .c.rng.re { border-top-right-radius: 9px; border-bottom-right-radius: 9px; }
-.calp .c.rng.today { box-shadow: inset 0 0 0 1.5px var(--accent-ink); }
+.calp .c.rng.today, .calp .c.sel.today { box-shadow: none; } /* today's grey ring only outside a selection */
+/* After the first tap: the days that can complete a period, as an outlined band on each side of the tapped day */
+.calp .c.cnd { border-radius: 0; box-shadow: inset 0 1.5px 0 rgba(var(--accent-rgb), .6), inset 0 -1.5px 0 rgba(var(--accent-rgb), .6); }
+.calp .c.cnd:nth-child(7n+1), .calp .c.cnd.cs { border-top-left-radius: 9px; border-bottom-left-radius: 9px; }
+.calp .c.cnd:nth-child(7n), .calp .c.cnd.ce { border-top-right-radius: 9px; border-bottom-right-radius: 9px; }
+.calp .c.cnd.cs { box-shadow: inset 0 1.5px 0 rgba(var(--accent-rgb), .6), inset 0 -1.5px 0 rgba(var(--accent-rgb), .6), inset 1.5px 0 0 rgba(var(--accent-rgb), .6); }
+.calp .c.cnd.ce { box-shadow: inset 0 1.5px 0 rgba(var(--accent-rgb), .6), inset 0 -1.5px 0 rgba(var(--accent-rgb), .6), inset -1.5px 0 0 rgba(var(--accent-rgb), .6); }
+.calp .c.cnd.cs.ce { box-shadow: inset 0 0 0 1.5px rgba(var(--accent-rgb), .6); }
+.calp .c.sel.cnd { border-radius: 9px; }
 .calp .c.rng.has::after { background: var(--accent-ink); }
 .calp .c.rng.fx::after { background: transparent; box-shadow: inset 0 0 0 1px var(--accent-ink); }
 .calp .c.rng.oth::after { background: var(--accent-ink); opacity: .4; }
@@ -630,12 +639,20 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 .tg.fadel .tgs { -webkit-mask-image: linear-gradient(to right, transparent 0, #000 32px); mask-image: linear-gradient(to right, transparent 0, #000 32px); }
 .tgsvg { display: block; overflow: visible; }
 /* Season: the round graph sits on top of each league card, collapsible like the team window's graph */
+.lgh .lgr { display: flex; align-items: center; gap: 2px; }
+/* Boxplots on/off: a small switch in the graph header */
+.lgh .bxt { gap: 7px; } .lgh .bxt[aria-pressed="true"] { background: transparent; color: var(--fg); border-color: transparent; }
+.lgh .bxt .sw { position: relative; width: 20px; height: 11px; border-radius: 6px; background: #3A4046; transition: background-color .15s ease; }
+.lgh .bxt .sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 7px; height: 7px; border-radius: 50%; background: #C9CED3; transition: transform .15s ease; }
+.lgh .bxt[aria-pressed="true"] .sw { background: #C9CED3; } .lgh .bxt[aria-pressed="true"] .sw::after { transform: translateX(9px); background: #1B1F23; }
+.gsh { padding-right: 8px; } .gsh .cap3.games { padding-bottom: 6px; padding-top: 6px; }
+.smb { display: flex; justify-content: center; gap: 4px; padding: 2px 0 6px; border-top: 1px solid var(--divider); }
+.smb .less .chev { transform: rotate(180deg); }
 .lgh { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 8px 0 14px; }
-.lgh .cap3 { text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 500; }
-.lgh .tst { min-height: 32px; height: 32px; padding: 0 8px; gap: 4px; font-size: 13px; }
+.lgh .cap3 { font: 600 12px/32px var(--display); letter-spacing: 0.08em; text-transform: uppercase; } /* like the team window's headings, centred on the buttons' line */
+.lgh .tst { min-height: 32px; height: 32px; padding: 0 8px; gap: 4px; font-size: 12px; }
 .lgb { padding: 0 0 6px; }
 .tgsvg .z1 { fill: #fff; opacity: .075; } .tgsvg .z2 { fill: #fff; opacity: .045; } .tgsvg .z3 { fill: #fff; opacity: .02; }
-.tgsvg .gl { stroke: #2B3035; stroke-width: 1; }
 .tgsvg .gp { fill: none; stroke: var(--fg); stroke-width: 2; stroke-linejoin: round; }
 .tgsvg .gd { stroke: var(--surface); stroke-width: 2; }
 .tgsvg .d1 { fill: var(--accent); } .tgsvg .d2 { fill: var(--t2-line); } .tgsvg .d3 { fill: #7B838A; } .tgsvg .dr { fill: var(--tr); }
@@ -643,6 +660,11 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 [data-scheme="mono"] .tgsvg .d2 { fill: var(--t2-soft); }
 .tgsvg .gring { fill: none; stroke: var(--fg); stroke-opacity: .5; stroke-width: 1.5; }
 .tgsvg .gx { fill: var(--muted); font: 400 10.5px var(--text); }
+/* League graphs: quiet boxplots (whiskers lowest–highest, box between the quartiles, median line) behind the average line, switchable */
+.tgsvg .gax { stroke: #3A4046; stroke-width: 1; }
+.tgsvg .bw { stroke: #34393F; stroke-width: 1.2; }
+.tgsvg .bm { stroke: #6A7279; stroke-width: 1.6; }
+.tgsvg .bb { fill: #202428; stroke: #3A4045; stroke-width: 1.2; }
 .gdot { position: absolute; width: 34px; height: 34px; min-height: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; }
 .gdot:hover { background: rgba(255, 255, 255, .05); }
 .gbub { position: absolute; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 0; padding: 12px 14px; background: #1B1F23; border: 1px solid var(--btn-line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .55); white-space: nowrap; text-align: center; }
@@ -875,9 +897,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   let infoOpen = false;
   // st.end: the last day of the shown period (null = yesterday, the default "last seven days"); st.from: first day of a custom period
   // picked in the calendar (null = the seven days up to st.end)
-  const st = { day: null, comp: 'all', end: null, from: null, msort: 'high', favCollapsed: false, compact: true, tsort: { k: 'avg', d: -1 } };
-  try { const s = JSON.parse(localStorage.getItem('sfr-prefs') || '{}'); if (s.comp === 'all' || C[s.comp]) st.comp = s.comp; st.favCollapsed = !!s.favCollapsed; if (['new', 'old', 'high', 'low'].includes(s.msort)) st.msort = s.msort; if (s.tsort && ['rk', 'n', 'k', 'rng', 'avg'].includes(s.tsort.k) && (s.tsort.d === 1 || s.tsort.d === -1)) st.tsort = s.tsort; } catch (e) {}
-  const savePrefs = () => { try { localStorage.setItem('sfr-prefs', JSON.stringify({ comp: st.comp, favCollapsed: st.favCollapsed, tsort: st.tsort, msort: st.msort })); } catch (e) {} };
+  const st = { day: null, comp: 'all', end: null, from: null, msort: 'high', ssort: 'high', boxes: true, favCollapsed: false, compact: true, tsort: { k: 'avg', d: -1 } };
+  try { const s = JSON.parse(localStorage.getItem('sfr-prefs') || '{}'); if (s.comp === 'all' || C[s.comp]) st.comp = s.comp; st.favCollapsed = !!s.favCollapsed; if (['new', 'old', 'high', 'low'].includes(s.msort)) st.msort = s.msort; if (['new', 'old', 'high', 'low'].includes(s.ssort)) st.ssort = s.ssort; if (s.boxes === false) st.boxes = false; if (s.tsort && ['rk', 'n', 'k', 'rng', 'avg'].includes(s.tsort.k) && (s.tsort.d === 1 || s.tsort.d === -1)) st.tsort = s.tsort; } catch (e) {}
+  const savePrefs = () => { try { localStorage.setItem('sfr-prefs', JSON.stringify({ comp: st.comp, favCollapsed: st.favCollapsed, tsort: st.tsort, msort: st.msort, ssort: st.ssort, boxes: st.boxes })); } catch (e) {} };
   // Tabs: Day, Week (default), Season. Old links (#matchweek, #best) still work; #outlook opens the upcoming week.
   if (location.hash === '#outlook') { st.from = null; st.end = plusDays(localIso(new Date()), 6); history.replaceState(null, '', '#week'); }
   const view = () => { const h = location.hash.slice(1); return h === 'season' || h === 'best' ? 'best' : h === 'favourites' || h === 'favorites' ? 'fav' : h === 'day' ? h : 'matchweek'; };
@@ -1005,7 +1027,6 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   const card = (rows) => '<div class="card">' + rows.join('') + '</div>';
   // big: a tall box for empty days / weeks, so there is plenty of room to swipe on
   const emptyCard = (t, big) => '<div class="card"><div class="empty' + (big ? ' big' : '') + '">' + t + '</div></div>';
-  const sectionHtml = (labelHtml, rows) => '<section><h2 class="label">' + labelHtml + '</h2>' + card(rows) + '</section>';
   // Compact one-line list row for a team: rank, average (team scale), flag + name, games played on the right
   const teamLine = (x, rank, withFlag, act) => {
     const inner = '<span class="pos">' + rank + '</span><span class="chip small ' + atier(x.avg) + '">' + x.avg.toFixed(1) + '</span>' +
@@ -1025,22 +1046,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       (nav.ahead ? ph1 : lb) +
       '<button type="button" class="sq" data-act="next" aria-label="Next ' + nav.what + '"' + (nav.canNext ? '' : ' disabled') + '>' + ICON.next + '</button></div>';
   };
-  // Match count next to the league name: played matches only ("51 m."), or "49 to come" when none is played yet
-  const cnt = (ms) => { const p = ms.filter((m) => m.rt != null).length, u = ms.length - p; return !p && u ? u + ' to come' : p + ' m.'; };
+  // Match count next to the league name: played matches only ("51 matches"), or "49 to come" when none is played yet
+  const cnt = (ms) => { const p = ms.filter((m) => m.rt != null).length, u = ms.length - p; return !p && u ? u + ' to come' : p + (p === 1 ? ' match' : ' matches'); };
   const roundOf = (m) => RN[m.c] + ' ' + m.r;
-  // The round(s) a 7-day window of one league stands for. Every match keeps the round it was originally assigned to; a round counts
-  // when the window has one of its matches played within 4 days of the round's middle date, so a postponed match played weeks later
-  // doesn't add its round, while a round split over two windows shows in both. "Round 14", "Rounds 6 & 7", '' when none.
-  function roundsLabel(c, ms) {
-    const all = D.concat(ORDER.flatMap((x) => openFixtures(x)).filter((m) => !D.includes(m))).filter((m) => m.c === c && m.d && m.r != null);
-    const mid = {};
-    Array.from(new Set(all.map((m) => m.r))).forEach((r) => { const ds = all.filter((m) => m.r === r).map((m) => m.d).sort(); mid[r] = ds[Math.floor((ds.length - 1) / 2)]; });
-    const near = (m) => Math.abs(dt(m.d) - dt(mid[m.r])) <= 4 * DAYMS;
-    const rs = Array.from(new Set(ms.filter((m) => m.c === c && m.d && m.r != null && near(m)).map((m) => m.r))).sort((a, b) => a - b);
-    if (!rs.length) return '';
-    return rs.length === 1 ? RN[c] + ' ' + rs[0] : RN[c] + 's ' + rs.slice(0, -1).join(', ') + ' & ' + rs[rs.length - 1];
-  }
-
   const allDays = () => Array.from(new Set(D.map((m) => m.d))).sort();
   // Days the Day view steps through: days with stored matches plus days with upcoming fixtures
   const dayList = () => Array.from(new Set(allDays().concat(ORDER.flatMap((c) => openFixtures(c)).map((m) => m.d).filter(Boolean)))).sort();
@@ -1081,16 +1089,17 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       const p = md.filter((d) => D.some((m) => m.d === d && m.rt != null)), def = (p.length ? p : md).slice(-1)[0];
       if (st.day == null || !(md.includes(st.day) || (md.length && st.day >= md[0] && st.day <= plusDays(md[md.length - 1], 7)))) st.day = def;
       const days = md.includes(st.day) ? md : md.concat([st.day]).sort();
-      return { days, i: days.indexOf(st.day), from: st.day, to: st.day, label: short(st.day), atDefault: st.day === def };
+      const ms = D.filter((m) => m.d === st.day && inComp(m)).concat(extraFixtures((m) => m.d === st.day && inComp(m)));
+      return { days, i: days.indexOf(st.day), from: st.day, to: st.day, ms, label: short(st.day), atDefault: st.day === def };
     }
     // Seven days are the one way to browse, also with one league picked: the league only filters them. The default is the last seven
     // days up to yesterday; ‹ › move seven days. One step forward shows today and the next six days with their potential.
-    // Empty spans stay. Seven days whose matches are all still to come show them by potential (P.next).
+    // Empty spans stay. Played matches and matches still to come are listed the same way (one list, one sort order).
     if (v === 'matchweek') {
       // A custom period (two days tapped in the calendar) runs from st.from to st.end; ‹ › then move by its own length
       const R = dayRange(), def = lastDay(), to = st.end || def, custom = !!st.from, from = custom ? st.from : plusDays(to, -6);
       const ms = D.filter((m) => m.d >= from && m.d <= to && inComp(m)).concat(extraFixtures((m) => m.d >= from && m.d <= to && inComp(m)));
-      return { from, to, ms, def, canPrev: !!R.first && from > R.first, canNext: !!R.last && to < R.last, custom, next: ms.length > 0 && ms.every((m) => m.rt == null), atDefault: !custom && to === def };
+      return { from, to, ms, def, canPrev: !!R.first && from > R.first, canNext: !!R.last && to < R.last, custom, atDefault: !custom && to === def };
     }
     return {};
   }
@@ -1100,12 +1109,12 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 
   function favorites(v, P) {
     let body = '', count = '';
-    if (v === 'matchweek' && P.next) {
-      // Like for played matches: your teams from every league in the shown period, whatever league is selected below
-      const ms = ORDER.flatMap((c) => openFixtures(c)).filter((m) => isFav(m) && (!P.from || (m.d >= P.from && m.d <= P.to))).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
-      body = ms.length ? card(ms.map((m) => row(m, [], null, true, true))) : '<div class="card"><div class="empty small">' + (FAV.size ? 'No upcoming match of your teams stored yet.' : 'Pick your teams in Favourites.') + '</div></div>';
+    if (v !== 'best') {
+      // Your teams' matches of the shown day or days, played and to come, from every league whatever league is selected below
+      const ms = D.filter((m) => isFav(m) && m.d >= P.from && m.d <= P.to).concat(extraFixtures((m) => isFav(m) && m.d >= P.from && m.d <= P.to)).sort((a, b) => byWhen(a, b));
+      body = ms.length ? card(ms.map((m) => row(m, [], null, true, true))) : '<div class="card"><div class="empty small">' + (FAV.size ? 'None of your favourite teams play ' + (v === 'day' ? 'on this day' : 'in these days') + '.' : 'Pick your teams in Favourites.') + '</div></div>';
       count = cnt(ms);
-    } else if (v === 'best') {
+    } else {
       const rated = D.filter((m) => m.rt != null);
       const parts = [];
       if (st.compact) {
@@ -1133,10 +1142,6 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       if (!st.compact) body = parts.join('') || '<div class="card"><div class="empty">No rated matches for your teams yet.</div></div>';
       const nt = Array.from(FAV).filter((t2) => rated.some((m) => m.h === t2 || m.a === t2)).length;
       count = nt + (nt === 1 ? ' team' : ' teams');
-    } else {
-      const ms = D.filter((m) => isFav(m) && m.d >= P.from && m.d <= P.to).sort((a, b) => a.d < b.d ? -1 : 1);
-      body = ms.length ? card(ms.map((m) => row(m, [roundOf(m), v === 'day' ? '' : short(m.d)], null, true, true))) : '<div class="card"><div class="empty small">' + (FAV.size ? 'None of your favourite teams play ' + (v === 'day' ? 'on this day' : 'in these 7 days') + '.' : 'Pick your teams in Favourites.') + '</div></div>';
-      count = cnt(ms);
     }
     return '<section class="fav"><div class="favhead"><h2 class="label">' + '<svg class="hstar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>' + 'Favourites <span class="favsub">' + esc(count) + '</span></h2>' +
       '<button type="button" class="ghost" data-act="favtoggle" aria-expanded="' + !st.favCollapsed + '" aria-controls="favbody">' + (st.favCollapsed ? 'Show' : 'Hide') + ICON.chev + '</button></div>' +
@@ -1151,19 +1156,20 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 
   // Lists: rated matches by rating, then matches still to come by predicted potential
   const byRatingThenPred = (a, b) => (a.rt == null) - (b.rt == null) || (a.rt != null ? b.rt - a.rt : byPred(a, b));
-  // Day / Week order (sort menu, same choices as the team window). Rating orders keep the matches to come at the end, by potential;
+  // Day / seven-day order (sort menu). Rating orders: the rated matches first, then the matches to come by their prediction, in the
+  // same direction (Highest rated: ratings high to low, then predictions high to low);
   // date orders put them where they fall (kickoff time within a day, rating among played matches of the same day).
   const byWhen = (a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0) || (kickOf(a) < kickOf(b) ? -1 : kickOf(a) > kickOf(b) ? 1 : 0);
   const listSort = () => ({
     high: byRatingThenPred,
-    low: (a, b) => (a.rt == null) - (b.rt == null) || (a.rt != null ? a.rt - b.rt : byPred(a, b)),
+    low: (a, b) => (a.rt == null) - (b.rt == null) || (a.rt != null ? a.rt - b.rt : byPred(b, a)),
     new: (a, b) => byWhen(b, a) || (b.rt ?? -1) - (a.rt ?? -1),
     old: (a, b) => byWhen(a, b) || (b.rt ?? -1) - (a.rt ?? -1),
   })[st.msort] || byRatingThenPred;
 
   function renderDay(P) {
     const d = st.day;
-    const ms = D.filter((m) => m.d === d && inComp(m)).concat(extraFixtures((m) => m.d === d && inComp(m))).sort(listSort());
+    const ms = P.ms.slice().sort(listSort());
     if (!ms.length) return emptyCard('No ' + (st.comp === 'all' ? '' : C[st.comp] + ' ') + 'matches on this day.', true);
     // Every match once, in one list in the chosen order (flag only when all leagues are shown)
     return card(ms.map((m) => row(m, [], null, st.comp === 'all', true)));
@@ -1176,20 +1182,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       [3, 2].map((l) => '<span class="chip pot p' + l + '" role="img" aria-label="' + POT[l] + '">' + bolt(l) + '</span>&nbsp;' + n[l] + ' ' + (l === 3 ? 'high' : 'medium')).join(' <span class="sep">·</span> ') + ' <span class="sep">·</span> ' + n[1] + ' low</span>';
   };
 
-  // A week with only matches to come: best predicted first; all leagues get the top pick of each league, then one section per league
-  function renderNext(P) {
-    const ms = P.ms.slice().sort(byPred);
-    if (st.comp !== 'all') return card(ms.map((m) => row(m, [], null, false, true)));
-    // All leagues: the top pick of each league, then every league's round sorted by potential
-    let h = '';
-    const tops = ORDER.map((c) => ms.find((m) => m.c === c)).filter(Boolean).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : ORDER.indexOf(a.c) - ORDER.indexOf(b.c)));
-    if (tops.length > 1) h += sectionHtml('Top pick per league', tops.map((m) => row(m, [], null, true, true)));
-    ORDER.forEach((c) => { const x = ms.filter((m) => m.c === c), rl = roundsLabel(c, x); if (x.length) h += sectionHtml('<span>' + C[c] + '</span>' + (rl ? ' <span class="favsub">· ' + rl + '</span>' : ''), x.map((m) => row(m, [], null, false, true))); });
-    return h;
-  }
-
   function renderMatchweek(P) {
-    if (P.next) return renderNext(P);
     const ms = P.ms.slice().sort(listSort());
     if (!ms.length) return emptyCard('No ' + (st.comp === 'all' ? '' : C[st.comp] + ' ') + 'matches in these 7 days.', true);
     if (st.msort !== 'new' && st.msort !== 'old') return card(ms.map((m) => row(m, [], null, st.comp === 'all', true)));
@@ -1198,6 +1191,18 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const rows = [];
     ms.forEach((m) => { if (m.d !== last) { last = m.d; rows.push('<div class="dayh">' + short(m.d) + '</div>'); } rows.push(row(m, [], null, st.comp === 'all', true)); });
     return card(rows);
+  }
+
+  // Graph section on top of a Season card (the All-leagues card too), collapsible like the team window's graph
+  const graphSec = (c) => ((c === 'all' ? blockPts() : roundPts(c)).length > 1 ? '<div class="lgsec"><div class="lgh"><span class="cap3">Graph</span><span class="lgr">' + (lgOpen ? '<button type="button" class="ghost tst bxt" data-act="lgbox" aria-pressed="' + st.boxes + '" title="Show the spread of each point as a boxplot"><span class="sw" aria-hidden="true"></span>Boxplots</button>' : '') + '<button type="button" class="ghost tst" data-act="lgsec" aria-expanded="' + lgOpen + '">' + (lgOpen ? 'Hide' : 'Show') + ICON.chev + '</button></span></div><div class="lgb"' + (lgOpen ? '' : ' hidden') + '><div class="tg" data-lg="' + c + '"></div></div></div>' : '');
+  // Season match lists: the sort menu's order, 5 shown, "Show more" adds 5 at a time, "Show fewer" goes back to 5
+  const smore = {};
+  const sCmp = () => ({ high: (a, b) => b.rt - a.rt || (a.d < b.d ? -1 : 1), low: (a, b) => a.rt - b.rt || (a.d < b.d ? -1 : 1), new: (a, b) => (a.d < b.d ? 1 : a.d > b.d ? -1 : b.rt - a.rt), old: (a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : b.rt - a.rt) })[st.ssort];
+  function seasonGames(key, games, flagged) {
+    const ms = games.slice().sort(sCmp()), n = Math.min(ms.length, smore[key] || 5), cur = LSORTS.find((x) => x[0] === st.ssort)[1];
+    const head = '<div class="selh gsh"><div class="cap3 games">Matches</div><button type="button" class="ghost ddb" data-act="lsortmenu" data-id="S|' + key + '" aria-haspopup="menu" aria-expanded="' + (lMenu === 'S|' + key) + '" aria-label="Sort: ' + cur + '">' + ICON_SORT + '<span>' + cur + '</span>' + ICON.chev + '</button>' + (lMenu === 'S|' + key ? sortMenu(st.ssort) : '') + '</div>';
+    const btns = (n < ms.length ? '<button type="button" class="ghost more" data-act="smore" data-id="' + key + '">Show more' + ICON.chev + '</button>' : '') + (n > 5 ? '<button type="button" class="ghost more less" data-act="sless" data-id="' + key + '">Show fewer' + ICON.chev + '</button>' : '');
+    return head + '<div class="rows grows" data-k="' + key + '">' + ms.slice(0, n).map((m) => row(m, [], null, flagged)).join('') + (btns ? '<div class="smb">' + btns + '</div>' : '') + '</div>';
   }
 
   function renderBest() {
@@ -1221,25 +1226,21 @@ header { transform: translateZ(0); backface-visibility: hidden; }
       if (st.compact) {
         // Compact: flat card with "Teams" and "Games" lists, each with its own "Show worst"
         const t = expand(tSort(ranked2(teams)), 'T|' + key, (x) => tRow(x, x.rk, flagged, 'data-act="team" data-id="' + esc(key + '|' + x.c + '|' + x.n) + '" title="' + esc(name(x.n)) + ': all matches"'), true, true);
-        const g = expand(games, 'G|' + key, (m) => row(m, [], null, flagged), true);
-        return '<div class="cap3 games">Teams</div><div class="rows ttab' + t.cls + '">' + tHead() + t.html + '</div>' +
-          '<div class="cap3 games">Matches</div><div class="rows' + g.cls + '">' + g.html + '</div>';
+        return '<div class="cap3 games">Teams</div><div class="rows ttab' + t.cls + '">' + tHead() + t.html + '</div>' + seasonGames(key, games, flagged);
       }
       const t = expand(tSort(ranked2(teams)), 'T|' + key, (x) => tRow(x, x.rk, flagged, 'data-act="team" data-id="' + esc(key + '|' + x.c + '|' + x.n) + '" title="' + esc(name(x.n)) + ': all matches"'), true, true);
-      const g = expand(games, 'G|' + key, (m) => row(m, meta(m), null, flagged), true);
-      return '<div class="cap3 games">Teams</div><div class="rows ttab' + t.cls + '">' + tHead() + t.html + '</div>' +
-        '<div class="cap3 games">Matches</div><div class="rows' + g.cls + '">' + g.html + '</div>';
+      return '<div class="cap3 games">Teams</div><div class="rows ttab' + t.cls + '">' + tHead() + t.html + '</div>' + seasonGames(key, games, flagged);
     };
     // Ties: older game first, so among equally rated games the most recent sits lowest
     const ranked = (ms) => ms.slice().sort((a, b) => b.rt - a.rt || (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
     // League average: mean match rating, shown in the card header as a rating box (two decimals, the leagues sit close together)
     const lavg = (ms) => { if (!ms.length) return ''; const a = ms.reduce((s2, m) => s2 + m.rt, 0) / ms.length; return '<span class="lavg" title="League average rating"><span class="chip small ' + tier(a) + '">' + a.toFixed(2) + '</span></span>'; };
     if (st.comp === 'all') {
-      h += '<section class="card league overall"><h3>All leagues' + lavg(rated) + '</h3>' + box('all', teamTable(rated), ranked(rated), true, (m) => [short(m.d)], (m) => dm(m.d)) + '</section>';
+      h += '<section class="card league overall"><h3>All leagues' + lavg(rated) + '</h3>' + graphSec('all') + box('all', teamTable(rated), ranked(rated), true, (m) => [short(m.d)], (m) => dm(m.d)) + '</section>';
     }
     leagues.forEach((c) => {
       const ms = rated.filter((m) => m.c === c);
-      h += '<section class="card league"><h3>' + label(c) + lavg(ms) + '</h3>' + (roundPts(c).length > 1 ? '<div class="lgsec"><div class="lgh"><span class="cap3">Graph</span><button type="button" class="ghost tst" data-act="lgsec" aria-expanded="' + lgOpen + '">' + (lgOpen ? 'Hide' : 'Show') + ICON.chev + '</button></div><div class="lgb"' + (lgOpen ? '' : ' hidden') + '><div class="tg" data-lg="' + c + '"></div></div></div>' : '') + box(c, teamTable(ms), ranked(ms), false, (m) => [short(m.d), roundOf(m)], (m) => RS[m.c] + m.r) + '</section>';
+      h += '<section class="card league"><h3>' + label(c) + lavg(ms) + '</h3>' + graphSec(c) + box(c, teamTable(ms), ranked(ms), false, (m) => [short(m.d), roundOf(m)], (m) => RS[m.c] + m.r) + '</section>';
     });
     return h + '</div>';
   }
@@ -1266,24 +1267,22 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   const INFO = {
     day: SECS('Every match of the selected day, highest rated first – the sort button changes the order.<br>' + RATED, KEY,
       '<b class="ih">Navigation:</b><br>‹ › move one day back or forward.<br>' + JUMP(true) + ' ' + JUMP(false) + ' jumps back to the current day.', TAPKEY),
-    matchweek: SECS('Every match of the last seven days (up to yesterday, all rated), highest rated first – the sort button changes the order. Pick a league to see only its matches.<br>' + RATED, KEY,
-      '<b class="ih">Navigation:</b><br>‹ › move seven days back or forward.<br>' + JUMP(true) + ' ' + JUMP(false) + ' jumps back to the last seven days.<br>Move forward to see the next seven days’ matches (from today) and their potential to be worth watching.<br>In the calendar, tap a day to see just that day, then a second day to see the period in between (up to ten days).', TAPKEY),
-    // Next week (predictions)
-    next: SECS('All upcoming matches of these seven days, most promising first. Pick a league to see only its matches.<br>Upcoming matches get a prediction instead of a rating.', POTKEY,
-      '<b class="ih">Navigation:</b><br>‹ › move seven days back or forward.<br>' + JUMP(true) + ' ' + JUMP(false) + ' jumps back to the last seven days.'),
-    best: SECS('Teams, ranked by how watchable their matches are:<br><b>#</b> = rank in the league<br><b>M</b> = matches played<br><b>RNG</b> = range, best minus worst match rating (high = unpredictable, low = consistent)<br><b>AVG</b> = average rating of all their matches.', 'The graph shows each round’s average match rating – tap a point to see it. Postponed matches count towards their own round.')
+    matchweek: SECS('Every match of the shown days, highest rated first – the sort button changes the order. The default is the last seven days up to yesterday, all rated; matches still to come show their potential instead of a rating. Pick a league to see only its matches.<br>' + RATED, KEY,
+      '<b class="ih">Navigation:</b><br>‹ › move seven days back or forward.<br>' + JUMP(true) + ' ' + JUMP(false) + ' jumps back to the last seven days.<br>Move forward to see the next seven days’ matches (from today) and their potential to be worth watching.<br>In the calendar, tap a day to see just that day, then a second day to see the period in between (up to 14 days).', TAPKEY),
+    best: SECS('Teams, ranked by how watchable their matches are:<br><b>#</b> = rank in the league<br><b>M</b> = matches played<br><b>RNG</b> = range, best minus worst match rating (high = unpredictable, low = consistent)<br><b>AVG</b> = average rating of all their matches.', 'The graph shows each round’s average match rating (for all leagues: each block of seven days) – tap a point to see it, tap it again for its matches. With Boxplots on, each point also shows its spread: the box holds the middle half of the matches, the line in it is the median and the whiskers reach from the lowest to the highest rating. Postponed matches count towards their own round.', 'Swipe left or right to move between the leagues.')
   };
-  // The sort menu only belongs to the played-match lists (Day, Week); Next week stays ordered by potential
-  let lMenu = false;
+  // Sort menu of the match lists (Day, seven days, and each league's matches in Season). lMenu = which one is open: 'm' (Matches tab) or 'S|<card>'
+  let lMenu = false; // false, 'm' or 'S|<card>'
   const sortBtn = (v, P) => {
-    if (!(v === 'day' || (v === 'matchweek' && !P.next))) return '';
+    if (!(v === 'day' || v === 'matchweek')) return '';
     const cur = LSORTS.find((x) => x[0] === st.msort)[1];
-    return '<button type="button" class="ghost ddb" data-act="lsortmenu" aria-haspopup="menu" aria-expanded="' + lMenu + '" aria-label="Sort: ' + cur + '">' + ICON_SORT + '<span>' + cur + '</span>' + ICON.chev + '</button>' +
-      (lMenu ? '<div class="lmdim"></div><div class="menu" role="menu">' + LSORTS.map(([k, l]) => '<button type="button" role="menuitemradio" aria-checked="' + (k === st.msort) + '" data-act="lsortby" data-id="' + k + '"><span class="ck">' + (k === st.msort ? '✓' : '') + '</span>' + l + '</button>').join('') + '</div>' : '');
+    return '<button type="button" class="ghost ddb" data-act="lsortmenu" aria-haspopup="menu" aria-expanded="' + (lMenu === 'm') + '" aria-label="Sort: ' + cur + '">' + ICON_SORT + '<span>' + cur + '</span>' + ICON.chev + '</button>' +
+      (lMenu === 'm' ? sortMenu(st.msort) : '');
   };
+  const sortMenu = (curK) => '<div class="lmdim"></div><div class="menu" role="menu">' + LSORTS.map(([k, l]) => '<button type="button" role="menuitemradio" aria-checked="' + (k === curK) + '" data-act="lsortby" data-id="' + k + '"><span class="ck">' + (k === curK ? '✓' : '') + '</span>' + l + '</button>').join('') + '</div>';
   const sectionHead = (v, P) => '<div class="favhead sect"><h2 class="label">' + (v === 'best' ? 'League' : 'Matches') + '</h2><span class="hacts">' +
     '<button type="button" class="ghost info" data-act="info" aria-expanded="' + infoOpen + '" aria-controls="infobox" aria-label="About this tab" title="About this tab">' + ICON.info + '</button></span>' +
-    (infoOpen ? '<div class="hdim idim"></div><div class="infobox bubble" id="infobox" role="dialog" aria-label="About this tab">' + INFO[v === 'matchweek' && P && P.next ? 'next' : v] + '</div>' : '') + '</div>';
+    (infoOpen ? '<div class="hdim idim"></div><div class="infobox bubble" id="infobox" role="dialog" aria-label="About this tab">' + INFO[v] + ((v === 'day' || v === 'matchweek') && P && P.ms && P.ms.some((m) => m.rt == null) ? SECS(POTKEY) : '') + '</div>' : '') + '</div>';
 
   // ---- Team popup (tap a team in the Season table) ----
   let pop = null, popY = 0, popSort = 'new', popMenu = false, popList = 0;
@@ -1298,7 +1297,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (old) popList = old.scrollTop;
     document.documentElement.classList.toggle('popopen', !!pop);
     if (!pop) { box.innerHTML = ''; return; }
-    if (pop.startsWith('round|')) { renderRound(box); return; }
+    if (pop.startsWith('round|') || pop.startsWith('days|')) { renderRound(box); return; }
     const [, c, ...rest] = pop.split('|'), n = rest.join('|');
     const rated = D.filter((m) => m.c === c && m.rt != null), table = ranked2(teamTable(rated)), me = table.find((x) => x.n === n);
     if (!me) { pop = null; box.innerHTML = ''; document.documentElement.classList.remove('popopen'); return; }
@@ -1326,11 +1325,11 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   }
   // Ratings graph (team window, Season league cards): one dot per item, oldest left; the 10 most recent fill the width, older ones
   // are reached by scrolling left. Grey bands hint at the rating zones (8.5 / 7 / 4); dots take the rating colour. The tapped dot's
-  // bubble floats above everything. S keeps the state between redraws: sel (tapped item), scroll (strip position, saved on every
-  // scroll so a redraw never moves the strip), draw (play the draw-in once).
+  // bubble floats above everything. S keeps the state between redraws: sel (tapped item) and scroll (strip position, saved on every
+  // scroll so a redraw never moves the strip). No draw-in animation.
   // items: [{ id, v (rating), xl (x-axis label), aria }]; o: { act (button action), bubble(item) → bubble content }
   const YMIN = 2.5; // y axis starts at 2.5 (no match has been rated lower); a lower rating sits on the bottom line
-  const TG = { sel: null, scroll: null, draw: false }; // team window
+  const TG = { sel: null, scroll: null }; // team window
   function plotGraph(el, items, S, o) {
     if (!el) return;
     const W = el.clientWidth || 340, H = 173, pt = 6, pb = 24, pl = 14, pr = 12, ih = H - pt - pb, n = items.length;
@@ -1338,7 +1337,15 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const X = (i) => (n === 1 ? W / 2 : pl + step * i), Y = (v) => pt + ih * (1 - (Math.max(YMIN, v) - YMIN) / (10 - YMIN));
     let g = '<svg class="tgsvg" width="' + CW + '" height="' + H + '" aria-hidden="true">';
     [[8.5, 10, 'z1'], [7, 8.5, 'z2'], [4, 7, 'z3']].forEach(([a, b, z]) => { g += '<rect class="' + z + '" x="0" y="' + Y(b) + '" width="' + CW + '" height="' + (Y(a) - Y(b)) + '"/>'; });
-    [YMIN, 4, 7, 8.5, 10].forEach((v) => { g += '<line class="gl" x1="0" x2="' + CW + '" y1="' + Y(v) + '" y2="' + Y(v) + '"/>'; });
+    g += '<line class="gax" x1="0" x2="' + CW + '" y1="' + Y(YMIN) + '" y2="' + Y(YMIN) + '"/>'; // x axis (the zone lines stay off)
+    // League graphs (when switched on): a quiet boxplot per point behind the line – whiskers from the lowest to the highest rating, the
+    // box from the lower to the upper quartile, a line at the median; the dot stays the average
+    const bw = Math.max(6, Math.min(16, step * 0.42));
+    if (o.boxes) items.forEach((m, i) => { const b = m.box; if (!b) return; const x = X(i), l = (x - bw / 2).toFixed(1), r = (x + bw / 2).toFixed(1), cl = (x - bw / 4).toFixed(1), cr = (x + bw / 4).toFixed(1);
+      g += '<g class="bx"><line class="bw" x1="' + x.toFixed(1) + '" x2="' + x.toFixed(1) + '" y1="' + Y(b.max).toFixed(1) + '" y2="' + Y(b.min).toFixed(1) + '"/>' +
+        '<line class="bw" x1="' + cl + '" x2="' + cr + '" y1="' + Y(b.max).toFixed(1) + '" y2="' + Y(b.max).toFixed(1) + '"/><line class="bw" x1="' + cl + '" x2="' + cr + '" y1="' + Y(b.min).toFixed(1) + '" y2="' + Y(b.min).toFixed(1) + '"/>' +
+        '<rect class="bb" x="' + l + '" width="' + bw.toFixed(1) + '" y="' + Y(b.q3).toFixed(1) + '" height="' + Math.max(1, Y(b.q1) - Y(b.q3)).toFixed(1) + '" rx="2"/>' +
+        '<line class="bm" x1="' + l + '" x2="' + r + '" y1="' + Y(b.med).toFixed(1) + '" y2="' + Y(b.med).toFixed(1) + '"/></g>'; });
     if (n > 1) g += '<polyline class="gp" points="' + items.map((m, i) => X(i).toFixed(1) + ',' + Y(m.v).toFixed(1)).join(' ') + '"/>';
     const dc = (r) => (r >= 8.5 ? 'd1' : r >= 7 ? 'd2' : r >= 4 ? 'd3' : 'dr');
     items.forEach((m, i) => { g += '<circle class="gd ' + dc(m.v) + '" data-i="' + i + '" cx="' + X(i).toFixed(1) + '" cy="' + Y(m.v).toFixed(1) + '" r="4.5"/>'; if (m.id === S.sel) g += '<circle class="gring" cx="' + X(i).toFixed(1) + '" cy="' + Y(m.v).toFixed(1) + '" r="9"/>'; });
@@ -1353,18 +1360,17 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const bb = el.querySelector('.gbub');
     // The bubble lives outside the scrolling strip (so it is never clipped); it follows the dot when scrolling. The strip itself
     // stays where it is when a dot is tapped.
-    const place = () => { if (!bb) return; const x = X(si) - sc.scrollLeft, y = Y(items[si].v), bw = bb.offsetWidth, bh = bb.offsetHeight, below = y - bh - 14 < -34;
+    const place = () => { if (!bb) return; const x = X(si) - sc.scrollLeft, y = Y(items[si].v), bw = bb.offsetWidth, bh = bb.offsetHeight, below = y - bh - 14 < (o.boxes != null ? 0 : -34); // league graphs: never over the header with the Boxplots switch
       const left = Math.max(0, Math.min(el.clientWidth - bw, x - bw / 2));
       bb.style.left = left + 'px'; bb.style.top = (below ? y + 14 : y - bh - 14) + 'px'; bb.classList.toggle('below', below);
       bb.querySelector('.gbt').style.left = Math.max(10, Math.min(bw - 22, x - left - 6)) + 'px'; bb.style.visibility = x < -4 || x > W + 4 ? 'hidden' : ''; };
     place();
     const fade = () => el.classList.toggle('fadel', sc.scrollLeft > 2);
     fade(); sc.addEventListener('scroll', () => { S.scroll = sc.scrollLeft; fade(); place(); }, { passive: true });
-    if (S.draw) { S.draw = false; drawIn(el, items.map((m, i) => [X(i), Y(m.v)]), n); }
   }
   // Team window graph: the team's rated matches, oldest left; the bubble names the opponent; tapping it again opens the match
   function teamGraph() {
-    if (!pop || !gOpen || pop.startsWith('round|')) return;
+    if (!pop || !gOpen || pop.startsWith('round|') || pop.startsWith('days|')) return;
     const [, c, ...rest] = pop.split('|'), team = rest.join('|');
     const ms = D.filter((m) => m.c === c && m.rt != null && (m.h === team || m.a === team)).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
     const byId = new Map(ms.map((m) => [m.id, m]));
@@ -1376,46 +1382,60 @@ header { transform: translateZ(0); backface-visibility: hidden; }
   }
   // Season league graph: one point per round = the average rating of its matches (by their real round, so postponed matches
   // count towards their own round). Same scale, bands and colours as the team graph.
-  const LG = {}, lgS = (c) => (LG[c] = LG[c] || { sel: null, scroll: null, draw: true });
+  const LG = {}, lgS = (c) => (LG[c] = LG[c] || { sel: null, scroll: null });
   let lgOpen = true;
+  // All leagues: one point per 7-day block ending yesterday, 7 days earlier, … (the Matches tab's "Last seven days" and the blocks before)
+  const blockPts = () => {
+    const rated = D.filter((m) => m.rt != null); if (!rated.length) return [];
+    const last = lastDay(), first = rated.map((m) => m.d).sort()[0], out = [];
+    for (let to = last; to >= first || out.length === 0; to = plusDays(to, -7)) {
+      const from = plusDays(to, -6), ms = rated.filter((m) => m.d >= from && m.d <= to);
+      if (ms.length) out.unshift({ id: 'all|' + from, from, to, v: ms.reduce((x, m) => x + m.rt, 0) / ms.length, n: ms.length, box: quart(ms.map((m) => m.rt)) });
+      if (to < first) break;
+    }
+    return out;
+  };
+  // Spread of a set of ratings for the boxplots: lowest, lower quartile, median, upper quartile, highest
+  const quart = (vs) => { const a = vs.slice().sort((x, y) => x - y), q = (f) => { const i = (a.length - 1) * f, lo = Math.floor(i); return a[lo] + (a[Math.ceil(i)] - a[lo]) * (i - lo); };
+    return { min: a[0], q1: q(0.25), med: q(0.5), q3: q(0.75), max: a[a.length - 1] }; };
   const roundPts = (c) => { const by = {}; D.forEach((m) => { if (m.c === c && m.rt != null && m.r != null) (by[m.r] = by[m.r] || []).push(m); });
     return Object.keys(by).map(Number).sort((a, b) => a - b).map((r) => { const ms = by[r], ds = ms.map((m) => m.d).sort();
-      return { id: c + '|' + r, r, v: ms.reduce((x, m) => x + m.rt, 0) / ms.length, n: ms.length, from: ds[0], to: ds[ds.length - 1] }; }); };
+      return { id: c + '|' + r, r, v: ms.reduce((x, m) => x + m.rt, 0) / ms.length, n: ms.length, from: ds[0], to: ds[ds.length - 1], box: quart(ms.map((m) => m.rt)) }; }); };
+  // Under the average in a league bubble: the spread behind the boxplot
+  const spreadLine = (p) => p.box && st.boxes ? '<span class="gbd">median ' + p.box.med.toFixed(1) + ' · middle half ' + p.box.q1.toFixed(1) + '–' + p.box.q3.toFixed(1) + ' · range ' + p.box.min.toFixed(1) + '–' + p.box.max.toFixed(1) + '</span>' : '';
   function leagueGraph(c) {
+    if (c === 'all') {
+      const pts = blockPts();
+      plotGraph(document.querySelector('.lgb .tg[data-lg="all"]'), pts.map((p) => { const d = dt(p.from); return { ...p, xl: d.getUTCDate() + ' ' + MON[d.getUTCMonth()], aria: span(p.from, p.to) + ': average ' + p.v.toFixed(2) + ', ' + p.n + ' matches' }; }), lgS('all'), { act: 'lgdot', boxes: st.boxes, bubble: (p) =>
+        '<span class="gbd">' + span(p.from, p.to) + '</span><span class="gbm"><span>' + p.n + (p.n === 1 ? ' match' : ' matches') + '</span><span class="chip small ' + tier(p.v) + '" title="Average rating">' + p.v.toFixed(2) + '</span></span>' + spreadLine(p) });
+      return;
+    }
     const pts = roundPts(c);
-    plotGraph(document.querySelector('.lgb .tg[data-lg="' + c + '"]'), pts.map((p) => ({ ...p, xl: RS[c] + p.r, aria: RN[c] + ' ' + p.r + ': average ' + p.v.toFixed(2) + ', ' + p.n + (p.n === 1 ? ' match' : ' matches') })), lgS(c), { act: 'lgdot', bubble: (p) =>
+    plotGraph(document.querySelector('.lgb .tg[data-lg="' + c + '"]'), pts.map((p) => ({ ...p, xl: RS[c] + p.r, aria: RN[c] + ' ' + p.r + ': average ' + p.v.toFixed(2) + ', ' + p.n + (p.n === 1 ? ' match' : ' matches') })), lgS(c), { act: 'lgdot', boxes: st.boxes, bubble: (p) =>
       '<span class="gbd">' + RN[c] + ' ' + p.r + ' · ' + (p.from === p.to ? dm(p.from) : span(p.from, p.to)) + '</span>' +
-      '<span class="gbm"><span>' + p.n + (p.n === 1 ? ' match' : ' matches') + '</span><span class="chip small ' + tier(p.v) + '" title="Average rating">' + p.v.toFixed(2) + '</span></span>' });
+      '<span class="gbm"><span>' + p.n + (p.n === 1 ? ' match' : ' matches') + '</span><span class="chip small ' + tier(p.v) + '" title="Average rating">' + p.v.toFixed(2) + '</span></span>' + spreadLine(p) });
   }
   const leagueGraphs = () => document.querySelectorAll('.lgb .tg[data-lg]').forEach((el) => leagueGraph(el.dataset.lg));
-  // Draw-in: the line grows from left to right over the 10 most recent matches (older ones are already there), each dot pops in
-  // as the line reaches it. Skipped when the phone asks for reduced motion.
-  function drawIn(el, pts, n) {
-    if (!moving()) return;
-    const k0 = Math.max(0, n - 10), cum = [0]; for (let i = 1; i < n; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
-    const L = cum[n - 1] || 0, L0 = cum[k0] || 0, DUR = 750, span = Math.max(1, L - L0);
-    const pl = el.querySelector('.gp');
-    if (pl && L > 0) { pl.style.strokeDasharray = L + ' ' + L; anim(pl, [{ strokeDashoffset: L - L0 }, { strokeDashoffset: 0 }], { duration: DUR, easing: 'cubic-bezier(.4,0,.2,1)' }); }
-    el.querySelectorAll('.gd').forEach((c) => { const i = +c.dataset.i; if (i < k0) return;
-      anim(c, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.25)', opacity: 1, offset: 0.7 }, { transform: 'scale(1)', opacity: 1 }], { duration: 260, delay: n === 1 ? 0 : ((cum[i] - L0) / span) * DUR * 0.92, fill: 'backwards' }); });
-  }
   // Round window (from the Season graph): every rated match of the round, by its original round number (postponed ones included),
   // built like the team window; header = round, league, dates and the round's average
   function renderRound(box) {
-    const [, c, rs] = pop.split('|'), r = +rs, all = D.filter((m) => m.c === c && m.r === r && m.rt != null);
+    // 'round|<league>|<round>' or 'days|all|<first day>' (seven days of all leagues, from the All-leagues graph)
+    const [kind, c, rs] = pop.split('|'), blk = kind === 'days', r = +rs;
+    const all = blk ? D.filter((m) => m.rt != null && m.d >= rs && m.d <= plusDays(rs, 6)) : D.filter((m) => m.c === c && m.r === r && m.rt != null);
     if (!all.length) { pop = null; box.innerHTML = ''; document.documentElement.classList.remove('popopen'); return; }
     const cmp = { new: (a, b) => (a.d < b.d ? 1 : a.d > b.d ? -1 : b.rt - a.rt), old: (a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : b.rt - a.rt), high: (a, b) => b.rt - a.rt || (a.d < b.d ? -1 : 1), low: (a, b) => a.rt - b.rt || (a.d < b.d ? -1 : 1) }[popSort];
     const ms = all.slice().sort(cmp), ds = all.map((m) => m.d).sort(), avg = all.reduce((x, m) => x + m.rt, 0) / all.length;
     const cur = SORTS.find((x) => x[0] === popSort)[1];
-    let h = '<div class="tdim" data-close="1"></div><div class="tpop" role="dialog" aria-label="' + esc(C[c] + ', ' + RN[c] + ' ' + r) + '">' +
-      '<div class="tph"><div><div class="tpn"><span>' + RN[c] + ' ' + r + '</span><span class="chip ' + tier(avg) + '" title="Average rating">' + avg.toFixed(2) + '</span></div>' +
-      '<div class="tpl">' + FLAG[c] + '<span>' + C[c] + ' · ' + (ds[0] === ds[ds.length - 1] ? dm(ds[0]) : span(ds[0], ds[ds.length - 1])) + '</span></div></div>' +
+    const title = blk ? span(rs, plusDays(rs, 6)) : RN[c] + ' ' + r;
+    let h = '<div class="tdim" data-close="1"></div><div class="tpop" role="dialog" aria-label="' + esc(blk ? 'All leagues, ' + title : C[c] + ', ' + title) + '">' +
+      '<div class="tph"><div><div class="tpn"><span>' + title + '</span><span class="chip ' + tier(avg) + '" title="Average rating">' + avg.toFixed(2) + '</span></div>' +
+      '<div class="tpl">' + (blk ? '<span>All leagues</span>' : FLAG[c] + '<span>' + C[c] + ' · ' + (ds[0] === ds[ds.length - 1] ? dm(ds[0]) : span(ds[0], ds[ds.length - 1])) + '</span>') + '</div></div>' +
       '<button type="button" class="tpx" data-act="tclose" aria-label="Close" title="Close">✕</button></div>' +
       '<div class="tpb"><section class="tsec"><div class="tsh"><h2 class="label">Matches <span class="favsub">' + ms.length + '</span></h2><div class="tshr"><div class="dd">' +
       '<button type="button" class="ddb" data-act="tsortmenu" aria-haspopup="menu" aria-expanded="' + popMenu + '" aria-label="Sort: ' + cur + '">' + ICON_SORT + '<span>' + cur + '</span>' + ICON.chev + '</button>' +
       (popMenu ? '<div class="mdim"></div><div class="menu" role="menu">' + SORTS.map(([k, l]) => '<button type="button" role="menuitemradio" aria-checked="' + (k === popSort) + '" data-act="tsortby" data-id="' + k + '"><span class="ck">' + (k === popSort ? '✓' : '') + '</span>' + l + '</button>').join('') + '</div>' : '') +
       '</div></div></div><div id="tsl" class="tplist">';
-    ms.forEach((m) => { h += '<div class="tmr"><div class="mt">' + short(m.d) + '</div>' + row(m, [], null, false) + '</div>'; });
+    ms.forEach((m) => { h += '<div class="tmr"><div class="mt">' + short(m.d) + (blk ? ' · ' + C[m.c] + ' · ' + RN[m.c] + ' ' + m.r : '') + '</div>' + row(m, [], null, blk) + '</div>'; });
     box.innerHTML = h + '</div></section></div></div>';
     placePop();
     const body = box.querySelector('.tpb'); if (body) body.scrollTop = popList;
@@ -1428,7 +1448,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     p.style.bottom = (window.innerHeight - (tb ? tb.getBoundingClientRect().top : window.innerHeight) + 8) + 'px';
   }
   function openPop(id) {
-    pop = id; popSort = id.startsWith('round|') ? 'high' : 'new'; popMenu = false; popList = 0; gOpen = true; lOpen = true; TG.sel = null; TG.scroll = null; TG.draw = true;
+    pop = id; popSort = id.startsWith('round|') || id.startsWith('days|') ? 'high' : 'new'; popMenu = false; popList = 0; gOpen = true; lOpen = true; TG.sel = null; TG.scroll = null;
     renderPop();
     anim(document.querySelector('.tdim'), [{ opacity: 0 }, { opacity: 1 }], { duration: 220 });
     anim(document.querySelector('.tpop'), [{ opacity: 0, transform: 'translateY(24px)' }, { opacity: 1, transform: 'none' }], { duration: 300, delay: 40, fill: 'backwards' });
@@ -1492,22 +1512,26 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     let h = '<div class="ch"><button type="button" class="cb" data-act="calmonth" data-id="-1" aria-label="Previous month"' + (firstIso <= R.from ? ' disabled' : '') + '>' + ICON.prev + '</button><b>' + MONL[calMonth.m] + ' ' + calMonth.y + '</b>' +
       '<button type="button" class="cb" data-act="calmonth" data-id="1" aria-label="Next month"' + (lastIso >= R.last ? ' disabled' : '') + '>' + ICON.next + '</button></div>';
     h += '<div class="wh">' + ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((x) => '<span>' + x + '</span>').join('') + '</div>';
+    // The outline: the seven days ending on the tapped day and the seven days starting on it (13 days, the tapped day in the middle)
+    const cFrom = calLast ? [plusDays(calLast, -6), R.from].sort()[1] : null, cTo = calLast ? [plusDays(calLast, 6), R.last].sort()[0] : null;
     for (let w = monday(firstIso); w <= lastIso; w = plusDays(w, 7)) {
       h += '<div class="wk">';
       for (let i = 0; i < 7; i++) {
-        // With a starting day picked, only days that make a period of at most ten days can be tapped
-        const d = plusDays(w, i), ok = d >= R.from && d <= R.last && (!calLast || (d >= plusDays(calLast, -9) && d <= plusDays(calLast, 9)));
-        const cls = ['c', d.slice(5, 7) !== firstIso.slice(5, 7) && !(calLast && ok) ? 'out' : '', rated.has(d) ? 'has' : fxd.has(d) ? 'fx' : oRated.has(d) ? 'oth' : oFx.has(d) ? 'ofx' : '', d === today ? 'today' : '', d === selDay ? 'sel' : '', selFrom && d >= selFrom && d <= selTo ? 'rng' + (d === selFrom ? ' rs' : '') + (d === selTo ? ' re' : '') : ''].filter(Boolean).join(' ');
+        // With a starting day picked, only days up to 13 days before or after it can be tapped (a period has at most 14 days)
+        const d = plusDays(w, i), ok = d >= R.from && d <= R.last && (!calLast || (d >= plusDays(calLast, -13) && d <= plusDays(calLast, 13)));
+        const cls = ['c', d.slice(5, 7) !== firstIso.slice(5, 7) && !(calLast && ok) ? 'out' : '', rated.has(d) ? 'has' : fxd.has(d) ? 'fx' : oRated.has(d) ? 'oth' : oFx.has(d) ? 'ofx' : '', d === today ? 'today' : '', d === selDay ? 'sel' : '', selFrom && d >= selFrom && d <= selTo ? 'rng' + (d === selFrom ? ' rs' : '') + (d === selTo ? ' re' : '') : '',
+          // After the first tap: an outlined band over the seven days either side of the tapped day, the tapped day included
+          calLast && ok && d >= cFrom && d <= cTo ? 'cnd' + (d === cFrom ? ' cs' : '') + (d === cTo ? ' ce' : '') : ''].filter(Boolean).join(' ');
         h += '<button type="button" class="' + cls + '" data-act="calday" data-id="' + d + '"' + (ok ? '' : ' disabled') + ' aria-label="' + long(d) + '">' + (+d.slice(8)) + '</button>';
       }
       h += '</div>';
     }
     h += '<div class="cleg"><span><i></i>rated</span><span><i class="fx"></i>to come</span>' + (st.comp === 'all' ? '' : '<span><i class="oth"></i>other leagues</span>') + '<span><i class="td"></i>today</span></div>';
-    h += '<div class="cnote">' + (calLast ? 'Tap a day up to nine days away for the period from ' + short(calLast).replace(/ \w+$/, '') + '<br>or ' + short(calLast).replace(/ \w+$/, '') + ' again to start over' : 'Tap a day to see it<br>then a second one for up to ten days') + '</div>';
+    h += '<div class="cnote">' + (calLast ? 'Tap a day up to 13 days away for the period from ' + short(calLast).replace(/ \w+$/, '') + '<br>or ' + short(calLast).replace(/ \w+$/, '') + ' again to start over' : 'Tap a day to see it<br>then a second one for a period') + '</div>';
     return h;
   }
-  // First tap: just that day (Day view). A second, different day within nine days of it (also in another month, while the calendar
-  // is open): the period between the two, at most ten days. The same day again drops the starting point (the day stays shown).
+  // First tap: just that day (Day view). A second, different day up to 13 days before or after it (at most 14 days in all) (also in another month, while the
+  // calendar is open): the period between the two. The seven days either side of the first day are outlined as the natural choice. The same day again drops the starting point (the day stays shown).
   // After a period, the next tap is a single day again.
   function calPick(d) {
     const period = calLast && calLast !== d;
@@ -1712,6 +1736,7 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     else if (act === 'prev' || act === 'next') {
       const step = act === 'prev' ? -1 : 1;
       if (v === 'day') { const ds = dayList(); const nx = step > 0 ? ds.find((d) => d > st.day) : ds.slice().reverse().find((d) => d < st.day); if (nx) st.day = nx; }
+      else if (v === 'best') { const sl = ['all'].concat(comps()), i = sl.indexOf(st.comp) + step; if (sl[i]) { st.comp = sl[i]; savePrefs(); } }
       else if (v === 'matchweek') { const P = resolve(v); if (step < 0 ? P.canPrev : P.canNext) { const len = Math.round((dt(P.to) - dt(P.from)) / DAYMS) + 1; st.end = plusDays(P.to, len * step); if (st.from) st.from = plusDays(P.from, len * step); } if (!st.from && st.end === lastDay()) st.end = null; }
     }
   }
@@ -1802,16 +1827,21 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     if (act === 'tclose') { closePop(); return; }
     if (act === 'tsec') {
       const isG = id === 'g', open = isG ? gOpen : lOpen, body = document.getElementById(isG ? 'tsg' : 'tsl');
-      const done = () => { if (isG) { gOpen = !open; TG.sel = null; TG.scroll = null; if (gOpen) TG.draw = true; } else { lOpen = !open; popMenu = false; } renderPop();
+      const done = () => { if (isG) { gOpen = !open; TG.sel = null; TG.scroll = null; } else { lOpen = !open; popMenu = false; } renderPop();
         const f = document.querySelector('[data-act="tsec"][data-id="' + id + '"]'); if (f) f.focus({ preventScroll: true });
         if (!open) grow(document.getElementById(isG ? 'tsg' : 'tsl'), 280); };
       if (open) shrink([body], done); else done();
       return;
     }
     if (act === 'gdot') { if (TG.sel === id) { openMatch(id); return; } TG.sel = id; teamGraph(); return; }
+    // Season graphs: boxplots on / off (all league graphs at once, remembered on the phone)
+    if (act === 'lgbox') { st.boxes = !st.boxes; savePrefs(); keep(() => {}); const f = document.querySelector('[data-act="lgbox"]'); if (f) f.focus({ preventScroll: true }); return; }
+    // Season match lists: 5 more, or back to 5
+    if (act === 'smore' || act === 'sless') { const n0 = document.querySelectorAll('#main .grows[data-k="' + id + '"] > .row').length; smore[id] = act === 'smore' ? (smore[id] || 5) + 5 : 5; keep(() => {});
+      if (act === 'smore') fadeUp(Array.from(document.querySelectorAll('#main .grows[data-k="' + id + '"] > .row')).slice(n0), 30); return; }
     // Season round graph: tap a point for its bubble, tap it again for the round's matches
-    if (act === 'lgdot') { const S = lgS(id.split('|')[0]); if (S.sel === id) { openPop('round|' + id); return; } S.sel = id; leagueGraph(id.split('|')[0]); return; }
-    if (act === 'lgsec') { const body = document.querySelector('.lgb'); const done = () => { lgOpen = !lgOpen; Object.values(LG).forEach((x) => { x.sel = null; if (lgOpen) x.draw = true; }); keep(() => {}); if (lgOpen) document.querySelectorAll('.lgb').forEach((el) => grow(el, 280)); };
+    if (act === 'lgdot') { const S = lgS(id.split('|')[0]); if (S.sel === id) { openPop((id.startsWith('all|') ? 'days|' : 'round|') + id); return; } S.sel = id; leagueGraph(id.split('|')[0]); return; }
+    if (act === 'lgsec') { const body = document.querySelector('.lgb'); const done = () => { lgOpen = !lgOpen; Object.values(LG).forEach((x) => { x.sel = null; }); keep(() => {}); if (lgOpen) document.querySelectorAll('.lgb').forEach((el) => grow(el, 280)); };
       if (lgOpen) shrink(Array.from(document.querySelectorAll('.lgb')), done); else done(); return; }
     if (act === 'tsortmenu') {
       if (!popMenu) { popMenu = true; renderPop(); anim(document.querySelector('.tpop .mdim'), [{ opacity: 0 }, { opacity: 1 }], { duration: 170 }); anim(document.querySelector('.tpop .menu'), [{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 170 }); }
@@ -1833,15 +1863,15 @@ header { transform: translateZ(0); backface-visibility: hidden; }
 
     // Match lists: sort menu (opens like the team window's); picking an order fades the list in again
     if (act === 'lsortmenu') {
-      lMenu = true; keep(() => {});
+      lMenu = id || 'm'; keep(() => {});
       anim(document.querySelector('.lmdim'), [{ opacity: 0 }, { opacity: 1 }], { duration: 170 }); anim(document.querySelector('.selh .menu'), [{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 170 });
       return;
     }
     if (act === 'lsortby') {
       after(anim(document.querySelector('.selh .menu'), [{ opacity: 1 }, { opacity: 0 }], { duration: 110, fill: 'forwards' }), () => {
-        st.msort = id; lMenu = false; savePrefs(); keep(() => {});
-        fadeUp(Array.from(document.querySelectorAll('#main .selsec .card > .row, #main .selsec .card > .dayh')), 20);
-        const f = document.querySelector('[data-act="lsortmenu"]'); if (f) f.focus({ preventScroll: true });
+        const was = lMenu; if (String(was).startsWith('S|')) st.ssort = id; else st.msort = id; lMenu = false; savePrefs(); keep(() => {});
+        fadeUp(Array.from(document.querySelectorAll(String(was).startsWith('S|') ? '#main .grows[data-k="' + was.slice(2) + '"] > .row' : '#main .selsec .card > .row, #main .selsec .card > .dayh')), 20);
+        const f = document.querySelector('[data-act="lsortmenu"]' + (String(was).startsWith('S|') ? '[data-id="' + was + '"]' : ':not([data-id])')); if (f) f.focus({ preventScroll: true });
       });
       return;
     }
@@ -1922,8 +1952,8 @@ header { transform: translateZ(0); backface-visibility: hidden; }
     const area = document.getElementById('wrap');
     area.addEventListener('touchstart', (e) => {
       sw = null;
-      if (pop || hp || mpop || busy || e.touches.length !== 1 || view() === 'best' || view() === 'fav') return;
-      if (e.target.closest('.tpop, .search, input')) return;
+      if (pop || hp || mpop || busy || e.touches.length !== 1 || view() === 'fav') return;
+      if (e.target.closest('.tpop, .search, input, .tgs')) return;
       const el = document.querySelector('#main .slide'); if (!el) return;
       sw = { x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0, on: false, el };
     }, { passive: true });
@@ -1934,7 +1964,9 @@ header { transform: translateZ(0); backface-visibility: hidden; }
         if (Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.6) sw.on = true;
         else { if (Math.abs(dy) > 14) sw = null; return; }
       }
-      const btn = document.querySelector('#dbar [data-act="' + (dx < 0 ? 'next' : 'prev') + '"]'), ok = btn && !btn.disabled;
+      // Season: swipe moves between the league pills (All, then each league); elsewhere between days / periods
+      const btn = document.querySelector('#dbar [data-act="' + (dx < 0 ? 'next' : 'prev') + '"]'), sl = ['all'].concat(comps()), si = sl.indexOf(st.comp) + (dx < 0 ? 1 : -1);
+      const ok = view() === 'best' ? si >= 0 && si < sl.length : btn && !btn.disabled;
       sw.dx = dx; sw.ok = ok;
       if (moving()) { sw.el.style.transform = 'translateX(' + (ok ? dx * 0.6 : dx / 6) + 'px)'; sw.el.style.opacity = String(Math.max(0.5, 1 - Math.abs(dx) / 600)); }
     }, { passive: true });
